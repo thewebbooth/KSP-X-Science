@@ -45,7 +45,7 @@ namespace ScienceChecklist {
 			GameEvents.onGameStateSave.Add(x => ScheduleExperimentUpdate());
 			GameEvents.OnPartPurchased.Add(x => ScheduleExperimentUpdate());
 			GameEvents.OnScienceChanged.Add((x, y) => ScheduleExperimentUpdate());
-			GameEvents.OnScienceRecieved.Add((x, y) => ScheduleExperimentUpdate());
+            GameEvents.OnScienceRecieved.Add((x, y, z) => ScheduleExperimentUpdate());
 		}
 
 		/// <summary>

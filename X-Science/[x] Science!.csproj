@@ -35,12 +35,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\Stock 0.25.0\KSP_Data\Managed\Assembly-CSharp.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\..\KSP-Real\KSP_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>..\..\Stock 0.25.0\KSP_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\..\KSP-Real\KSP_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
     <Reference Include="MiniAVC">
       <HintPath>Libraries\MiniAVC-1.0.2.3\MiniAVC.dll</HintPath>
@@ -48,8 +46,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="UnityEngine">
-      <HintPath>..\..\Stock 0.25.0\KSP_Data\Managed\UnityEngine.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\..\KSP-Real\KSP_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -115,9 +112,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>@ECHO off
-robocopy . "GameData/[x] Science!" /xd "GameData" /xf "*.zip" /move /is
-"C:\Program Files\WinRAR\winrar.exe" a -r -afzip -ibck "[x] Science!.zip"</PostBuildEvent>
+    <PostBuildEvent>(robocopy . "C:\Games\KSP\KSP-Real\GameData\[x] Science!" /xd "GameData" /xf "*.zip") ^&amp; exit 0
+</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>

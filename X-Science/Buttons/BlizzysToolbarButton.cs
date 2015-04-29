@@ -49,13 +49,13 @@ namespace ScienceChecklist.Buttons {
 
 			if (!GameDatabase.Instance.ExistsTexture(texturePath)) {
 				var icon = TextureHelper.FromResource("ScienceChecklist.icon-small.png", 24, 24);
-				var ti = new GameDatabase.TextureInfo(icon, false, true, true);
+				var ti = new GameDatabase.TextureInfo( null, icon, false, true, true );
 				ti.name = texturePath;
 				GameDatabase.Instance.databaseTexture.Add(ti);
 			}
 
 			_button.TexturePath = texturePath;
-			_button.Visibility = new GameScenesVisibility(GameScenes.SPACECENTER, GameScenes.EDITOR, GameScenes.FLIGHT, GameScenes.TRACKSTATION, GameScenes.SPH);
+			_button.Visibility = new GameScenesVisibility(GameScenes.SPACECENTER, GameScenes.EDITOR, GameScenes.FLIGHT, GameScenes.TRACKSTATION);
 			_button.OnClick += OnClick;
 			_button.Enabled = true;
 		}

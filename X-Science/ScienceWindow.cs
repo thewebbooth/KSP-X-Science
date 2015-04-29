@@ -222,7 +222,7 @@ namespace ScienceChecklist {
 				0,
 				false,
 				false);
-
+//_logger.Trace("1");
 			GUILayout.Space(20);
 
 			GUILayout.BeginHorizontal();
@@ -235,12 +235,18 @@ namespace ScienceChecklist {
 			if (GUILayout.Button(new GUIContent(_clearSearchTexture, "Clear search"), GUILayout.Width(25), GUILayout.Height(23))) {
 				_filter.Text = string.Empty;
 			}
-
+//_logger.Trace("2");
 			GUILayout.EndHorizontal();
 
 			_scrollPos = GUILayout.BeginScrollView(_scrollPos, _skin.scrollView);
+			var i = 0; 
+			if( _filter.DisplayExperiments == null )
+				_logger.Trace( "DisplayExperiments is null" );
+			else
+			{
+//_logger.Trace(_filter.DisplayExperiments.ToString());
 
-			var i = 0;
+//_logger.Trace(_filter.DisplayExperiments.Count.ToString( ) );
 			for (; i < _filter.DisplayExperiments.Count; i++) {
 				var rect = new Rect(5, 20 * i, _filter.DisplayExperiments.Count > 13 ? 490 : 500, 20);
 				if (rect.yMax < _scrollPos.y || rect.yMin > _scrollPos.y + 400) {
@@ -250,7 +256,8 @@ namespace ScienceChecklist {
 				var experiment = _filter.DisplayExperiments[i];
 				DrawExperiment(experiment, rect, false, _labelStyle);
 			}
-
+			}
+//_logger.Trace("3");
 			GUILayout.Space(20 * i);
 			GUILayout.EndScrollView();
 			
@@ -264,7 +271,7 @@ namespace ScienceChecklist {
 			}, 4);
 
 			GUILayout.FlexibleSpace();
-
+//_logger.Trace("4");
 			if (_filter.CurrentSituation != null) {
 				var desc = _filter.CurrentSituation.Description;
 				GUILayout.Label(char.ToUpper(desc[0]) + desc.Substring(1), _situationStyle);
@@ -302,6 +309,7 @@ namespace ScienceChecklist {
 			if (Input.GetMouseButton(0) || Input.GetMouseButton(1) || Input.GetMouseButton(2)) {
 				_lastTooltip = string.Empty;
 			}
+//_logger.Trace("End");
 		}
 
 		/// <summary>
@@ -312,17 +320,21 @@ namespace ScienceChecklist {
 			GUILayout.BeginVertical();
 			_compactScrollPos = GUILayout.BeginScrollView(_compactScrollPos);
 			var i = 0;
-			for (; i < _filter.DisplayExperiments.Count; i++) {
+			if( _filter.DisplayExperiments == null )
+				_logger.Trace( "DisplayExperiments is null" );
+			else
+			{
+				for (; i < _filter.DisplayExperiments.Count; i++) {
 
-				var rect = new Rect(5, 15 * i, _filter.DisplayExperiments.Count > 11 ? 405 : 420, 20);
-				if (rect.yMax < _compactScrollPos.y || rect.yMin > _compactScrollPos.y + 400) {
-					continue;
+					var rect = new Rect(5, 15 * i, _filter.DisplayExperiments.Count > 11 ? 405 : 420, 20);
+					if (rect.yMax < _compactScrollPos.y || rect.yMin > _compactScrollPos.y + 400) {
+						continue;
+					}
+
+					var experiment = _filter.DisplayExperiments[i];
+					DrawExperiment(experiment, rect, true, _compactLabelStyle);
 				}
-
-				var experiment = _filter.DisplayExperiments[i];
-				DrawExperiment(experiment, rect, true, _compactLabelStyle);
 			}
-
 			GUILayout.Space(15 * i);
 			GUILayout.EndScrollView();
 			GUILayout.EndVertical();

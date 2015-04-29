@@ -18,6 +18,8 @@ namespace ScienceChecklist {
 			_text = string.Empty;
 			_kscBiomes = new List<string>();
 			AllExperiments = new List<Experiment>();
+			DisplayExperiments = new List<Experiment>();
+			CompleteCount = TotalCount = 0;
 		}
 
 		/// <summary>
@@ -111,7 +113,7 @@ namespace ScienceChecklist {
 			}
 
 			var exps = new List<Experiment>();
-
+//_logger.Trace("aaa");
 			var experiments = PartLoader.Instance.parts
 				.SelectMany(x => x.partPrefab.FindModulesImplementing<ModuleScienceExperiment>())
 				.Select(x => new {
@@ -121,14 +123,44 @@ namespace ScienceChecklist {
 				.Where(x => x.Experiment != null)
 				.GroupBy(x => x.Experiment)
 				.ToDictionary(x => x.Key, x => x.First().Module);
-
+//_logger.Trace("bbb");
 			experiments[ResearchAndDevelopment.GetExperiment("evaReport")] = null;
 			experiments[ResearchAndDevelopment.GetExperiment("surfaceSample")] = null;
 
 			var bodies = FlightGlobals.Bodies;
+//_logger.Trace( bodies.ToString( ) );
 			var situations = Enum.GetValues(typeof(ExperimentSituations)).Cast<ExperimentSituations>();
-			var biomes = bodies.ToDictionary(x => x, x => x.BiomeMap.Attributes.Select(y => y.name).ToArray());
+//_logger.Trace( situations.ToString( ) );
 
+//_logger.Trace( bodies[ 0 ].BiomeMap.Attributes.Select( y => y.name ).ToArray( ) );
+
+
+
+
+
+			var biomes = new Dictionary< CelestialBody, string[ ]>( );
+			foreach( var body in bodies )
+			{
+				if( body.BiomeMap != null )
+					biomes[ body ] = body.BiomeMap.Attributes.Select(y => y.name).ToArray();
+				else
+					biomes[ body ] = new string[ 0 ];
+			}
+
+			_logger.Trace( biomes.ToString( ) );
+//			String s = String.Format( "FOUND {0} BIOMES.", biomes.Count );
+//_logger.Trace( s );
+
+
+
+
+
+
+
+
+
+
+//_logger.Trace("ccc");
 			_kscBiomes = _kscBiomes.Any () ? _kscBiomes : UnityEngine.Object.FindObjectsOfType<Collider>()
 				.Where(x => x.gameObject.layer == 15)
 				.Select(x => x.gameObject.tag)
@@ -142,9 +174,9 @@ namespace ScienceChecklist {
 				.ToList();
 
 			var subjects = ResearchAndDevelopment.GetSubjects();
-
+//_logger.Trace("ddd");
 			var onboardScience = GameHelper.GetOnboardScience();
-
+//_logger.Trace("eee");
 			foreach (var experiment in experiments.Keys) {
 				var sitMask = experiment.situationMask;
 				var biomeMask = experiment.biomeMask;
@@ -155,7 +187,7 @@ namespace ScienceChecklist {
 						sitMask = (uint) (int) sitMaskField.GetValue(experiments[experiment]);
 						_logger.Debug("Setting sitMask to " + sitMask + " for " + experiment.experimentTitle);
 					}
-
+//_logger.Trace("fff");
 					if (biomeMask == 0) {
 						var biomeMaskField = experiments[experiment].GetType().GetField("bioMask");
 						if (biomeMaskField != null) {
@@ -164,13 +196,13 @@ namespace ScienceChecklist {
 						}
 					}
 				}
-
+//_logger.Trace("ggg");
 				foreach (var body in bodies) {
 					if (experiment.requireAtmosphere && !body.atmosphere) {
 						// If the whole planet doesn't have an atmosphere, then there's not much point continuing.
 						continue;
 					}
-
+//_logger.Trace("hhh");
 					foreach (var situation in situations) {
 						if (situation == ExperimentSituations.SrfSplashed && !body.ocean) {
 							// Some planets don't have an ocean for us to be splashed down in.
@@ -213,10 +245,14 @@ namespace ScienceChecklist {
 					}
 				}
 			}
-
+//_logger.Trace("iii");
 			AllExperiments = exps;
+//_logger.Trace( "Gonna UpdateFilter" );
 			UpdateFilter();
+//_logger.Trace("Done Refreshing Experiments");
 		}
+
+
 
 		/// <summary>
 		/// Recalculates the experiments to be displayed.
@@ -239,7 +275,7 @@ namespace ScienceChecklist {
 				default:
 					break;
 			}
-
+//_logger.Trace("1");
 			foreach (var word in Text.Split(' ')) {
 				var options = word.Split('|');
 				query = query.Where(x => options.Any(o => {
@@ -253,12 +289,14 @@ namespace ScienceChecklist {
 					return x.Description.ToLowerInvariant().Contains(s.ToLowerInvariant()) == !negate;
 				}));
 			}
-
+//_logger.Trace("2");
 			query = query.OrderBy (x => x.TotalScience);
-
+//_logger.Trace("3");
 			CompleteCount = query.Count(x => x.IsComplete);
 			TotalCount = query.Count();
+//_logger.Trace("4");
 			DisplayExperiments = query.Where (x => !Config.HideCompleteExperiments || !x.IsComplete).ToList();
+//_logger.Trace("End");
 		}
 
 		/// <summary>
@@ -274,8 +312,7 @@ namespace ScienceChecklist {
 						? Enumerable.Empty<Experiment> ()
 						: ApplyPartFilter(src, vessel.FindPartModulesImplementing<ModuleScienceExperiment>(), vessel.GetCrewCount() > 0);
 				case GameScenes.EDITOR:
-				case GameScenes.SPH:
-					return EditorLogic.startPod == null || EditorLogic.SortedShipList == null
+					return EditorLogic.SortedShipList == null
 						? Enumerable.Empty<Experiment> ()
 						: ApplyPartFilter(src, EditorLogic.SortedShipList.SelectMany(x => x.Modules.OfType<ModuleScienceExperiment> ()), EditorLogic.SortedShipList.Any (x => x != null && x.CrewCapacity > 0));
 				case GameScenes.CREDITS:
