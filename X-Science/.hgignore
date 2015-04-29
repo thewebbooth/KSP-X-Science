@@ -1,0 +1,8 @@
+syntax: glob
+obj/*
+bin/*
+*.suo
+*.csproj.user
+KSP.log
+MiniAVC.log
+Thumbs.db

@@ -1,0 +1,133 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{DDFBE6F2-5DC6-4493-AB08-89F9A33A3219}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ScienceChecklist</RootNamespace>
+    <AssemblyName>[x] Science!</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>
+    </DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\Stock 0.25.0\KSP_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>..\..\Stock 0.25.0\KSP_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="MiniAVC">
+      <HintPath>Libraries\MiniAVC-1.0.2.3\MiniAVC.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\Stock 0.25.0\KSP_Data\Managed\UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Buttons\BlizzysToolbarButton.cs" />
+    <Compile Include="Buttons\IToolbarButton.cs" />
+    <Compile Include="Config.cs" />
+    <Compile Include="DisplayMode.cs" />
+    <Compile Include="Experiment.cs" />
+    <Compile Include="ExperimentalFeatures.cs" />
+    <Compile Include="ExperimentFilter.cs" />
+    <Compile Include="GameHelper.cs" />
+    <Compile Include="ScienceChecklistAddon.cs" />
+    <Compile Include="ScienceWindow.cs" />
+    <Compile Include="SettingsPanel.cs" />
+    <Compile Include="Situation.cs" />
+    <Compile Include="StreamEx.cs" />
+    <Compile Include="TextureHelper.cs" />
+    <Compile Include="Buttons\AppLauncherButton.cs" />
+    <Compile Include="Logger.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Buttons\ToolbarWrapper.cs" />
+    <None Include="CHANGES.md" />
+    <None Include="Deploy.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Deploy.tt</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="scienceCompleteCompact.png" />
+    <EmbeddedResource Include="scienceProgressCompact.png" />
+    <EmbeddedResource Include="scienceComplete.png" />
+    <EmbeddedResource Include="scienceProgress.png" />
+    <EmbeddedResource Include="icon.png" />
+    <EmbeddedResource Include="icons\all.png" />
+    <EmbeddedResource Include="icons\clearSearch.png" />
+    <EmbeddedResource Include="icons\currentSituation.png" />
+    <EmbeddedResource Include="icons\currentVessel.png" />
+    <EmbeddedResource Include="icons\search.png" />
+    <EmbeddedResource Include="icons\settings.png" />
+    <EmbeddedResource Include="icons\unlocked.png" />
+    <EmbeddedResource Include="icons\maximize.png" />
+    <EmbeddedResource Include="icons\minimize.png" />
+    <EmbeddedResource Include="icon-small.png" />
+    <Content Include="LICENSE.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Deploy.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Deploy.cs</LastGenOutput>
+    </None>
+    <None Include="GameData\[x] Science!\[x] Science!.version">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>@ECHO off
+robocopy . "GameData/[x] Science!" /xd "GameData" /xf "*.zip" /move /is
+"C:\Program Files\WinRAR\winrar.exe" a -r -afzip -ibck "[x] Science!.zip"</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

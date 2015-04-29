@@ -1,0 +1,27 @@
+﻿<#
+
+Action<System.IO.DirectoryInfo, System.IO.DirectoryInfo> copy = null;
+copy = new Action<System.IO.DirectoryInfo, System.IO.DirectoryInfo> ((src, target) =>
+{
+	foreach (System.IO.DirectoryInfo dir in src.GetDirectories ())
+	{
+		copy (dir, target.CreateSubdirectory (dir.Name));
+	}
+
+	foreach (System.IO.FileInfo file in src.GetFiles ())
+	{
+		file.CopyTo (System.IO.Path.Combine (target.FullName, file.Name));
+	}
+});
+
+var targetDir = System.IO.Path.Combine ("..", "..", "Test 0.25.0");
+var existing = new System.IO.DirectoryInfo (System.IO.Path.Combine(targetDir, "GameData", "[x] Science!"));
+if (existing.Exists)
+{
+	existing.Delete (true);
+}
+
+copy(new System.IO.DirectoryInfo (System.IO.Path.Combine (".", "bin", "Release", "GameData")), new System.IO.DirectoryInfo (System.IO.Path.Combine(targetDir, "GameData")));
+System.Diagnostics.Process.Start (System.IO.Path.Combine (targetDir, "KSP.exe"));
+
+#>
