@@ -1,3 +1,14 @@
+Z-Key Aerospace has rebuilt this KSP Mod for KSP V1.0 onwards
+[X] Science! was by Brodrick and is released under "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International license"
+
+As of V4.1 it is rebuilt and fixed by Z-Key Aerospace.
+
+
+
+Brodrick's readme follows...
+
+
+
 [x] Science!
 ============
 

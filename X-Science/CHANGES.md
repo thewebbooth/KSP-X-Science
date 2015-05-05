@@ -1,6 +1,25 @@
 [x] Science!
 ============
 
+
+
+4.3
+---
+5-May-2015 Fix and rebuild for KSP V1.0.2 by Z-Key Aerospace
+* Changed blizzy icon text - doesn't say 'test' any more!
+
+
+
+4.2
+---
+1-May-2015 Fix and rebuild for KSP V1.0.1 by Z-Key Aerospace
+
+
+4.1
+---
+28-April-2015 Fix and rebuild for KSP V1.0 by Z-Key Aerospace
+
+
 4.0
 ---
 * Added support for blizzy's toolbar - find the toggle in the settings menu if you've got it installed.

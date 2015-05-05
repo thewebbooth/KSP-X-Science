@@ -43,7 +43,7 @@ namespace ScienceChecklist.Buttons {
 
 			_button = ToolbarManager.Instance.add("ScienceChecklist", "button");
 			_button.ToolTip = "[x] Science!";
-			_button.Text = "test";
+			_button.Text = "[x] Science!";
 
 			const string texturePath = "ScienceChecklist/icon.png";
 
