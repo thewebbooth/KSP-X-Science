@@ -2,12 +2,17 @@
 ============
 
 
+4.4
+---
+15-May-2015 Speed increase for KSP V1.0.2 by Z-Key Aerospace
+* No longer checks for science stored in debris.
+* Only gets the science subjects once and indexes the list for efficient queries.
+
 
 4.3
 ---
 5-May-2015 Fix and rebuild for KSP V1.0.2 by Z-Key Aerospace
 * Changed blizzy icon text - doesn't say 'test' any more!
-
 
 
 4.2

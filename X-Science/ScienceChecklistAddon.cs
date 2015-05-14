@@ -38,14 +38,15 @@ namespace ScienceChecklist {
 			GameEvents.onGUIApplicationLauncherReady.Add(Load);
 			GameEvents.onGUIApplicationLauncherDestroyed.Add(Unload);
 
-			GameEvents.onVesselWasModified.Add(x => _filterRefreshPending = true);
-			GameEvents.onVesselChange.Add(x => _filterRefreshPending = true);
-			GameEvents.onEditorShipModified.Add(x => _filterRefreshPending = true);
+			GameEvents.onVesselWasModified.Add( new EventData<Vessel>.OnEvent( this.VesselWasModified ) );
+			GameEvents.onVesselChange.Add( new EventData<Vessel>.OnEvent( this.VesselChange ) );
+			GameEvents.onEditorShipModified.Add( new EventData<ShipConstruct>.OnEvent( this.EditorShipModified ) );
 
-			GameEvents.onGameStateSave.Add(x => ScheduleExperimentUpdate());
-			GameEvents.OnPartPurchased.Add(x => ScheduleExperimentUpdate());
-			GameEvents.OnScienceChanged.Add((x, y) => ScheduleExperimentUpdate());
-            GameEvents.OnScienceRecieved.Add((w, x, y, z) => ScheduleExperimentUpdate());
+			GameEvents.onGameStateSave.Add( new EventData<ConfigNode>.OnEvent( this.GameStateSave ) );
+			GameEvents.OnPartPurchased.Add( new EventData<AvailablePart>.OnEvent( this.PartPurchased ) );
+			GameEvents.OnScienceChanged.Add( new EventData<float, TransactionReasons>.OnEvent( this.ScienceChanged ) );
+			GameEvents.OnScienceRecieved.Add( new EventData<float, ScienceSubject, ProtoVessel, bool>.OnEvent( this.ScienceRecieved ) );
+			GameEvents.onVesselRename.Add( new EventData<GameEvents.HostedFromToAction<Vessel, string>>.OnEvent( this.VesselRename ) );
 		}
 
 		/// <summary>
@@ -108,8 +109,11 @@ namespace ScienceChecklist {
 
 		#region METHODS (PRIVATE)
 
+
+
 		/// <summary>
 		/// Initializes the addon if it hasn't already been loaded.
+		/// Callback from onGUIApplicationLauncherReady
 		/// </summary>
 		private void Load () {
 			_logger.Trace("Load");
@@ -144,8 +148,11 @@ namespace ScienceChecklist {
 			StartCoroutine(_filterRefresher);
 		}
 
+
+
 		/// <summary>
 		/// Unloads the addon if it has been loaded.
+		/// Callback from onGUIApplicationLauncherDestroyed
 		/// </summary>
 		private void Unload () {
 			_logger.Trace("Unload");
@@ -174,6 +181,54 @@ namespace ScienceChecklist {
 			}
 		}
 
+		private void VesselWasModified( Vessel V )
+		{
+//			_logger.Trace( "Callback: VesselWasModified" );
+			_filterRefreshPending = true;
+		}
+
+		private void VesselChange( Vessel V )
+		{
+//			_logger.Trace( "Callback: VesselChange" );
+			_filterRefreshPending = true;
+		}
+
+		private void EditorShipModified( ShipConstruct S )
+		{
+//			_logger.Trace( "Callback: EditorShipModified" );
+			_filterRefreshPending = true;
+		}
+
+		private void GameStateSave( ConfigNode C )
+		{
+//			_logger.Trace( "Callback: GameStateSave" );
+			ScheduleExperimentUpdate( );
+		}
+
+		private void PartPurchased( AvailablePart P )
+		{
+//			_logger.Trace( "Callback: PartPurchased" );
+			ScheduleExperimentUpdate( );
+		}
+
+		private void ScienceChanged( float V, TransactionReasons R )
+		{
+//			_logger.Trace( "Callback: ScienceChanged" );
+			ScheduleExperimentUpdate( );
+		}
+
+		private void ScienceRecieved( float V, ScienceSubject S, ProtoVessel P, bool F )
+		{
+//			_logger.Trace( "Callback: ScienceRecieved" );
+			ScheduleExperimentUpdate( );
+		}
+
+		private void VesselRename( GameEvents.HostedFromToAction<Vessel, string> Data )
+		{
+//			_logger.Trace( "Callback: VesselRename" );
+			ScheduleExperimentUpdate( );
+		}
+
 		/// <summary>
 		/// Waits for the ResearchAndDevelopment and PartLoader instances to be available.
 		/// </summary>
@@ -198,6 +253,8 @@ namespace ScienceChecklist {
 			_rndLoader = null;
 		}
 
+
+
 		/// <summary>
 		/// Coroutine to throttle calls to _window.UpdateExperiments.
 		/// </summary>
@@ -212,6 +269,8 @@ namespace ScienceChecklist {
 				yield return 0;
 			}
 		}
+
+
 
 		/// <summary>
 		/// Coroutine to throttle calls to _window.RefreshFilter.
@@ -230,6 +289,8 @@ namespace ScienceChecklist {
 			}
 		}
 
+
+
 		/// <summary>
 		/// Called when the toolbar button is toggled on.
 		/// </summary>
@@ -243,6 +304,8 @@ namespace ScienceChecklist {
 			_buttonClicked = true;
 			UpdateVisibility();
 		}
+
+
 
 		/// <summary>
 		/// Called when the toolbar button is toggled off.
@@ -258,6 +321,8 @@ namespace ScienceChecklist {
 			UpdateVisibility();
 		}
 
+
+
 		/// <summary>
 		/// Called when the KSP toolbar is shown.
 		/// </summary>
@@ -269,6 +334,8 @@ namespace ScienceChecklist {
 			_launcherVisible = true;
 			UpdateVisibility();
 		}
+
+
 
 		/// <summary>
 		/// Called when the KSP toolbar is hidden.
@@ -282,6 +349,8 @@ namespace ScienceChecklist {
 			UpdateVisibility();
 		}
 
+
+
 		/// <summary>
 		/// Shows or hides the ScienceWindow iff the KSP toolbar is visible and the toolbar button is toggled on.
 		/// </summary>
@@ -294,12 +363,16 @@ namespace ScienceChecklist {
 			ScheduleExperimentUpdate();
 		}
 
+
+
 		/// <summary>
 		/// Schedules a full experiment update in 1 second.
 		/// </summary>
 		private void ScheduleExperimentUpdate () {
 			_nextExperimentUpdate = DateTime.Now.AddSeconds (1);
 		}
+
+
 
 		/// <summary>
 		/// Handler for the UseBlizzysToolbarChanged event on _window.Settings.
@@ -309,6 +382,8 @@ namespace ScienceChecklist {
 		private void Settings_UseBlizzysToolbarChanged (object sender, EventArgs e) {
 			InitializeButton();
 		}
+
+
 
 		/// <summary>
 		/// Initializes the toolbar button.

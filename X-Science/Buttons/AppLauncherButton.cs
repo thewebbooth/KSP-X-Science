@@ -44,7 +44,7 @@ namespace ScienceChecklist.Buttons {
 
 			var texture = new Texture2D(38, 38, TextureFormat.ARGB32, false);
 			
-			var iconStream = Assembly.GetExecutingAssembly ().GetManifestResourceStream ("ScienceChecklist.icon.png").ReadToEnd ();
+			var iconStream = Assembly.GetExecutingAssembly ().GetManifestResourceStream ("ScienceChecklist.icons.icon.png").ReadToEnd ();
 			
 			texture.LoadImage(iconStream);
 			texture.Apply();

@@ -45,10 +45,10 @@ namespace ScienceChecklist.Buttons {
 			_button.ToolTip = "[x] Science!";
 			_button.Text = "[x] Science!";
 
-			const string texturePath = "ScienceChecklist/icon.png";
+			const string texturePath = "ScienceChecklist/icons/icon-small.png";
 
 			if (!GameDatabase.Instance.ExistsTexture(texturePath)) {
-				var icon = TextureHelper.FromResource("ScienceChecklist.icon-small.png", 24, 24);
+				var icon = TextureHelper.FromResource("ScienceChecklist.icons.icon-small.png", 24, 24);
 				var ti = new GameDatabase.TextureInfo( null, icon, false, true, true );
 				ti.name = texturePath;
 				GameDatabase.Instance.databaseTexture.Add(ti);

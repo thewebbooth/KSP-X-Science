@@ -15,10 +15,12 @@ namespace ScienceChecklist {
 		/// <param name="experiment">The ScienceExperiment to be used.</param>
 		/// <param name="situation">The Situation this experiment is valid in.</param>
 		/// <param name="onboardScience">A collection of all onboard ScienceData.</param>
-		public Experiment (ScienceExperiment experiment, Situation situation, IEnumerable<ScienceData> onboardScience) {
+		public Experiment( ScienceExperiment experiment, Situation situation, IEnumerable<ScienceData> onboardScience, Dictionary<string, ScienceSubject> SciDict )
+		{
 			_experiment = experiment;
 			_situation = situation;
-			Update(onboardScience);
+			ScienceSubject = null;
+			Update( onboardScience, SciDict );
 		}
 
 		#region PROPERTIES
@@ -86,14 +88,22 @@ namespace ScienceChecklist {
 		/// Updates the IsUnlocked, CompletedScience, TotalScience, OnboardScience, and IsComplete fields.
 		/// </summary>
 		/// <param name="onboardScience">The total onboard ScienceData.</param>
-		public void Update (IEnumerable<ScienceData> onboardScience) {
-			ScienceSubject = (ResearchAndDevelopment.GetSubjects() ?? new List<ScienceSubject> ())
-				.SingleOrDefault(x => x.id == Id)
-				?? new ScienceSubject(ScienceExperiment, Situation.ExperimentSituation, Situation.Body, Situation.SubBiome ?? Situation.Biome ?? string.Empty);
+		public void Update (IEnumerable<ScienceData> onboardScience, Dictionary<string,ScienceSubject> SciDict )
+		{
+			if( SciDict.ContainsKey( Id ) )
+				ScienceSubject = SciDict[ Id ];
+			else ScienceSubject = new ScienceSubject(ScienceExperiment, Situation.ExperimentSituation, Situation.Body, Situation.SubBiome ?? Situation.Biome ?? string.Empty);
+
+
 			IsUnlocked = ScienceExperiment.id == "evaReport" ||
 				ScienceExperiment.id == "surfaceSample" ||
 				ScienceExperiment.id == "crewReport" ||
-				PartLoader.Instance.parts.Any(x => ResearchAndDevelopment.PartModelPurchased(x) && x.partPrefab.Modules != null && x.partPrefab.Modules.OfType<ModuleScienceExperiment>().Any(y => y.experimentID == ScienceExperiment.id));
+				PartLoader.Instance.parts.Any
+				(
+					x => ResearchAndDevelopment.PartModelPurchased(x) &&
+					x.partPrefab.Modules != null &&
+					x.partPrefab.Modules.OfType<ModuleScienceExperiment>().Any(y => y.experimentID == ScienceExperiment.id)
+				);
 
 			CompletedScience = ScienceSubject.science * HighLogic.CurrentGame.Parameters.Career.ScienceGainMultiplier;
 			TotalScience = ScienceSubject.scienceCap * HighLogic.CurrentGame.Parameters.Career.ScienceGainMultiplier;
@@ -118,7 +128,7 @@ namespace ScienceChecklist {
 
 		private readonly ScienceExperiment _experiment;
 		private readonly Situation _situation;
-		private readonly bool _usesSubBiomes;
+//UNUSED		private readonly bool _usesSubBiomes;
 
 		#endregion
 	}

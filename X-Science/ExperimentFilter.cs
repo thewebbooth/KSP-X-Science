@@ -39,6 +39,8 @@ namespace ScienceChecklist {
 		/// </summary>
 		public int               TotalCount         { get; private set; }
 
+
+
 		/// <summary>
 		/// Gets or sets a value indicating the current mode of the filter.
 		/// </summary>
@@ -52,6 +54,8 @@ namespace ScienceChecklist {
 				}
 			}
 		}
+
+
 
 		/// <summary>
 		/// Gets or sets a string to be used for filtering experiments.
@@ -67,6 +71,8 @@ namespace ScienceChecklist {
 			}
 		}
 
+
+
 		/// <summary>
 		/// Gets or sets the current situation.
 		/// </summary>
@@ -81,23 +87,51 @@ namespace ScienceChecklist {
 			}
 		}
 
+
+
+		public Dictionary<string,ScienceSubject> GetScienceSubjects( )
+		{
+			var SciSubjects = ( ResearchAndDevelopment.GetSubjects( ) ?? new List<ScienceSubject>( ) );
+			Dictionary<string,ScienceSubject> SciDict = SciSubjects.ToDictionary( p => p.id );
+//			_logger.Trace( "Science Subjects contains " + SciSubjects.Count.ToString( ) + " items" );
+//			_logger.Trace( "Science Subjects contains " + SciDict.Count.ToString( ) + " items" );
+			return SciDict;
+		}
+
+
+
 		/// <summary>
 		/// Calls the Update method on all experiments.
 		/// </summary>
-		public void UpdateExperiments () {
-			_logger.Trace("UpdateExperiments");
-			var onboardScience = GameHelper.GetOnboardScience();
+		public void UpdateExperiments( )
+		{
+			var StartTime = DateTime.Now;
+//			_logger.Trace( "UpdateExperiments" );
+			var onboardScience = GameHelper.GetOnboardScience( );
 
-			foreach (var exp in AllExperiments) {
-				exp.Update(onboardScience);
+			var SciDict = GetScienceSubjects( );
+
+
+//			foreach( var K in SciDict.Keys )
+//				_logger.Trace( K + "=" + SciDict[K].title );
+
+			foreach( var exp in AllExperiments )
+			{
+				exp.Update( onboardScience, SciDict );
 			}
+			var Elapsed = DateTime.Now - StartTime;
+			_logger.Trace( "UpdateExperiments Done - " + Elapsed.ToString( ) + "ms" );
 		}
+
+
 
 		/// <summary>
 		/// Refreshes the experiment cache. THIS IS VERY EXPENSIVE.
+		/// CB: Actually doesn't seem much worse than UpdateExperiments()
 		/// </summary>
 		public void RefreshExperimentCache () {
-			_logger.Info("RefreshExperimentCache");
+			var StartTime = DateTime.Now;
+//			_logger.Info( "RefreshExperimentCache" );
 			if (ResearchAndDevelopment.Instance == null) {
 				_logger.Debug("ResearchAndDevelopment not instantiated.");
 				AllExperiments = new List<Experiment>();
@@ -147,7 +181,7 @@ namespace ScienceChecklist {
 					biomes[ body ] = new string[ 0 ];
 			}
 
-			_logger.Trace( biomes.ToString( ) );
+//			_logger.Trace( biomes.ToString( ) );
 //			String s = String.Format( "FOUND {0} BIOMES.", biomes.Count );
 //_logger.Trace( s );
 
@@ -173,7 +207,7 @@ namespace ScienceChecklist {
 				.Distinct()
 				.ToList();
 
-			var subjects = ResearchAndDevelopment.GetSubjects();
+			var SciDict = GetScienceSubjects( );
 //_logger.Trace("ddd");
 			var onboardScience = GameHelper.GetOnboardScience();
 //_logger.Trace("eee");
@@ -185,14 +219,14 @@ namespace ScienceChecklist {
 					var sitMaskField = experiments[experiment].GetType().GetField("sitMask");
 					if (sitMaskField != null) {
 						sitMask = (uint) (int) sitMaskField.GetValue(experiments[experiment]);
-						_logger.Debug("Setting sitMask to " + sitMask + " for " + experiment.experimentTitle);
+//						_logger.Debug("Setting sitMask to " + sitMask + " for " + experiment.experimentTitle);
 					}
 //_logger.Trace("fff");
 					if (biomeMask == 0) {
 						var biomeMaskField = experiments[experiment].GetType().GetField("bioMask");
 						if (biomeMaskField != null) {
 							biomeMask = (uint) (int) biomeMaskField.GetValue(experiments[experiment]);
-							_logger.Debug("Setting biomeMask to " + biomeMask + " for " + experiment.experimentTitle);
+//							_logger.Debug("Setting biomeMask to " + biomeMask + " for " + experiment.experimentTitle);
 						}
 					}
 				}
@@ -229,18 +263,18 @@ namespace ScienceChecklist {
 
 						if (biomes[body].Any() && (biomeMask & (uint) situation) != 0) {
 							foreach (var biome in biomes[body]) {
-								exps.Add(new Experiment(experiment, new Situation(body, situation, biome), onboardScience));
+								exps.Add( new Experiment( experiment, new Situation( body, situation, biome ), onboardScience, SciDict ) );
 							}
 
 							if ((body.name == "Kerbin") && situation == ExperimentSituations.SrfLanded) {
 								foreach (var kscBiome in _kscBiomes) {
 									// Ew.
-									exps.Add(new Experiment(experiment, new Situation(body, situation, "Shores", kscBiome), onboardScience));
+									exps.Add( new Experiment( experiment, new Situation( body, situation, "Shores", kscBiome ), onboardScience, SciDict ) );
 								}
 							}
 
 						} else {
-							exps.Add(new Experiment(experiment, new Situation(body, situation), onboardScience));
+							exps.Add( new Experiment( experiment, new Situation( body, situation ), onboardScience, SciDict ) );
 						}
 					}
 				}
@@ -249,7 +283,8 @@ namespace ScienceChecklist {
 			AllExperiments = exps;
 //_logger.Trace( "Gonna UpdateFilter" );
 			UpdateFilter();
-//_logger.Trace("Done Refreshing Experiments");
+			var Elapsed = DateTime.Now - StartTime;
+			_logger.Trace( "RefreshExperimentCache Done - " + Elapsed.ToString( ) + "ms" );
 		}
 
 
@@ -258,7 +293,8 @@ namespace ScienceChecklist {
 		/// Recalculates the experiments to be displayed.
 		/// </summary>
 		public void UpdateFilter () {
-			_logger.Trace("UpdateFilter");
+			var StartTime = DateTime.Now;
+//			_logger.Trace("UpdateFilter");
 			var query = AllExperiments.AsEnumerable();
 			switch (_displayMode) {
 				case DisplayMode.All:
@@ -297,7 +333,13 @@ namespace ScienceChecklist {
 //_logger.Trace("4");
 			DisplayExperiments = query.Where (x => !Config.HideCompleteExperiments || !x.IsComplete).ToList();
 //_logger.Trace("End");
+
+			var Elapsed = DateTime.Now - StartTime;
+			_logger.Trace( "UpdateFilter Done - " + Elapsed.ToString( ) + "ms" );
+
 		}
+
+
 
 		/// <summary>
 		/// Filters a collection of experiments to only return ones that can be performed on the current vessel.
@@ -329,6 +371,8 @@ namespace ScienceChecklist {
 			}
 		}
 
+
+
 		/// <summary>
 		/// Filters a collection of experiments to only return ones that can be performed on a vessel made from the given modules.
 		/// </summary>
@@ -345,6 +389,8 @@ namespace ScienceChecklist {
 				(hasCrew && experiments.Contains("crewReport") && x.ScienceExperiment.id == "crewReport") || // manned crewReport
 				(hasCrew && (x.ScienceExperiment.id == "surfaceSample" || x.ScienceExperiment.id == "evaReport"))); // manned
 		}
+
+
 
 		/// <summary>
 		/// Filters a collection of experiments to only return ones that can be performed in the current situation.
@@ -370,12 +416,12 @@ namespace ScienceChecklist {
 				.Where(x => x.Situation.ExperimentSituation == CurrentSituation.ExperimentSituation);
 		}
 
-		private DisplayMode _displayMode;
-		private string _text;
-		private Situation _situation;
 
-		private IList<string> _kscBiomes;
 
-		private readonly Logger _logger;
+		private DisplayMode		_displayMode;
+		private string			_text;
+		private Situation		_situation;
+		private IList<string>	_kscBiomes;
+		private readonly Logger	_logger;
 	}
 }
