@@ -20,6 +20,7 @@ namespace ScienceChecklist {
 			AllExperiments = new List<Experiment>();
 			DisplayExperiments = new List<Experiment>();
 			CompleteCount = TotalCount = 0;
+			AvailableExperiments = new UnlockedExperimentList( );
 		}
 
 		/// <summary>
@@ -38,7 +39,7 @@ namespace ScienceChecklist {
 		/// Gets the total number of display experiments.
 		/// </summary>
 		public int               TotalCount         { get; private set; }
-
+		public UnlockedExperimentList AvailableExperiments { get; private set; }
 
 
 		/// <summary>
@@ -91,10 +92,19 @@ namespace ScienceChecklist {
 
 		public Dictionary<string,ScienceSubject> GetScienceSubjects( )
 		{
+//			var StartTime = DateTime.Now;
+			
+			
+			
 			var SciSubjects = ( ResearchAndDevelopment.GetSubjects( ) ?? new List<ScienceSubject>( ) );
 			Dictionary<string,ScienceSubject> SciDict = SciSubjects.ToDictionary( p => p.id );
+
+
+
 //			_logger.Trace( "Science Subjects contains " + SciSubjects.Count.ToString( ) + " items" );
 //			_logger.Trace( "Science Subjects contains " + SciDict.Count.ToString( ) + " items" );
+//			var Elapsed = DateTime.Now - StartTime;
+//			_logger.Trace( "GetScienceSubjects Done - " + Elapsed.ToString( ) + "ms" );
 			return SciDict;
 		}
 
@@ -106,18 +116,19 @@ namespace ScienceChecklist {
 		public void UpdateExperiments( )
 		{
 			var StartTime = DateTime.Now;
-//			_logger.Trace( "UpdateExperiments" );
+			_logger.Trace( "UpdateExperiments" );
 			var onboardScience = GameHelper.GetOnboardScience( );
 
 			var SciDict = GetScienceSubjects( );
-
-
+//			_logger.Trace( "onboardScience contains " + onboardScience.Count() + " items" );
+//			_logger.Trace( "AllExperiments contains " + AllExperiments.Count( ) + " items" );
+//			_logger.Trace( "SciDict contains " + SciDict.Count( ) + " items" );
 //			foreach( var K in SciDict.Keys )
 //				_logger.Trace( K + "=" + SciDict[K].title );
 
 			foreach( var exp in AllExperiments )
 			{
-				exp.Update( onboardScience, SciDict );
+				exp.Update( onboardScience, SciDict, AvailableExperiments );
 			}
 			var Elapsed = DateTime.Now - StartTime;
 			_logger.Trace( "UpdateExperiments Done - " + Elapsed.ToString( ) + "ms" );
@@ -131,7 +142,7 @@ namespace ScienceChecklist {
 		/// </summary>
 		public void RefreshExperimentCache () {
 			var StartTime = DateTime.Now;
-//			_logger.Info( "RefreshExperimentCache" );
+			_logger.Info( "RefreshExperimentCache" );
 			if (ResearchAndDevelopment.Instance == null) {
 				_logger.Debug("ResearchAndDevelopment not instantiated.");
 				AllExperiments = new List<Experiment>();
@@ -147,7 +158,7 @@ namespace ScienceChecklist {
 			}
 
 			var exps = new List<Experiment>();
-//_logger.Trace("aaa");
+_logger.Trace("aaa");
 			var experiments = PartLoader.Instance.parts
 				.SelectMany(x => x.partPrefab.FindModulesImplementing<ModuleScienceExperiment>())
 				.Select(x => new {
@@ -157,7 +168,7 @@ namespace ScienceChecklist {
 				.Where(x => x.Experiment != null)
 				.GroupBy(x => x.Experiment)
 				.ToDictionary(x => x.Key, x => x.First().Module);
-//_logger.Trace("bbb");
+_logger.Trace("bbb");
 			experiments[ResearchAndDevelopment.GetExperiment("evaReport")] = null;
 			experiments[ResearchAndDevelopment.GetExperiment("surfaceSample")] = null;
 
@@ -182,8 +193,8 @@ namespace ScienceChecklist {
 			}
 
 //			_logger.Trace( biomes.ToString( ) );
-//			String s = String.Format( "FOUND {0} BIOMES.", biomes.Count );
-//_logger.Trace( s );
+			String s = String.Format( "FOUND {0} BIOMES.", biomes.Count );
+_logger.Trace( s );
 
 
 
@@ -194,7 +205,8 @@ namespace ScienceChecklist {
 
 
 
-//_logger.Trace("ccc");
+_logger.Trace("ccc");
+_kscBiomes = new List<string>( );
 			_kscBiomes = _kscBiomes.Any () ? _kscBiomes : UnityEngine.Object.FindObjectsOfType<Collider>()
 				.Where(x => x.gameObject.layer == 15)
 				.Select(x => x.gameObject.tag)
@@ -206,6 +218,9 @@ namespace ScienceChecklist {
 				.Select(x => x.Replace(" ", ""))
 				.Distinct()
 				.ToList();
+
+
+				AvailableExperiments.Clear( );
 
 			var SciDict = GetScienceSubjects( );
 //_logger.Trace("ddd");
@@ -263,18 +278,18 @@ namespace ScienceChecklist {
 
 						if (biomes[body].Any() && (biomeMask & (uint) situation) != 0) {
 							foreach (var biome in biomes[body]) {
-								exps.Add( new Experiment( experiment, new Situation( body, situation, biome ), onboardScience, SciDict ) );
+								exps.Add( new Experiment( experiment, new Situation( body, situation, biome ), onboardScience, SciDict, AvailableExperiments ) );
 							}
 
 							if ((body.name == "Kerbin") && situation == ExperimentSituations.SrfLanded) {
 								foreach (var kscBiome in _kscBiomes) {
 									// Ew.
-									exps.Add( new Experiment( experiment, new Situation( body, situation, "Shores", kscBiome ), onboardScience, SciDict ) );
+									exps.Add( new Experiment( experiment, new Situation( body, situation, "Shores", kscBiome ), onboardScience, SciDict, AvailableExperiments ) );
 								}
 							}
 
 						} else {
-							exps.Add( new Experiment( experiment, new Situation( body, situation ), onboardScience, SciDict ) );
+							exps.Add( new Experiment( experiment, new Situation( body, situation ), onboardScience, SciDict, AvailableExperiments ) );
 						}
 					}
 				}
@@ -384,7 +399,7 @@ namespace ScienceChecklist {
 			var experiments = modules
 				.Select(x => x.experimentID)
 				.Distinct();
-			return src.Where(x =>
+			return src.Where( x => x.IsUnlocked ).Where(x =>
 				(x.ScienceExperiment.id != "crewReport" && experiments.Contains(x.ScienceExperiment.id)) || // unmanned - crewReport needs to be explicitly ignored as we need crew for that experiment even though it's a module on the capsules.
 				(hasCrew && experiments.Contains("crewReport") && x.ScienceExperiment.id == "crewReport") || // manned crewReport
 				(hasCrew && (x.ScienceExperiment.id == "surfaceSample" || x.ScienceExperiment.id == "evaReport"))); // manned

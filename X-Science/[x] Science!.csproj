@@ -67,6 +67,7 @@
     <Compile Include="Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Buttons\ToolbarWrapper.cs" />
+    <Compile Include="UnlockedExperimentList.cs" />
     <None Include="CHANGES.md" />
     <None Include="Deploy.cs">
       <AutoGen>True</AutoGen>

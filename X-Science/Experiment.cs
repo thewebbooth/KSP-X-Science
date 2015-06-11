@@ -15,12 +15,12 @@ namespace ScienceChecklist {
 		/// <param name="experiment">The ScienceExperiment to be used.</param>
 		/// <param name="situation">The Situation this experiment is valid in.</param>
 		/// <param name="onboardScience">A collection of all onboard ScienceData.</param>
-		public Experiment( ScienceExperiment experiment, Situation situation, IEnumerable<ScienceData> onboardScience, Dictionary<string, ScienceSubject> SciDict )
+		public Experiment( ScienceExperiment experiment, Situation situation, Dictionary<string, List<ScienceData>> onboardScience, Dictionary<string, ScienceSubject> SciDict, UnlockedExperimentList AvailableExperiments )
 		{
 			_experiment = experiment;
 			_situation = situation;
 			ScienceSubject = null;
-			Update( onboardScience, SciDict );
+			Update( onboardScience, SciDict, AvailableExperiments );
 		}
 
 		#region PROPERTIES
@@ -88,40 +88,36 @@ namespace ScienceChecklist {
 		/// Updates the IsUnlocked, CompletedScience, TotalScience, OnboardScience, and IsComplete fields.
 		/// </summary>
 		/// <param name="onboardScience">The total onboard ScienceData.</param>
-		public void Update (IEnumerable<ScienceData> onboardScience, Dictionary<string,ScienceSubject> SciDict )
+		public void Update( Dictionary<string, List<ScienceData>> onboardScience, Dictionary<string, ScienceSubject> SciDict, UnlockedExperimentList AvailableExperiments )
 		{
 			if( SciDict.ContainsKey( Id ) )
 				ScienceSubject = SciDict[ Id ];
 			else ScienceSubject = new ScienceSubject(ScienceExperiment, Situation.ExperimentSituation, Situation.Body, Situation.SubBiome ?? Situation.Biome ?? string.Empty);
 
 
-			IsUnlocked = ScienceExperiment.id == "evaReport" ||
-				ScienceExperiment.id == "surfaceSample" ||
-				ScienceExperiment.id == "crewReport" ||
-				PartLoader.Instance.parts.Any
-				(
-					x => ResearchAndDevelopment.PartModelPurchased(x) &&
-					x.partPrefab.Modules != null &&
-					x.partPrefab.Modules.OfType<ModuleScienceExperiment>().Any(y => y.experimentID == ScienceExperiment.id)
-				);
+			IsUnlocked = AvailableExperiments.IsUnlocked( ScienceExperiment.id ); 
 
 			CompletedScience = ScienceSubject.science * HighLogic.CurrentGame.Parameters.Career.ScienceGainMultiplier;
 			TotalScience = ScienceSubject.scienceCap * HighLogic.CurrentGame.Parameters.Career.ScienceGainMultiplier;
 			IsComplete = CompletedScience > TotalScience || TotalScience - CompletedScience < 0.1;
 
 			var multiplier = ScienceExperiment.baseValue / ScienceExperiment.scienceCap;
-			
-			var data = onboardScience
-				.Where (x => x.subjectID == ScienceSubject.id)
-				.ToList ();
-			
+
+
+
 			OnboardScience = 0;
-			foreach (var i in data) {
-				var next = (TotalScience - (CompletedScience + OnboardScience)) * multiplier;
-				OnboardScience += next;
+			if( onboardScience.ContainsKey( ScienceSubject.id ) )
+			{
+				var data = onboardScience[ ScienceSubject.id ];
+//				var _logger = new Logger( "Experiment" );
+//				_logger.Trace( ScienceSubject.id + " found " + data.Count( ) + " items" );
+				foreach (var i in data)
+				{
+					var next = (TotalScience - (CompletedScience + OnboardScience)) * multiplier;
+					OnboardScience += next;
+				}
 			}
 		}
-
 		#endregion
 
 		#region FIELDS
