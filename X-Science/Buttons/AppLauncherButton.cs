@@ -36,7 +36,7 @@ namespace ScienceChecklist.Buttons {
 		/// Adds the button to the KSP toolbar.
 		/// </summary>
 		public void Add () {
-			_logger.Trace("Add");
+//			_logger.Trace("Add");
 			if (_button != null) {
 				_logger.Debug("Button already added");
 				return;
@@ -49,7 +49,7 @@ namespace ScienceChecklist.Buttons {
 			texture.LoadImage(iconStream);
 			texture.Apply();
 			
-			_logger.Info("Adding button");
+//			_logger.Info("Adding button");
 			_button = ApplicationLauncher.Instance.AddModApplication(
 				OnToggleOn,
 				OnToggleOff,
@@ -65,13 +65,13 @@ namespace ScienceChecklist.Buttons {
 		/// Removes the button from the KSP toolbar.
 		/// </summary>
 		public void Remove () {
-			_logger.Trace("Remove");
+//			_logger.Trace("Remove");
 			if (_button == null) {
 				_logger.Debug("Button already removed");
 				return;
 			}
 
-			_logger.Info("Removing button");
+//			_logger.Info("Removing button");
 			ApplicationLauncher.Instance.RemoveModApplication(_button);
 			_button = null;
 		}
@@ -84,7 +84,7 @@ namespace ScienceChecklist.Buttons {
 		/// Called when the button is toggled on.
 		/// </summary>
 		private void OnToggleOn () {
-			_logger.Trace("OnToggleOn");
+//			_logger.Trace("OnToggleOn");
 			OnOpen(EventArgs.Empty);
 		}
 
@@ -92,7 +92,7 @@ namespace ScienceChecklist.Buttons {
 		/// Called when the button is toggled off.
 		/// </summary>
 		private void OnToggleOff () {
-			_logger.Trace("OnToggleOff");
+//			_logger.Trace("OnToggleOff");
 			OnClose(EventArgs.Empty);
 		}
 
@@ -101,7 +101,7 @@ namespace ScienceChecklist.Buttons {
 		/// </summary>
 		/// <param name="e">The EventArgs of this event.</param>
 		private void OnOpen (EventArgs e) {
-			_logger.Trace("OnOpen");
+//			_logger.Trace("OnOpen");
 			if (Open != null) {
 				Open(this, e);
 			}
@@ -112,7 +112,7 @@ namespace ScienceChecklist.Buttons {
 		/// </summary>
 		/// <param name="e">The EventArgs of this event.</param>
 		private void OnClose (EventArgs e) {
-			_logger.Trace("OnClose");
+//			_logger.Trace("OnClose");
 			if (Close != null) {
 				Close(this, e);
 			}

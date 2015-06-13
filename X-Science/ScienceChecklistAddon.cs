@@ -193,31 +193,31 @@ namespace ScienceChecklist {
 
 		private void VesselWasModified( Vessel V )
 		{
-			_logger.Trace( "Callback: VesselWasModified" );
+//			_logger.Trace( "Callback: VesselWasModified" );
 			_filterRefreshPending = true;
 		}
 
 		private void VesselChange( Vessel V )
 		{
-			_logger.Trace( "Callback: VesselChange" );
+//			_logger.Trace( "Callback: VesselChange" );
 			_filterRefreshPending = true;
 		}
 
 		private void EditorShipModified( ShipConstruct S )
 		{
-			_logger.Trace( "Callback: EditorShipModified" );
+//			_logger.Trace( "Callback: EditorShipModified" );
 			_filterRefreshPending = true;
 		}
 
 		private void GameStateSave( ConfigNode C )
 		{
-			_logger.Trace( "Callback: GameStateSave" );
+//			_logger.Trace( "Callback: GameStateSave" );
 			ScheduleExperimentUpdate( );
 		}
 
 		private void PartPurchased( AvailablePart P )
 		{
-			_logger.Trace( "Callback: PartPurchased" );
+//			_logger.Trace( "Callback: PartPurchased" );
 			ScheduleExperimentUpdate( true );
 		}
 
@@ -225,44 +225,38 @@ namespace ScienceChecklist {
 		{
 			if( Data.target == RDTech.OperationResult.Successful )
 			{
-				_logger.Trace( "Callback: TechnologyResearched" );
+//				_logger.Trace( "Callback: TechnologyResearched" );
 				ScheduleExperimentUpdate( true );
 			}
-			else
-				_logger.Trace( "Callback: Technology Research Failed" );
+//			else
+//				_logger.Trace( "Callback: Technology Research Failed" );
 		}
 
 
 
 		private void ScienceChanged( float V, TransactionReasons R )
 		{
-			_logger.Trace( "Callback: ScienceChanged" );
+//			_logger.Trace( "Callback: ScienceChanged" );
 			ScheduleExperimentUpdate( );
 		}
 
 		private void ScienceRecieved( float V, ScienceSubject S, ProtoVessel P, bool F )
 		{
-			_logger.Trace( "Callback: ScienceRecieved" );
+//			_logger.Trace( "Callback: ScienceRecieved" );
 			ScheduleExperimentUpdate( );
 		}
 
 		private void VesselRename( GameEvents.HostedFromToAction<Vessel, string> Data )
 		{
-			_logger.Trace( "Callback: VesselRename" );
+//			_logger.Trace( "Callback: VesselRename" );
 			ScheduleExperimentUpdate( );
 		}
 
 		private void FacilityUpgrade( Upgradeables.UpgradeableFacility Data, int V )
 		{
-			_logger.Trace( "Callback: KSP Facility Upgraded" );
+//			_logger.Trace( "Callback: KSP Facility Upgraded" );
 			ScheduleExperimentUpdate( true );
 		}
-
-
-
-
-
-
 
 
 

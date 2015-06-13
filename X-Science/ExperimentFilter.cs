@@ -4,6 +4,20 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
+
+
+
+
+
+// Resource map
+//ResourceMap.Instance.IsPlanetScanned(body.flightGlobalsIndex);
+
+
+
+
+
+
+
 namespace ScienceChecklist {
 	/// <summary>
 	/// Stores a cache of experiments available in the game, and provides methods to manipulate a filtered view of this collection.
@@ -116,7 +130,7 @@ namespace ScienceChecklist {
 		public void UpdateExperiments( )
 		{
 			var StartTime = DateTime.Now;
-			_logger.Trace( "UpdateExperiments" );
+//			_logger.Trace( "UpdateExperiments" );
 			var onboardScience = GameHelper.GetOnboardScience( );
 
 			var SciDict = GetScienceSubjects( );
@@ -142,7 +156,7 @@ namespace ScienceChecklist {
 		/// </summary>
 		public void RefreshExperimentCache () {
 			var StartTime = DateTime.Now;
-			_logger.Info( "RefreshExperimentCache" );
+//			_logger.Info( "RefreshExperimentCache" );
 			if (ResearchAndDevelopment.Instance == null) {
 				_logger.Debug("ResearchAndDevelopment not instantiated.");
 				AllExperiments = new List<Experiment>();
@@ -158,7 +172,6 @@ namespace ScienceChecklist {
 			}
 
 			var exps = new List<Experiment>();
-_logger.Trace("aaa");
 			var experiments = PartLoader.Instance.parts
 				.SelectMany(x => x.partPrefab.FindModulesImplementing<ModuleScienceExperiment>())
 				.Select(x => new {
@@ -168,19 +181,11 @@ _logger.Trace("aaa");
 				.Where(x => x.Experiment != null)
 				.GroupBy(x => x.Experiment)
 				.ToDictionary(x => x.Key, x => x.First().Module);
-_logger.Trace("bbb");
 			experiments[ResearchAndDevelopment.GetExperiment("evaReport")] = null;
 			experiments[ResearchAndDevelopment.GetExperiment("surfaceSample")] = null;
 
 			var bodies = FlightGlobals.Bodies;
-//_logger.Trace( bodies.ToString( ) );
 			var situations = Enum.GetValues(typeof(ExperimentSituations)).Cast<ExperimentSituations>();
-//_logger.Trace( situations.ToString( ) );
-
-//_logger.Trace( bodies[ 0 ].BiomeMap.Attributes.Select( y => y.name ).ToArray( ) );
-
-
-
 
 
 			var biomes = new Dictionary< CelestialBody, string[ ]>( );
@@ -192,21 +197,13 @@ _logger.Trace("bbb");
 					biomes[ body ] = new string[ 0 ];
 			}
 
-//			_logger.Trace( biomes.ToString( ) );
-			String s = String.Format( "FOUND {0} BIOMES.", biomes.Count );
-_logger.Trace( s );
+
+//String s = String.Format( "FOUND {0} BIOMES.", biomes.Count );
+//_logger.Trace( s );
 
 
 
-
-
-
-
-
-
-
-_logger.Trace("ccc");
-_kscBiomes = new List<string>( );
+			_kscBiomes = new List<string>( );
 			_kscBiomes = _kscBiomes.Any () ? _kscBiomes : UnityEngine.Object.FindObjectsOfType<Collider>()
 				.Where(x => x.gameObject.layer == 15)
 				.Select(x => x.gameObject.tag)
@@ -223,9 +220,9 @@ _kscBiomes = new List<string>( );
 				AvailableExperiments.Clear( );
 
 			var SciDict = GetScienceSubjects( );
-//_logger.Trace("ddd");
+
 			var onboardScience = GameHelper.GetOnboardScience();
-//_logger.Trace("eee");
+
 			foreach (var experiment in experiments.Keys) {
 				var sitMask = experiment.situationMask;
 				var biomeMask = experiment.biomeMask;
@@ -236,7 +233,7 @@ _kscBiomes = new List<string>( );
 						sitMask = (uint) (int) sitMaskField.GetValue(experiments[experiment]);
 //						_logger.Debug("Setting sitMask to " + sitMask + " for " + experiment.experimentTitle);
 					}
-//_logger.Trace("fff");
+
 					if (biomeMask == 0) {
 						var biomeMaskField = experiments[experiment].GetType().GetField("bioMask");
 						if (biomeMaskField != null) {
@@ -245,13 +242,12 @@ _kscBiomes = new List<string>( );
 						}
 					}
 				}
-//_logger.Trace("ggg");
+
 				foreach (var body in bodies) {
 					if (experiment.requireAtmosphere && !body.atmosphere) {
 						// If the whole planet doesn't have an atmosphere, then there's not much point continuing.
 						continue;
 					}
-//_logger.Trace("hhh");
 					foreach (var situation in situations) {
 						if (situation == ExperimentSituations.SrfSplashed && !body.ocean) {
 							// Some planets don't have an ocean for us to be splashed down in.
@@ -294,9 +290,8 @@ _kscBiomes = new List<string>( );
 					}
 				}
 			}
-//_logger.Trace("iii");
+
 			AllExperiments = exps;
-//_logger.Trace( "Gonna UpdateFilter" );
 			UpdateFilter();
 			var Elapsed = DateTime.Now - StartTime;
 			_logger.Trace( "RefreshExperimentCache Done - " + Elapsed.ToString( ) + "ms" );

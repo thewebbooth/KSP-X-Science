@@ -30,7 +30,7 @@ namespace ScienceChecklist.Buttons {
 		/// Adds the button to the toolbar.
 		/// </summary>
 		public void Add () {
-			_logger.Trace("Add");
+//			_logger.Trace("Add");
 			if (!IsAvailable) {
 				_logger.Info("Blizzy's toolbar not available.");
 				return;
@@ -77,7 +77,7 @@ namespace ScienceChecklist.Buttons {
 		/// Removes the button from the toolbar.
 		/// </summary>
 		public void Remove () {
-			_logger.Trace("Remove");
+//			_logger.Trace("Remove");
 			if (!IsAvailable) {
 				_logger.Info("Blizzy's toolbar not available.");
 				return;

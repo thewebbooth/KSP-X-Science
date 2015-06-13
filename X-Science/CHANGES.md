@@ -1,17 +1,23 @@
 [x] Science!
 ============
 
+4.5
+---
+12-June-2015 Speed increase and bug fix for KSP V1.0.2
+* Handles building upgrades in career mode - surface samples listed as appropriate, baby biomes appear and disappear as appropriate
+* Better use of indexed lists means it is much faster 
+
 
 4.4
 ---
-15-May-2015 Speed increase for KSP V1.0.2 by Z-Key Aerospace
+15-May-2015 Speed increase for KSP V1.0.2
 * No longer checks for science stored in debris.
 * Only gets the science subjects once and indexes the list for efficient queries.
 
 
 4.3
 ---
-5-May-2015 Fix and rebuild for KSP V1.0.2 by Z-Key Aerospace
+5-May-2015 Fix and rebuild for KSP V1.0.2
 * Changed blizzy icon text - doesn't say 'test' any more!
 
 

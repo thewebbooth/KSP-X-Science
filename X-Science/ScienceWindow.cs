@@ -270,7 +270,7 @@ namespace ScienceChecklist {
 				DrawExperiment(experiment, rect, false, _labelStyle);
 			}
 			}
-//_logger.Trace("3");
+
 			GUILayout.Space(20 * i);
 			GUILayout.EndScrollView();
 			
@@ -284,7 +284,7 @@ namespace ScienceChecklist {
 			}, 4);
 
 			GUILayout.FlexibleSpace();
-//_logger.Trace("4");
+
 			if (_filter.CurrentSituation != null) {
 				var desc = _filter.CurrentSituation.Description;
 				GUILayout.Label(char.ToUpper(desc[0]) + desc.Substring(1), _situationStyle);
@@ -322,7 +322,6 @@ namespace ScienceChecklist {
 			if (Input.GetMouseButton(0) || Input.GetMouseButton(1) || Input.GetMouseButton(2)) {
 				_lastTooltip = string.Empty;
 			}
-//_logger.Trace("End");
 		}
 
 		/// <summary>
@@ -333,9 +332,7 @@ namespace ScienceChecklist {
 			GUILayout.BeginVertical();
 			_compactScrollPos = GUILayout.BeginScrollView(_compactScrollPos);
 			var i = 0;
-			if( _filter.DisplayExperiments == null )
-				_logger.Trace( "DisplayExperiments is null" );
-			else
+			if( _filter.DisplayExperiments != null )
 			{
 				for (; i < _filter.DisplayExperiments.Count; i++) {
 
@@ -348,6 +345,8 @@ namespace ScienceChecklist {
 					DrawExperiment(experiment, rect, true, _compactLabelStyle);
 				}
 			}
+			else
+				_logger.Trace( "DisplayExperiments is null" );
 			GUILayout.Space(15 * i);
 			GUILayout.EndScrollView();
 			GUILayout.EndVertical();

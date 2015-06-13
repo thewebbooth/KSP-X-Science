@@ -10,19 +10,19 @@ namespace ScienceChecklist {
 		public static bool UseBlizzysToolbar       { get; set; }
 
 		public static void Save () {
-			_logger.Trace("Save");
+//			_logger.Trace("Save");
 			var node = new ConfigNode();
 			var root = node.AddNode("ScienceChecklist");
 			var settings = root.AddNode("Config");
 			settings.AddValue("HideCompleteExperiments", HideCompleteExperiments);
 			settings.AddValue("UseBlizzysToolbar", UseBlizzysToolbar);
-			_logger.Debug("Saving to" + _file);
+//			_logger.Debug("Saving to" + _file);
 			node.Save(_file);
 		}
 
 		public static void Load () {
-			_logger.Trace("Load");
-			_logger.Debug("Loading from " + _file);
+//			_logger.Trace("Load");
+//			_logger.Debug("Loading from " + _file);
 			try {
 				if (File.Exists(_file)) {
 					var node = ConfigNode.Load(_file);
@@ -31,7 +31,7 @@ namespace ScienceChecklist {
 
 					HideCompleteExperiments = bool.Parse(settings.GetValue("HideCompleteExperiments"));
 					UseBlizzysToolbar = bool.Parse(settings.GetValue("UseBlizzysToolbar"));
-					_logger.Info("Loaded successfully.");
+//					_logger.Info("Loaded successfully.");
 					return;
 				}
 			} catch (Exception e) {

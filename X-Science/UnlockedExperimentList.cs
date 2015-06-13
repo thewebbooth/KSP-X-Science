@@ -21,7 +21,7 @@ namespace ScienceChecklist
 			var _logger = new Logger( "UnlockedExperimentList" );
 			_unlockedExperiments = new Dictionary<string, bool>( );
 			float RnDLevel = ScenarioUpgradeableFacilities.GetFacilityLevel( SpaceCenterFacility.ResearchAndDevelopment );
-			_logger.Trace( "RnDLevel " + RnDLevel );
+//			_logger.Trace( "RnDLevel " + RnDLevel );
 			_unlockedExperiments.Add( "crewReport", true );
 			_unlockedExperiments.Add( "evaReport", true );
 			if( RnDLevel >= 0.5 )
