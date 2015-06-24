@@ -57,7 +57,12 @@ namespace ScienceChecklist.Buttons {
 				null,
 				null,
 				null,
-				ApplicationLauncher.AppScenes.ALWAYS,
+				ApplicationLauncher.AppScenes.SPACECENTER |
+				ApplicationLauncher.AppScenes.FLIGHT |
+				ApplicationLauncher.AppScenes.MAPVIEW |
+				ApplicationLauncher.AppScenes.VAB |
+				ApplicationLauncher.AppScenes.SPH |
+				ApplicationLauncher.AppScenes.TRACKSTATION,
 				texture);
 		}
 
