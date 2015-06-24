@@ -4,7 +4,7 @@
 
 4.6
 ---
-24-June-2015 Gui bug for KSP V1.0.4
+24-June-2015 Gui bug fix for KSP V1.0.4
 * Completed experiments total is updated correctly when vehicles are recovered
 * Window is closed on main menu and certain other scenes
 * Added close button to window
