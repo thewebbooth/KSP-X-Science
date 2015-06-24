@@ -76,6 +76,19 @@ namespace ScienceChecklist.Buttons {
 			_button = null;
 		}
 
+
+
+		public void SetOn( )
+		{
+			_button.SetTrue( false );
+			_logger.Debug( "SetOn" );
+		}
+		public void SetOff( )
+		{
+			_button.SetFalse( false );
+			_logger.Debug( "SetOff" );
+		}
+
 		#endregion
 
 		#region METHODS (PRIVATE)

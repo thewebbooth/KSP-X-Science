@@ -92,6 +92,18 @@ namespace ScienceChecklist.Buttons {
 			_button = null;
 		}
 
+		public void SetOn( )
+		{
+			_open = true;
+		}
+		public void SetOff( )
+		{
+			_open = false;
+		}
+
+
+
+
 		/// <summary>
 		/// Raises the Open event.
 		/// </summary>

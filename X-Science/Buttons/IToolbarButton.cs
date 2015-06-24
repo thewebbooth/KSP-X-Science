@@ -22,5 +22,8 @@ namespace ScienceChecklist.Buttons {
 		/// Removes the button from the toolbar.
 		/// </summary>
 		void Remove ();
+
+		void SetOn( );
+		void SetOff( );
 	}
 }

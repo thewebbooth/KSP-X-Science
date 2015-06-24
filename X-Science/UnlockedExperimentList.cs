@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+
+
 namespace ScienceChecklist
 {
 	internal sealed class UnlockedExperimentList
@@ -21,7 +23,15 @@ namespace ScienceChecklist
 			var _logger = new Logger( "UnlockedExperimentList" );
 			_unlockedExperiments = new Dictionary<string, bool>( );
 			float RnDLevel = ScenarioUpgradeableFacilities.GetFacilityLevel( SpaceCenterFacility.ResearchAndDevelopment );
-//			_logger.Trace( "RnDLevel " + RnDLevel );
+			//			_logger.Trace( "RnDLevel " + RnDLevel );
+
+
+
+/* According to the UI you need the AstronautComplex upgraded to do surface samples.  Turns out that is rubbish.
+			float AstroLevel = ScenarioUpgradeableFacilities.GetFacilityLevel( SpaceCenterFacility.AstronautComplex );*/
+
+
+
 			_unlockedExperiments.Add( "crewReport", true );
 			_unlockedExperiments.Add( "evaReport", true );
 			if( RnDLevel >= 0.5 )
@@ -34,8 +44,6 @@ namespace ScienceChecklist
 
 		public bool IsUnlocked( string Id )
 		{
-
-
 			if( PartLoader.Instance == null )
 				return false;
 			if( _unlockedExperiments.ContainsKey( Id ) )

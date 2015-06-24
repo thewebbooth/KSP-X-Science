@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
+
+
 namespace ScienceChecklist {
 	/// <summary>
 	/// The main entry point into the addon. Constructed by the KSP addon loader.
@@ -33,6 +35,7 @@ namespace ScienceChecklist {
 			_logger.Trace("Awake");
 			_window = new ScienceWindow();
 			_window.Settings.UseBlizzysToolbarChanged += Settings_UseBlizzysToolbarChanged;
+			_window.OnCloseEvent += OnWindowClosed;
 			
 			_nextSituationUpdate = DateTime.Now;
 			GameEvents.onGUIApplicationLauncherReady.Add(Load);
@@ -92,7 +95,8 @@ namespace ScienceChecklist {
 		/// <summary>
 		/// Called by Unity once per frame.
 		/// </summary>
-		public void Update () {
+		public void Update( )
+		{
 			if (!_window.IsVisible) {
 				return;
 			}
@@ -336,7 +340,7 @@ namespace ScienceChecklist {
 				return;
 			}
 			_logger.Trace("Button_Open");
-			_buttonClicked = true;
+			_windowVisible = true;
 			UpdateVisibility();
 		}
 
@@ -352,9 +356,18 @@ namespace ScienceChecklist {
 				return;
 			}
 			_logger.Trace("Button_Close");
-			_buttonClicked = false;
+			_windowVisible = false;
 			UpdateVisibility();
 		}
+
+
+		public void OnWindowClosed( object sender, EventArgs e  )
+		{
+			_button.SetOff( );
+			_windowVisible = false;
+		}
+
+
 
 
 
@@ -394,7 +407,7 @@ namespace ScienceChecklist {
 				return;
 			}
 			_logger.Trace("UpdateVisibility");
-			_window.IsVisible = _launcherVisible && _buttonClicked;
+			_window.IsVisible = _launcherVisible && _windowVisible;
 			ScheduleExperimentUpdate();
 		}
 
@@ -419,6 +432,13 @@ namespace ScienceChecklist {
 		/// <param name="e">The EventArgs of the event.</param>
 		private void Settings_UseBlizzysToolbarChanged (object sender, EventArgs e) {
 			InitializeButton();
+
+
+			// Need to set this
+			if( _windowVisible )
+				_button.SetOn( );
+			else
+				_button.SetOff( );
 		}
 
 
@@ -453,7 +473,7 @@ namespace ScienceChecklist {
 		private Logger _logger;
 		private IToolbarButton _button;
 		private bool _launcherVisible;
-		private bool _buttonClicked;
+		private bool _windowVisible;
 		private ScienceWindow _window;
 		private IEnumerator _rndLoader;
 

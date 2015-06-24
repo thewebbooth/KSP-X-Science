@@ -103,5 +103,31 @@ namespace ScienceChecklist {
 			_logger.Trace( "GetOnboardScience took " + Elapsed.ToString( ) + "ms and found " + onboardScience.Count( ) + " ScienceData" );
 			return onboardScienceDict;
 		}
+	
+	
+	
+	
+		public static bool WindowVisibility( )
+		{
+			switch( HighLogic.LoadedScene )
+			{
+				case GameScenes.LOADING:
+				case GameScenes.LOADINGBUFFER:
+				case GameScenes.MAINMENU:
+				case GameScenes.SETTINGS:
+				case GameScenes.CREDITS:
+					return false;
+				case GameScenes.SPACECENTER:
+				case GameScenes.EDITOR:
+				case GameScenes.FLIGHT:
+				case GameScenes.TRACKSTATION:
+					return true;
+				case GameScenes.PSYSTEM:
+					return false;
+				default:
+					return false;
+			}
+			return false;
+		}
 	}
 }

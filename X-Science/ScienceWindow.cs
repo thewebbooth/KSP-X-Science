@@ -39,6 +39,10 @@ namespace ScienceChecklist {
 			_settingsPanel.HideCompleteEventsChanged += (s, e) => _filter.UpdateFilter();
 		}
 
+
+		public event EventHandler OnCloseEvent;
+
+
 		#region PROPERTIES
 
 		/// <summary>
@@ -60,12 +64,21 @@ namespace ScienceChecklist {
 		/// <summary>
 		/// Draws the window if it is visible.
 		/// </summary>
-		public void Draw () {
-			if (!IsVisible) {
+		public void Draw( )
+		{
+			if( !IsVisible )
+			{
 				return;
 			}
+			if( !GameHelper.WindowVisibility( ) )
+			{
+				IsVisible = false;
+				OnCloseEvent( this, EventArgs.Empty );
+			}
 
-			if (_skin == null) {
+
+			if( _skin == null )
+			{
 				// Initialize our skin and styles.
 				_skin = GameObject.Instantiate(HighLogic.Skin) as GUISkin;
 
@@ -122,17 +135,33 @@ namespace ScienceChecklist {
 
 				_compactButtonStyle = new GUIStyle(_skin.button) {
 					padding = new RectOffset(),
+					fixedHeight = 16
+				};
+				_closeButtonStyle = new GUIStyle( _skin.button )
+				{
+					// int left, int right, int top, int bottom
+					padding = new RectOffset( 2, 2, 6, 2 ),
 				};
 			}
 
 			var oldSkin = GUI.skin;
 			GUI.skin = _skin;
 
-			if (_compactMode) {
+			if( _compactMode )
+			{
 				_rect3 = GUILayout.Window(_window3Id, _rect3, DrawCompactControls, string.Empty, _compactWindowStyle);
 			} else {
 				_rect = GUILayout.Window(_windowId, _rect, DrawControls, "[x] Science!");
+				var ClosePos = new Rect( _rect.xMin + _rect.width - 20, _rect.yMin + 2, 18, 18 );
+				--GUI.depth;
+				if( GUI.Button( ClosePos, "X", _closeButtonStyle ) )
+				{
+					IsVisible = false;
+					OnCloseEvent( this, EventArgs.Empty );
+				}
 			}
+
+
 
 			if (!string.IsNullOrEmpty(_lastTooltip)) {
 				_tooltipStyle = _tooltipStyle ?? new GUIStyle(_skin.window) {
@@ -173,9 +202,11 @@ namespace ScienceChecklist {
 		/// <summary>
 		/// Updates all experiments.
 		/// </summary>
-		public void UpdateExperiments () {
+		public void UpdateExperiments( )
+		{
 //			_logger.Trace("UpdateExperiments");
-			_filter.UpdateExperiments();
+			_filter.UpdateExperiments( );
+			_filter.UpdateFilter( ); // Need to do this, otherwise complete count can be incorrect after vehicle recovery.
 		}
 
 
@@ -226,6 +257,9 @@ namespace ScienceChecklist {
 		/// <param name="windowId"></param>
 		private void DrawControls (int windowId) {
 			GUILayout.BeginHorizontal ();
+
+
+
 			GUILayout.BeginVertical(GUILayout.Width(480), GUILayout.ExpandHeight(true));
 
 			ProgressBar(
@@ -235,7 +269,7 @@ namespace ScienceChecklist {
 				0,
 				false,
 				false);
-//_logger.Trace("1");
+
 			GUILayout.Space(20);
 
 			GUILayout.BeginHorizontal();
@@ -248,7 +282,7 @@ namespace ScienceChecklist {
 			if (GUILayout.Button(new GUIContent(_clearSearchTexture, "Clear search"), GUILayout.Width(25), GUILayout.Height(23))) {
 				_filter.Text = string.Empty;
 			}
-//_logger.Trace("2");
+
 			GUILayout.EndHorizontal();
 
 			_scrollPos = GUILayout.BeginScrollView(_scrollPos, _skin.scrollView);
@@ -257,9 +291,9 @@ namespace ScienceChecklist {
 				_logger.Trace( "DisplayExperiments is null" );
 			else
 			{
-//_logger.Trace(_filter.DisplayExperiments.ToString());
 
-//_logger.Trace(_filter.DisplayExperiments.Count.ToString( ) );
+
+
 			for (; i < _filter.DisplayExperiments.Count; i++) {
 				var rect = new Rect(5, 20 * i, _filter.DisplayExperiments.Count > 13 ? 490 : 500, 20);
 				if (rect.yMax < _scrollPos.y || rect.yMin > _scrollPos.y + 400) {
@@ -324,6 +358,8 @@ namespace ScienceChecklist {
 			}
 		}
 
+
+
 		/// <summary>
 		/// Draws the controls for the window in compact mode.
 		/// </summary>
@@ -353,11 +389,25 @@ namespace ScienceChecklist {
 
 			GUILayout.BeginHorizontal();
 
+
+
+
+			var CloseButton = GUILayout.Button( "X", _compactButtonStyle, GUILayout.Height( 16 ), GUILayout.Width( 16 ) );
+			if( CloseButton )
+			{
+				IsVisible = false;
+				OnCloseEvent( this, EventArgs.Empty );
+			}
+
+
 			GUILayout.FlexibleSpace();
 			if (_filter.CurrentSituation != null) {
 				var desc = _filter.CurrentSituation.Description;
 				GUILayout.Label(char.ToUpper(desc[0]) + desc.Substring(1), _compactSituationStyle, GUILayout.Height(16));
 			}
+
+
+
 			GUILayout.FlexibleSpace();
 
 			var toggleCompact = GUILayout.Button(new GUIContent(_maximizeTexture, "Normal mode"), _compactButtonStyle, GUILayout.Height(16), GUILayout.Width(16));
@@ -461,6 +511,7 @@ namespace ScienceChecklist {
 		private GUIStyle _compactLabelStyle;
 		private GUIStyle _compactSituationStyle;
 		private GUIStyle _compactButtonStyle;
+		private GUIStyle _closeButtonStyle;
 		private GUISkin _skin;
 
 		private string _lastTooltip;
