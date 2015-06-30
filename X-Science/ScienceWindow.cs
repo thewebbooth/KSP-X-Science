@@ -22,21 +22,23 @@ namespace ScienceChecklist {
 			_completeTexture =			TextureHelper.FromResource( "ScienceChecklist.icons.scienceComplete.png", 13, 13 );
 			_progressTextureCompact =	TextureHelper.FromResource( "ScienceChecklist.icons.scienceProgressCompact.png", 8, 8 );
 			_completeTextureCompact =	TextureHelper.FromResource( "ScienceChecklist.icons.scienceCompleteCompact.png", 8, 8 );
-			_currentSituationTexture =	TextureHelper.FromResource("ScienceChecklist.icons.currentSituation.png", 25, 21);
-			_currentVesselTexture =		TextureHelper.FromResource("ScienceChecklist.icons.currentVessel.png", 25, 21);
-			_unlockedTexture =			TextureHelper.FromResource("ScienceChecklist.icons.unlocked.png", 25, 21);
-			_allTexture =				TextureHelper.FromResource("ScienceChecklist.icons.all.png", 25, 21);
-			_searchTexture =			TextureHelper.FromResource("ScienceChecklist.icons.search.png", 25, 21);
-			_clearSearchTexture =		TextureHelper.FromResource("ScienceChecklist.icons.clearSearch.png", 25, 21);
-			_settingsTexture =			TextureHelper.FromResource("ScienceChecklist.icons.settings.png", 25, 21);
-			_maximizeTexture =			TextureHelper.FromResource("ScienceChecklist.icons.minimize.png", 25, 21);
-			_minimizeTexture =			TextureHelper.FromResource("ScienceChecklist.icons.maximize.png", 25, 21);
+			_currentSituationTexture =	TextureHelper.FromResource( "ScienceChecklist.icons.currentSituation.png", 25, 21 );
+			_currentVesselTexture =		TextureHelper.FromResource( "ScienceChecklist.icons.currentVessel.png", 25, 21 );
+			_unlockedTexture =			TextureHelper.FromResource( "ScienceChecklist.icons.unlocked.png", 25, 21 );
+			_allTexture =				TextureHelper.FromResource( "ScienceChecklist.icons.all.png", 25, 21 );
+			_searchTexture =			TextureHelper.FromResource( "ScienceChecklist.icons.search.png", 25, 21 );
+			_clearSearchTexture =		TextureHelper.FromResource( "ScienceChecklist.icons.clearSearch.png", 25, 21 );
+			_settingsTexture =			TextureHelper.FromResource( "ScienceChecklist.icons.settings.png", 25, 21 );
+			_maximizeTexture =			TextureHelper.FromResource( "ScienceChecklist.icons.minimize.png", 25, 21 );
+			_minimizeTexture =			TextureHelper.FromResource( "ScienceChecklist.icons.maximize.png", 25, 21 );
 
 			_emptyTexture = new Texture2D(1, 1, TextureFormat.ARGB32, false);
 			_emptyTexture.SetPixels(new[] { Color.clear });
 			_emptyTexture.Apply();
 			_settingsPanel = new SettingsPanel();
-			_settingsPanel.HideCompleteEventsChanged += (s, e) => _filter.UpdateFilter();
+			_settingsPanel.HideCompleteEventsChanged += (s, e) => _filter.UpdateFilter( );
+			_settingsPanel.CheckDebrisChanged += ( s, e ) => _filter.UpdateExperiments( );
+			_settingsPanel.CompleteWithoutRecoveryChanged += ( s, e ) => _filter.UpdateFilter( );
 		}
 
 

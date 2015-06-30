@@ -4,21 +4,35 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
+
+
 namespace ScienceChecklist {
 	internal static class Config {
-		public static bool HideCompleteExperiments { get; set; }
-		public static bool UseBlizzysToolbar       { get; set; }
+		public static bool HideCompleteExperiments	{ get; set; }
+		public static bool UseBlizzysToolbar		{ get; set; }
+		public static bool CompleteWithoutRecovery	{ get; set; }
+		public static bool CheckDebris				{ get; set; }
+
+
 
 		public static void Save () {
 //			_logger.Trace("Save");
 			var node = new ConfigNode();
 			var root = node.AddNode("ScienceChecklist");
 			var settings = root.AddNode("Config");
-			settings.AddValue("HideCompleteExperiments", HideCompleteExperiments);
-			settings.AddValue("UseBlizzysToolbar", UseBlizzysToolbar);
+
+			settings.AddValue( "HideCompleteExperiments",	HideCompleteExperiments );
+			settings.AddValue( "UseBlizzysToolbar",			UseBlizzysToolbar );
+			settings.AddValue( "CompleteWithoutRecovery",	CompleteWithoutRecovery );
+			settings.AddValue( "CheckDebris",				CheckDebris );
+
+
+
 //			_logger.Debug("Saving to" + _file);
 			node.Save(_file);
 		}
+
+
 
 		public static void Load () {
 //			_logger.Trace("Load");
@@ -29,17 +43,25 @@ namespace ScienceChecklist {
 					var root = node.GetNode("ScienceChecklist");
 					var settings = root.GetNode("Config");
 
-					HideCompleteExperiments = bool.Parse(settings.GetValue("HideCompleteExperiments"));
-					UseBlizzysToolbar = bool.Parse(settings.GetValue("UseBlizzysToolbar"));
+					HideCompleteExperiments =	bool.Parse( settings.GetValue( "HideCompleteExperiments" ) );
+					UseBlizzysToolbar =			bool.Parse( settings.GetValue( "UseBlizzysToolbar") );
+					CompleteWithoutRecovery =	bool.Parse( settings.GetValue( "CompleteWithoutRecovery" ) );
+					CheckDebris =				bool.Parse( settings.GetValue( "CheckDebris" ) );
+
+
+
+
 //					_logger.Info("Loaded successfully.");
-					return;
+					return; // <--- Return from here --------------------------------------
 				}
 			} catch (Exception e) {
 				_logger.Info("Unable to load config: " + e.ToString());
 			}
 
-			HideCompleteExperiments = false;
-			UseBlizzysToolbar = false;
+			HideCompleteExperiments =	false;
+			UseBlizzysToolbar =			false;
+			CompleteWithoutRecovery =	false;
+			CheckDebris =				false;
 		}
 
 		private static readonly Logger _logger = new Logger("Config");

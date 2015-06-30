@@ -27,6 +27,21 @@ namespace ScienceChecklist {
 		/// Raised when the HideCompleteEvents settings has changed.
 		/// </summary>
 		public event EventHandler HideCompleteEventsChanged;
+
+
+
+		/// <summary>
+		/// Raised when the CompleteWithoutRecovery setting has changed.
+		/// </summary>
+		public event EventHandler CompleteWithoutRecoveryChanged;
+
+		/// <summary>
+		/// Raised when the CheckDebrisChanged settings has changed.
+		/// </summary>
+		public event EventHandler CheckDebrisChanged;
+		
+
+
 		
 		/// <summary>
 		/// Renders this panel to the screen.
@@ -50,6 +65,22 @@ namespace ScienceChecklist {
 				}
 			}
 
+			toggle = GUILayout.Toggle( Config.CompleteWithoutRecovery, "Complete without recovery" );
+			if( toggle != Config.CompleteWithoutRecovery )
+			{
+				Config.CompleteWithoutRecovery = toggle;
+				OnCompleteWithoutRecoveryChanged( );
+				save = true;
+			}
+
+			toggle = GUILayout.Toggle( Config.CheckDebris, "Check debris" );
+			if( toggle != Config.CheckDebris )
+			{
+				Config.CheckDebris = toggle;
+				OnCheckDebrisChanged( );
+				save = true;
+			}
+
 			if (save) {
 				Config.Save();
 			}
@@ -69,6 +100,22 @@ namespace ScienceChecklist {
 		private void OnHideCompleteEventsChanged () {
 			if (HideCompleteEventsChanged != null) {
 				HideCompleteEventsChanged(this, EventArgs.Empty);
+			}
+		}
+
+		private void OnCompleteWithoutRecoveryChanged( )
+		{
+			if( CompleteWithoutRecoveryChanged != null )
+			{
+				CompleteWithoutRecoveryChanged( this, EventArgs.Empty );
+			}
+		}
+
+		private void OnCheckDebrisChanged( )
+		{
+			if( CheckDebrisChanged != null )
+			{
+				CheckDebrisChanged( this, EventArgs.Empty );
 			}
 		}
 

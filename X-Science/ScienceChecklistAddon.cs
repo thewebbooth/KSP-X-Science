@@ -6,7 +6,12 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-
+/*
+RECOVERY
+SCANSAT
+RESOURCES
+DMAGIC
+*/
 
 namespace ScienceChecklist {
 	/// <summary>

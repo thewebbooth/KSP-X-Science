@@ -131,7 +131,7 @@ namespace ScienceChecklist {
 		{
 			var StartTime = DateTime.Now;
 //			_logger.Trace( "UpdateExperiments" );
-			var onboardScience = GameHelper.GetOnboardScience( );
+			var onboardScience = GameHelper.GetOnboardScience( Config.CheckDebris );
 
 			var SciDict = GetScienceSubjects( );
 //			_logger.Trace( "onboardScience contains " + onboardScience.Count() + " items" );
@@ -221,7 +221,7 @@ namespace ScienceChecklist {
 
 			var SciDict = GetScienceSubjects( );
 
-			var onboardScience = GameHelper.GetOnboardScience();
+			var onboardScience = GameHelper.GetOnboardScience( Config.CheckDebris );
 
 			foreach (var experiment in experiments.Keys) {
 				var sitMask = experiment.situationMask;
@@ -341,7 +341,7 @@ namespace ScienceChecklist {
 			CompleteCount = query.Count(x => x.IsComplete);
 			TotalCount = query.Count();
 //_logger.Trace("4");
-			DisplayExperiments = query.Where (x => !Config.HideCompleteExperiments || !x.IsComplete).ToList();
+			DisplayExperiments = query.Where (x => !Config.HideCompleteExperiments || !x.IsComplete).ToList( );
 //_logger.Trace("End");
 
 			var Elapsed = DateTime.Now - StartTime;
