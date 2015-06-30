@@ -335,14 +335,22 @@ namespace ScienceChecklist {
 					return x.Description.ToLowerInvariant().Contains(s.ToLowerInvariant()) == !negate;
 				}));
 			}
-//_logger.Trace("2");
+
 			query = query.OrderBy (x => x.TotalScience);
-//_logger.Trace("3");
-			CompleteCount = query.Count(x => x.IsComplete);
 			TotalCount = query.Count();
-//_logger.Trace("4");
-			DisplayExperiments = query.Where (x => !Config.HideCompleteExperiments || !x.IsComplete).ToList( );
-//_logger.Trace("End");
+
+
+
+			if( Config.CompleteWithoutRecovery ) // Lab lander mode.  Complete is a green bar ( Recovered+OnBoard )
+			{
+				CompleteCount = query.Count( x => x.IsCollected );
+				DisplayExperiments = query.Where( x => !Config.HideCompleteExperiments || !x.IsCollected ).ToList( );		
+			}
+			else // Normal mode, must recover/transmit to KSC
+			{
+				CompleteCount = query.Count(x => x.IsComplete);
+				DisplayExperiments = query.Where (x => !Config.HideCompleteExperiments || !x.IsComplete).ToList( );
+			}
 
 			var Elapsed = DateTime.Now - StartTime;
 			_logger.Trace( "UpdateFilter Done - " + Elapsed.ToString( ) + "ms" );

@@ -57,8 +57,15 @@ namespace ScienceChecklist {
 		public float  TotalScience     { get; private set; }
 		/// <summary>
 		/// Gets a value indicating whether all the science has been obtained for this experiment.
+		/// This is science that has made it back to KSC
 		/// </summary>
 		public bool   IsComplete       { get; private set; }
+
+		/// <summary>
+		/// Completed Science + Onboard Science science
+		/// </summary>
+		public bool	IsCollected { get; private set; }
+
 		/// <summary>
 		/// Gets the amount of science for this experiment that is currently stored on vessels.
 		/// </summary>
@@ -117,6 +124,8 @@ namespace ScienceChecklist {
 					OnboardScience += next;
 				}
 			}
+			var AllCollectedScience = CompletedScience + OnboardScience;
+			IsCollected = AllCollectedScience > TotalScience || TotalScience - AllCollectedScience < 0.1;
 		}
 		#endregion
 
