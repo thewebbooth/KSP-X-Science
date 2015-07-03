@@ -1,6 +1,12 @@
 [x] Science!
 ============
 
+4.7
+---
+3-July-2015 New settings for KSP V1.0.4
+* Option to check for science in debris
+* Option to consider science "completed" before recovery
+
 
 4.6
 ---
