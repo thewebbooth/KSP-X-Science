@@ -178,7 +178,12 @@ namespace ScienceChecklist {
 			}
 			_active = false;
 
-			_button.Remove();
+
+
+			if( _button != null )
+				_button.Remove();
+
+
 			
 			ApplicationLauncher.Instance.RemoveOnShowCallback(Launcher_Show);
 			ApplicationLauncher.Instance.RemoveOnHideCallback(Launcher_Hide);

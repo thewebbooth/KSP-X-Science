@@ -1,6 +1,13 @@
 [x] Science!
 ============
 
+4.8
+---
+23-July-2015 Bug fixes for KSP V1.0.4
+* Loading settings is a bit more robust
+* Fixed an exception if Blizzy78's toolbar is missing
+
+
 4.7
 ---
 3-July-2015 New settings for KSP V1.0.4

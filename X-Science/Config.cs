@@ -34,7 +34,13 @@ namespace ScienceChecklist {
 
 
 
-		public static void Load () {
+		public static void Load( )
+		{
+			HideCompleteExperiments = false;
+			UseBlizzysToolbar = false;
+			CompleteWithoutRecovery = false;
+			CheckDebris = false;
+
 //			_logger.Trace("Load");
 //			_logger.Debug("Loading from " + _file);
 			try {
@@ -43,10 +49,21 @@ namespace ScienceChecklist {
 					var root = node.GetNode("ScienceChecklist");
 					var settings = root.GetNode("Config");
 
-					HideCompleteExperiments =	bool.Parse( settings.GetValue( "HideCompleteExperiments" ) );
-					UseBlizzysToolbar =			bool.Parse( settings.GetValue( "UseBlizzysToolbar") );
-					CompleteWithoutRecovery =	bool.Parse( settings.GetValue( "CompleteWithoutRecovery" ) );
-					CheckDebris =				bool.Parse( settings.GetValue( "CheckDebris" ) );
+					var V = settings.GetValue( "HideCompleteExperiments" );
+					if( V != null )
+						HideCompleteExperiments = bool.Parse( V );
+
+					V = settings.GetValue( "UseBlizzysToolbar" );
+					if( V != null )
+						UseBlizzysToolbar = bool.Parse( V );
+
+					V = settings.GetValue( "CompleteWithoutRecovery" );
+					if( V != null )
+						CompleteWithoutRecovery = bool.Parse( V );
+
+					V = settings.GetValue( "CheckDebris" );
+					if( V != null )
+						CheckDebris = bool.Parse( V );
 
 
 
@@ -57,11 +74,6 @@ namespace ScienceChecklist {
 			} catch (Exception e) {
 				_logger.Info("Unable to load config: " + e.ToString());
 			}
-
-			HideCompleteExperiments =	false;
-			UseBlizzysToolbar =			false;
-			CompleteWithoutRecovery =	false;
-			CheckDebris =				false;
 		}
 
 		private static readonly Logger _logger = new Logger("Config");
