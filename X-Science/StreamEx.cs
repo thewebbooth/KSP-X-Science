@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
+
+
 namespace ScienceChecklist {
 	/// <summary>
 	/// Contains extension methods on the Stream class.

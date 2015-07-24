@@ -49,12 +49,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AllBodies.cs" />
+    <Compile Include="Body.cs" />
     <Compile Include="Buttons\BlizzysToolbarButton.cs" />
     <Compile Include="Buttons\IToolbarButton.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="DisplayMode.cs" />
     <Compile Include="Experiment.cs" />
-    <Compile Include="ExperimentalFeatures.cs" />
     <Compile Include="ExperimentFilter.cs" />
     <Compile Include="GameHelper.cs" />
     <Compile Include="ScienceChecklistAddon.cs" />
@@ -112,7 +113,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>(robocopy . "C:\Games\KSP\KSP-Real\GameData\[x] Science!" /xd "GameData" /xf "*.zip") ^&amp; exit 0
+    <PostBuildEvent>(robocopy . "C:\Games\KSP\KSP-Stock\GameData\[x] Science!" /xd "GameData" /xf "*.zip") ^&amp; exit 0
 </PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>

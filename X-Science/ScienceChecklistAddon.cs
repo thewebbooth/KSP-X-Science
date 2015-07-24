@@ -188,18 +188,28 @@ namespace ScienceChecklist {
 			ApplicationLauncher.Instance.RemoveOnShowCallback(Launcher_Show);
 			ApplicationLauncher.Instance.RemoveOnHideCallback(Launcher_Hide);
 			_launcherVisible = false;
-
-			if (_rndLoader != null) {
+_logger.Trace( "Unload 1" );
+			if( _rndLoader != null && _rndLoader.Current != null )
+			{
 				StopCoroutine(_rndLoader);
+				_logger.Trace( "Stopped" );
 			}
+_logger.Trace( "Unload 2" );
 
-			if (_experimentUpdater != null) {
+
+
+			if( _experimentUpdater != null && _experimentUpdater.Current != null )
+			{
 				StopCoroutine(_experimentUpdater);
+				_logger.Trace( "Stopped" );
 			}
-
-			if (_filterRefresher != null) {
+_logger.Trace( "Unload 3" );
+			if( _filterRefresher != null && _filterRefresher.Current != null )
+			{
 				StopCoroutine(_filterRefresher);
+				_logger.Trace( "Stopped" );
 			}
+_logger.Trace( "Unload Done" );
 		}
 
 

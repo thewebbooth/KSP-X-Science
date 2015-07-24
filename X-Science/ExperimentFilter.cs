@@ -184,23 +184,10 @@ namespace ScienceChecklist {
 			experiments[ResearchAndDevelopment.GetExperiment("evaReport")] = null;
 			experiments[ResearchAndDevelopment.GetExperiment("surfaceSample")] = null;
 
-			var bodies = FlightGlobals.Bodies;
+			_logger.Debug( "Bodies..." );
+			var bodies = new AllBodies( );
 			var situations = Enum.GetValues(typeof(ExperimentSituations)).Cast<ExperimentSituations>();
-
-
-			var biomes = new Dictionary< CelestialBody, string[ ]>( );
-			foreach( var body in bodies )
-			{
-				if( body.BiomeMap != null )
-					biomes[ body ] = body.BiomeMap.Attributes.Select(y => y.name).ToArray();
-				else
-					biomes[ body ] = new string[ 0 ];
-			}
-
-
-//String s = String.Format( "FOUND {0} BIOMES.", biomes.Count );
-//_logger.Trace( s );
-
+			_logger.Debug( "Bodies Done" );
 
 
 			_kscBiomes = new List<string>( );
@@ -223,7 +210,11 @@ namespace ScienceChecklist {
 
 			var onboardScience = GameHelper.GetOnboardScience( Config.CheckDebris );
 
-			foreach (var experiment in experiments.Keys) {
+			foreach (var experiment in experiments.Keys)
+			{
+//experiment.requireAtmosphere;
+//experiment.requiredExperimentLevel;
+
 				var sitMask = experiment.situationMask;
 				var biomeMask = experiment.biomeMask;
 				if (sitMask == 0 && experiments[experiment] != null) {
@@ -243,23 +234,25 @@ namespace ScienceChecklist {
 					}
 				}
 
-				foreach (var body in bodies) {
-					if (experiment.requireAtmosphere && !body.atmosphere) {
+				foreach( var b in bodies.List )
+				{
+					var body = b.Value;
+					if( experiment.requireAtmosphere && !body.HasAtmosphere ) {
 						// If the whole planet doesn't have an atmosphere, then there's not much point continuing.
 						continue;
 					}
 					foreach (var situation in situations) {
-						if (situation == ExperimentSituations.SrfSplashed && !body.ocean) {
+						if (situation == ExperimentSituations.SrfSplashed && !body.HasOcean) {
 							// Some planets don't have an ocean for us to be splashed down in.
 							continue;
 						}
 
-						if (situation == ExperimentSituations.SrfLanded && (body.name == "Jool" || body.name == "Sun")) {
+						if (situation == ExperimentSituations.SrfLanded && (body.Name == "Jool" || body.Name == "Sun")) {
 							// Jool and the Sun don't have a surface.
 							continue;
 						}
 
-						if ((situation == ExperimentSituations.FlyingHigh || situation == ExperimentSituations.FlyingLow) && !body.atmosphere) {
+						if ((situation == ExperimentSituations.FlyingHigh || situation == ExperimentSituations.FlyingLow) && !body.HasAtmosphere) {
 							// Some planets don't have an atmosphere for us to fly in.
 							continue;
 						}
@@ -272,20 +265,23 @@ namespace ScienceChecklist {
 							continue;
 						}
 
-						if (biomes[body].Any() && (biomeMask & (uint) situation) != 0) {
-							foreach (var biome in biomes[body]) {
-								exps.Add( new Experiment( experiment, new Situation( body, situation, biome ), onboardScience, SciDict, AvailableExperiments ) );
+						if( body.Biomes.Any( ) && ( biomeMask & (uint)situation ) != 0 )
+						{
+							foreach( var biome in body.Biomes )
+							{
+								exps.Add( new Experiment( experiment, new Situation( body.CelestialBody, situation, biome ), onboardScience, SciDict, AvailableExperiments ) );
 							}
 
-							if ((body.name == "Kerbin") && situation == ExperimentSituations.SrfLanded) {
+
+							if ((body.Name == "Kerbin") && situation == ExperimentSituations.SrfLanded) {
 								foreach (var kscBiome in _kscBiomes) {
 									// Ew.
-									exps.Add( new Experiment( experiment, new Situation( body, situation, "Shores", kscBiome ), onboardScience, SciDict, AvailableExperiments ) );
+									exps.Add( new Experiment( experiment, new Situation( body.CelestialBody, situation, "Shores", kscBiome ), onboardScience, SciDict, AvailableExperiments ) );
 								}
 							}
 
 						} else {
-							exps.Add( new Experiment( experiment, new Situation( body, situation ), onboardScience, SciDict, AvailableExperiments ) );
+							exps.Add( new Experiment( experiment, new Situation( body.CelestialBody, situation ), onboardScience, SciDict, AvailableExperiments ) );
 						}
 					}
 				}

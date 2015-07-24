@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+
+
 namespace ScienceChecklist {
 	/// <summary>
 	/// Contains helper methods for the current game state.
