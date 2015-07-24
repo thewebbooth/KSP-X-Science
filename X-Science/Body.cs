@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+
+
 namespace ScienceChecklist
 {
 	internal sealed class Body
@@ -15,10 +17,14 @@ namespace ScienceChecklist
 		private bool _hasOcean;
 		private bool _hasSurface;
 		private bool _isHome;
-		private bool _isResearched;
-		private bool _isStar;
-		private bool _isGasGiant;
-		// Could detect moons?
+		private double? _Reached; // Or null, if player hasn't reached it yet
+
+		private bool _isStar; // If it isn't a moon or a star, then it is a planet
+		private bool _isMoon;
+
+		private bool _isGasGiant; // No surface but isn't a star
+		private int? _parent; // Note: flightGlobalsIndex or null for the sun
+
 		private string _type;
 		private string _name;
 		private CelestialBody _celestialBody;
@@ -32,10 +38,13 @@ namespace ScienceChecklist
 		public bool HasOcean { get { return _hasOcean; } }
 		public bool HasSurface { get { return _hasSurface; } }
 		public bool IsHome { get { return _isHome; } }
+		public double? Reached { get { return _Reached; } }
 		public bool IsStar { get { return _isStar; } }
 		public bool IsGasGiant { get { return _isGasGiant; } }
+		public bool IsMoon { get { return _isMoon; } }
 		public string Type { get { return _type; } }
 		public string Name { get { return _name; } }
+		public int? Parent { get { return _parent; } }
 		public CelestialBody CelestialBody { get { return _celestialBody; } }
 
 
@@ -73,14 +82,50 @@ namespace ScienceChecklist
 			// Homeworld
 				_isHome = Body.isHomeWorld;
 
-			// Sun
+			// Star detection
 				_isStar = Sun.Instance.sun.flightGlobalsIndex == Body.flightGlobalsIndex;
 
-			// GasGiant
+			// GasGiant detection
 				_isGasGiant = !_isStar && !_hasSurface;
 
 			// Type
-				_type = Body.RevealType( );
+				_type = Body.RevealType( ); // Not sure we can trust this
+
+			// Moon detection + Parent
+				_parent = null; // No parent -  a star
+				if( Body.orbit != null && Body.orbit.referenceBody != null ) // Otherwise it is the sun
+				{
+					_parent = Body.orbit.referenceBody.flightGlobalsIndex;
+					if( Body.orbit.referenceBody.flightGlobalsIndex != Sun.Instance.sun.flightGlobalsIndex ) // A moon - parent isn't the sun
+						_isMoon = true;
+				}
+
+
+
+			// Reached - bit of a palaver but Body.DiscoveryInfo isn't useful
+				_Reached = null;
+				if( HighLogic.CurrentGame != null )
+				{
+					var node = new ConfigNode( );
+					var Progress = HighLogic.CurrentGame.scenarios.Find( s => s.moduleName == "ProgressTracking" );
+					Progress.Save( node );
+
+					ConfigNode[] P = node.GetNodes( "Progress" );
+					if( P.Count( ) > 0 )
+					{
+						ConfigNode[] B = P[ 0 ].GetNodes( _name );
+						if( B.Count( ) > 0 )
+						{
+							var V = B[ 0 ].GetValue( "reached" );
+							if( !string.IsNullOrEmpty( V ) )
+							{
+								double R;
+								if( double.TryParse( V, out R ) )
+									_Reached = R;
+							}
+						}
+					}
+				}
 		}
 	}
 }

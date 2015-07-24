@@ -7,11 +7,22 @@ using System.Text;
 using UnityEngine;
 
 /*
-RECOVERY
-SCANSAT
-RESOURCES
-DMAGIC
+ * RECOVERY
+ * SCANSAT
+ * RESOURCES
+ * DMAGIC
+ * Filter on reached bodies
+ * Config for experiments
+ * Asteroid science
+ * recovered science
+ * 
+ * Situation needs to take body or make more classes static.
+ * Experiment.IsUnlocked should take body.reached into account.
+
+
 */
+
+
 
 namespace ScienceChecklist {
 	/// <summary>

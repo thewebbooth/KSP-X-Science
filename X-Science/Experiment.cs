@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
+
+
 namespace ScienceChecklist {
 	/// <summary>
 	/// An object that represents a ScienceExperiement in a given situation.

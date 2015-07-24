@@ -69,7 +69,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Buttons\ToolbarWrapper.cs" />
     <Compile Include="UnlockedExperimentList.cs" />
-    <None Include="CHANGES.md" />
+    <None Include="GameData\[x] Science!\CHANGES.md" />
     <None Include="Deploy.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -92,12 +92,12 @@
     <EmbeddedResource Include="icons\maximize.png" />
     <EmbeddedResource Include="icons\minimize.png" />
     <EmbeddedResource Include="icons\icon-small.png" />
-    <Content Include="LICENSE.txt">
+    <Content Include="GameData\[x] Science!\LICENSE.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Include="README.md">
+    <None Include="GameData\[x] Science!\README.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Deploy.tt">

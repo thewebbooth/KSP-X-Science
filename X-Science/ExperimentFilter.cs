@@ -154,141 +154,181 @@ namespace ScienceChecklist {
 		/// Refreshes the experiment cache. THIS IS VERY EXPENSIVE.
 		/// CB: Actually doesn't seem much worse than UpdateExperiments()
 		/// </summary>
-		public void RefreshExperimentCache () {
+		public void RefreshExperimentCache( )
+		{
+			// Init
 			var StartTime = DateTime.Now;
 //			_logger.Info( "RefreshExperimentCache" );
-			if (ResearchAndDevelopment.Instance == null) {
-				_logger.Debug("ResearchAndDevelopment not instantiated.");
-				AllExperiments = new List<Experiment>();
-				UpdateFilter();
-				return;
-			}
-
-			if (PartLoader.Instance == null) {
-				_logger.Debug("PartLoader not instantiated.");
-				AllExperiments = new List<Experiment>();
-				UpdateFilter();
-				return;
-			}
-
-			var exps = new List<Experiment>();
-			var experiments = PartLoader.Instance.parts
-				.SelectMany(x => x.partPrefab.FindModulesImplementing<ModuleScienceExperiment>())
-				.Select(x => new {
-					Module = x,
-					Experiment = ResearchAndDevelopment.GetExperiment(x.experimentID),
-				})
-				.Where(x => x.Experiment != null)
-				.GroupBy(x => x.Experiment)
-				.ToDictionary(x => x.Key, x => x.First().Module);
-			experiments[ResearchAndDevelopment.GetExperiment("evaReport")] = null;
-			experiments[ResearchAndDevelopment.GetExperiment("surfaceSample")] = null;
-
-			_logger.Debug( "Bodies..." );
-			var bodies = new AllBodies( );
-			var situations = Enum.GetValues(typeof(ExperimentSituations)).Cast<ExperimentSituations>();
-			_logger.Debug( "Bodies Done" );
 
 
-			_kscBiomes = new List<string>( );
-			_kscBiomes = _kscBiomes.Any () ? _kscBiomes : UnityEngine.Object.FindObjectsOfType<Collider>()
-				.Where(x => x.gameObject.layer == 15)
-				.Select(x => x.gameObject.tag)
-				.Where(x => x != "Untagged")
-				.Where(x => !x.Contains("KSC_Runway_Light"))
-				.Where(x => !x.Contains("KSC_Pad_Flag_Pole"))
-				.Where(x => !x.Contains("Ladder"))
-				.Select(x => Vessel.GetLandedAtString(x))
-				.Select(x => x.Replace(" ", ""))
-				.Distinct()
-				.ToList();
+			// Quick check for things we depend on
+				if( ResearchAndDevelopment.Instance == null )
+				{
+					_logger.Debug( "ResearchAndDevelopment not instantiated." );
+					AllExperiments = new List<Experiment>( );
+					UpdateFilter( );
+					return;
+				}
+
+				if (PartLoader.Instance == null)
+				{
+					_logger.Debug( "PartLoader not instantiated." );
+					AllExperiments = new List<Experiment>( );
+					UpdateFilter( );
+					return;
+				}
+
+			// Temporary experiment list
+				var exps = new List<Experiment>( );
 
 
+
+
+
+/*foreach( var P in PartLoader.Instance.parts )
+{
+	var Modules = P.partPrefab.FindModulesImplementing<ModuleScienceExperiment>( );
+	if( Modules.Count > 0 )
+	{
+		foreach( var M in Modules )
+		{
+			_logger.Debug( "PART " + P.name + " HAS EXPERIMENT " + M.experimentID );
+		}
+	}
+}*/
+			// Find all experiments - These should be in an object
+				var experiments = PartLoader.Instance.parts
+					.SelectMany( x => x.partPrefab.FindModulesImplementing<ModuleScienceExperiment>( ) )
+					.Select( x => new {
+						Module = x,
+						Experiment = ResearchAndDevelopment.GetExperiment( x.experimentID ),
+					})
+					.Where( x => x.Experiment != null )
+					.GroupBy( x => x.Experiment )
+					.ToDictionary( x => x.Key, x => x.First( ).Module );
+				experiments.Remove( ResearchAndDevelopment.GetExperiment( "evaReport" ) );
+				experiments.Remove( ResearchAndDevelopment.GetExperiment( "surfaceSample" ) );
+/*			_logger.Debug( "Found " + experiments.Count + " experimnents" );
+			foreach( var XX in experiments )
+			{
+				if( XX.Value != null )
+					_logger.Debug( "EXPERIMENT " + XX.Key.experimentTitle );
+			}*/
+
+
+			// Find all celestial bodies
+				var bodies = new AllBodies( );
+
+			// Find all situations
+				var situations = Enum.GetValues( typeof( ExperimentSituations ) ).Cast<ExperimentSituations>( );
+
+			// Find the KSC baby biomes /* MOVE THIS ELSE WHERE */
+				_kscBiomes = new List<string>( );
+				_kscBiomes = _kscBiomes.Any () ? _kscBiomes : UnityEngine.Object.FindObjectsOfType<Collider>( )
+					.Where(x => x.gameObject.layer == 15)
+					.Select(x => x.gameObject.tag)
+					.Where(x => x != "Untagged")
+					.Where(x => !x.Contains("KSC_Runway_Light"))
+					.Where(x => !x.Contains("KSC_Pad_Flag_Pole"))
+					.Where(x => !x.Contains("Ladder"))
+					.Select(x => Vessel.GetLandedAtString(x))
+					.Select(x => x.Replace(" ", ""))
+					.Distinct()
+					.ToList();
+
+			// Unlocked experiment list - Maybe merge with "var experiments" above
 				AvailableExperiments.Clear( );
 
-			var SciDict = GetScienceSubjects( );
+			// Grab the list of science experiments
+				var SciDict = GetScienceSubjects( );
 
-			var onboardScience = GameHelper.GetOnboardScience( Config.CheckDebris );
+			// Find the science stored in vessels
+				var onboardScience = GameHelper.GetOnboardScience( Config.CheckDebris );
 
-			foreach (var experiment in experiments.Keys)
-			{
-//experiment.requireAtmosphere;
-//experiment.requiredExperimentLevel;
+			// We need the level of the RnD facility in career mode
+				float RnDLevel = ScenarioUpgradeableFacilities.GetFacilityLevel( SpaceCenterFacility.ResearchAndDevelopment );
 
-				var sitMask = experiment.situationMask;
-				var biomeMask = experiment.biomeMask;
-				if (sitMask == 0 && experiments[experiment] != null) {
-					// OrbitalScience support
-					var sitMaskField = experiments[experiment].GetType().GetField("sitMask");
-					if (sitMaskField != null) {
-						sitMask = (uint) (int) sitMaskField.GetValue(experiments[experiment]);
-//						_logger.Debug("Setting sitMask to " + sitMask + " for " + experiment.experimentTitle);
-					}
 
-					if (biomeMask == 0) {
-						var biomeMaskField = experiments[experiment].GetType().GetField("bioMask");
-						if (biomeMaskField != null) {
-							biomeMask = (uint) (int) biomeMaskField.GetValue(experiments[experiment]);
-//							_logger.Debug("Setting biomeMask to " + biomeMask + " for " + experiment.experimentTitle);
-						}
-					}
-				}
-
-				foreach( var b in bodies.List )
+			// Loop around all experiments
+				foreach( var experiment in experiments.Keys )
 				{
-					var body = b.Value;
-					if( experiment.requireAtmosphere && !body.HasAtmosphere ) {
-						// If the whole planet doesn't have an atmosphere, then there's not much point continuing.
-						continue;
-					}
-					foreach (var situation in situations) {
-						if (situation == ExperimentSituations.SrfSplashed && !body.HasOcean) {
-							// Some planets don't have an ocean for us to be splashed down in.
-							continue;
-						}
+					// Examine each experiment in turn
+						if( experiment.requiredExperimentLevel > RnDLevel ) 
+							continue; // Need to upgrade the RnD facility in career mode.
 
-						if (situation == ExperimentSituations.SrfLanded && (body.Name == "Jool" || body.Name == "Sun")) {
-							// Jool and the Sun don't have a surface.
-							continue;
-						}
-
-						if ((situation == ExperimentSituations.FlyingHigh || situation == ExperimentSituations.FlyingLow) && !body.HasAtmosphere) {
-							// Some planets don't have an atmosphere for us to fly in.
-							continue;
-						}
-
-						// TODO: This doesn't filter out impossible experiments based on the altitude of biomes.
-						// e.g. Crew report while splashed down in the Highlands of Kerbin.
-
-						if ((sitMask & (uint) situation) == 0) {
-							// This experiment isn't valid for our current situation.
-							continue;
-						}
-
-						if( body.Biomes.Any( ) && ( biomeMask & (uint)situation ) != 0 )
+						var sitMask = experiment.situationMask;
+						var biomeMask = experiment.biomeMask;
+				
+						// OrbitalScience support
+						if( sitMask == 0 && experiments[ experiment ] != null )
 						{
-							foreach( var biome in body.Biomes )
+							var sitMaskField = experiments[ experiment ].GetType( ).GetField( "sitMask" );
+							if( sitMaskField != null )
 							{
-								exps.Add( new Experiment( experiment, new Situation( body.CelestialBody, situation, biome ), onboardScience, SciDict, AvailableExperiments ) );
+								sitMask = (uint)(int)sitMaskField.GetValue( experiments[ experiment ] );
+								_logger.Debug( "Setting sitMask to " + sitMask + " for " + experiment.experimentTitle );
 							}
 
-
-							if ((body.Name == "Kerbin") && situation == ExperimentSituations.SrfLanded) {
-								foreach (var kscBiome in _kscBiomes) {
-									// Ew.
-									exps.Add( new Experiment( experiment, new Situation( body.CelestialBody, situation, "Shores", kscBiome ), onboardScience, SciDict, AvailableExperiments ) );
+							if( biomeMask == 0 )
+							{
+								var biomeMaskField = experiments[ experiment ].GetType( ).GetField( "bioMask" );
+								if( biomeMaskField != null )
+								{
+									biomeMask = (uint)(int)biomeMaskField.GetValue( experiments[ experiment ] );
+									_logger.Debug( "Setting biomeMask to " + biomeMask + " for " + experiment.experimentTitle );
 								}
 							}
-
-						} else {
-							exps.Add( new Experiment( experiment, new Situation( body.CelestialBody, situation ), onboardScience, SciDict, AvailableExperiments ) );
 						}
-					}
-				}
-			}
 
-			AllExperiments = exps;
-			UpdateFilter();
+		
+					// Check this experiment in all biomes on all bodies
+						foreach( var b in bodies.List )
+						{
+							var body = b.Value;
+							if( experiment.requireAtmosphere && !body.HasAtmosphere )
+								continue; // If the whole planet doesn't have an atmosphere, then there's not much point continuing.
+							foreach( var situation in situations )
+							{
+								if( situation == ExperimentSituations.SrfSplashed && !body.HasOcean )
+									continue; // Some planets don't have an ocean for us to be splashed down in.
+
+								if( situation == ExperimentSituations.SrfLanded && !body.HasSurface )
+									continue; // Jool and the Sun don't have a surface.
+
+								if( ( situation == ExperimentSituations.FlyingHigh || situation == ExperimentSituations.FlyingLow ) && !body.HasAtmosphere )
+									continue; // Some planets don't have an atmosphere for us to fly in.
+
+								if( ( sitMask & (uint)situation ) == 0 )
+									continue; // This experiment isn't valid for our current situation.
+
+								if( body.Biomes.Any( ) && ( biomeMask & (uint)situation ) != 0 )
+								{
+									foreach( var biome in body.Biomes )
+										exps.Add( new Experiment( experiment, new Situation( body.CelestialBody, situation, biome ), onboardScience, SciDict, AvailableExperiments ) );
+
+									/* MOVE THIS OUT OF THE LOOP - HANDLE IT SEPERATLY */
+									// Can't really avoid magic constants here - Kerbin and Shores 
+									if( ( body.Name == "Kerbin" ) && situation == ExperimentSituations.SrfLanded )
+									{
+										foreach( var kscBiome in _kscBiomes ) // Ew.
+											exps.Add( new Experiment( experiment, new Situation( body.CelestialBody, situation, "Shores", kscBiome ), onboardScience, SciDict, AvailableExperiments ) );
+									}
+								}
+								else
+									exps.Add( new Experiment( experiment, new Situation( body.CelestialBody, situation ), onboardScience, SciDict, AvailableExperiments ) );
+							}
+						}
+				}
+
+
+			// Done replace the old list with the new one
+				AllExperiments = exps;
+
+			// We need to redo the filter
+				UpdateFilter( );
+
+
+
 			var Elapsed = DateTime.Now - StartTime;
 			_logger.Trace( "RefreshExperimentCache Done - " + Elapsed.ToString( ) + "ms" );
 		}
