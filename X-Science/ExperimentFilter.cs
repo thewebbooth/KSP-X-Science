@@ -185,7 +185,7 @@ namespace ScienceChecklist {
 
 
 
-/*foreach( var P in PartLoader.Instance.parts )
+foreach( var P in PartLoader.Instance.parts )
 {
 	var Modules = P.partPrefab.FindModulesImplementing<ModuleScienceExperiment>( );
 	if( Modules.Count > 0 )
@@ -195,7 +195,7 @@ namespace ScienceChecklist {
 			_logger.Debug( "PART " + P.name + " HAS EXPERIMENT " + M.experimentID );
 		}
 	}
-}*/
+}
 			// Find all experiments - These should be in an object
 				var experiments = PartLoader.Instance.parts
 					.SelectMany( x => x.partPrefab.FindModulesImplementing<ModuleScienceExperiment>( ) )
@@ -206,14 +206,14 @@ namespace ScienceChecklist {
 					.Where( x => x.Experiment != null )
 					.GroupBy( x => x.Experiment )
 					.ToDictionary( x => x.Key, x => x.First( ).Module );
-				experiments.Remove( ResearchAndDevelopment.GetExperiment( "evaReport" ) );
-				experiments.Remove( ResearchAndDevelopment.GetExperiment( "surfaceSample" ) );
-/*			_logger.Debug( "Found " + experiments.Count + " experimnents" );
+//				experiments.Remove( ResearchAndDevelopment.GetExperiment( "evaReport" ) );
+//				experiments.Remove( ResearchAndDevelopment.GetExperiment( "surfaceSample" ) );
+			_logger.Debug( "Found " + experiments.Count + " experimnents" );
 			foreach( var XX in experiments )
 			{
 				if( XX.Value != null )
 					_logger.Debug( "EXPERIMENT " + XX.Key.experimentTitle );
-			}*/
+			}
 
 
 			// Find all celestial bodies
@@ -252,10 +252,10 @@ namespace ScienceChecklist {
 			// Loop around all experiments
 				foreach( var experiment in experiments.Keys )
 				{
-					// Examine each experiment in turn
-						if( experiment.requiredExperimentLevel > RnDLevel ) 
-							continue; // Need to upgrade the RnD facility in career mode.
+/*CANT DO THIS HERE
+ * // Examine each experiment in turn
 
+*/
 						var sitMask = experiment.situationMask;
 						var biomeMask = experiment.biomeMask;
 				
@@ -304,18 +304,18 @@ namespace ScienceChecklist {
 								if( body.Biomes.Any( ) && ( biomeMask & (uint)situation ) != 0 )
 								{
 									foreach( var biome in body.Biomes )
-										exps.Add( new Experiment( experiment, new Situation( body.CelestialBody, situation, biome ), onboardScience, SciDict, AvailableExperiments ) );
+										exps.Add( new Experiment( experiment, new Situation( body, situation, biome ), onboardScience, SciDict, AvailableExperiments ) );
 
 									/* MOVE THIS OUT OF THE LOOP - HANDLE IT SEPERATLY */
 									// Can't really avoid magic constants here - Kerbin and Shores 
 									if( ( body.Name == "Kerbin" ) && situation == ExperimentSituations.SrfLanded )
 									{
 										foreach( var kscBiome in _kscBiomes ) // Ew.
-											exps.Add( new Experiment( experiment, new Situation( body.CelestialBody, situation, "Shores", kscBiome ), onboardScience, SciDict, AvailableExperiments ) );
+											exps.Add( new Experiment( experiment, new Situation( body, situation, "Shores", kscBiome ), onboardScience, SciDict, AvailableExperiments ) );
 									}
 								}
 								else
-									exps.Add( new Experiment( experiment, new Situation( body.CelestialBody, situation ), onboardScience, SciDict, AvailableExperiments ) );
+									exps.Add( new Experiment( experiment, new Situation( body, situation ), onboardScience, SciDict, AvailableExperiments ) );
 							}
 						}
 				}
@@ -464,7 +464,7 @@ namespace ScienceChecklist {
 			src = ApplyActiveVesselFilter(src);
 
 			return src
-				.Where(x => x.Situation.Body == CurrentSituation.Body)
+				.Where(x => x.Situation.Body.CelestialBody == CurrentSituation.Body.CelestialBody )
 				.Where(x => string.IsNullOrEmpty(x.Situation.Biome) || x.Situation.Biome == CurrentSituation.Biome)
 				.Where(x => x.Situation.SubBiome == CurrentSituation.SubBiome)
 				.Where(x => x.Situation.ExperimentSituation == CurrentSituation.ExperimentSituation);

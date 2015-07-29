@@ -39,7 +39,11 @@ namespace ScienceChecklist {
 		/// Raised when the CheckDebrisChanged settings has changed.
 		/// </summary>
 		public event EventHandler CheckDebrisChanged;
-		
+
+		/// <summary>
+		/// Raised when the AllFilter settings has changed.
+		/// </summary>
+		public event EventHandler AllFilterChanged;
 
 
 		
@@ -81,6 +85,17 @@ namespace ScienceChecklist {
 				save = true;
 			}
 
+			toggle = GUILayout.Toggle( Config.AllFilter, "Allow all filter" );
+			if( toggle != Config.AllFilter )
+			{
+				Config.AllFilter = toggle;
+				OnAllFilterChanged( );
+				save = true;
+			}
+
+
+
+
 			if (save) {
 				Config.Save();
 			}
@@ -116,6 +131,14 @@ namespace ScienceChecklist {
 			if( CheckDebrisChanged != null )
 			{
 				CheckDebrisChanged( this, EventArgs.Empty );
+			}
+		}
+
+		private void OnAllFilterChanged( )
+		{
+			if( AllFilterChanged != null )
+			{
+				AllFilterChanged( this, EventArgs.Empty );
 			}
 		}
 

@@ -41,7 +41,7 @@ namespace ScienceChecklist {
 		/// </summary>
 		public string Id {
 			get {
-				return string.Format("{0}@{1}{2}{3}", ScienceExperiment.id, Situation.Body.name, Situation.ExperimentSituation, (Situation.SubBiome ?? Situation.Biome ?? string.Empty).Replace(" ", ""));
+				return string.Format("{0}@{1}{2}{3}", ScienceExperiment.id, Situation.Body.Name, Situation.ExperimentSituation, (Situation.SubBiome ?? Situation.Biome ?? string.Empty).Replace(" ", ""));
 			}
 		}
 
@@ -101,10 +101,10 @@ namespace ScienceChecklist {
 		{
 			if( SciDict.ContainsKey( Id ) )
 				ScienceSubject = SciDict[ Id ];
-			else ScienceSubject = new ScienceSubject(ScienceExperiment, Situation.ExperimentSituation, Situation.Body, Situation.SubBiome ?? Situation.Biome ?? string.Empty);
+			else ScienceSubject = new ScienceSubject(ScienceExperiment, Situation.ExperimentSituation, Situation.Body.CelestialBody, Situation.SubBiome ?? Situation.Biome ?? string.Empty);
 
 
-			IsUnlocked = AvailableExperiments.IsUnlocked( ScienceExperiment.id ); 
+			IsUnlocked = AvailableExperiments.IsUnlocked( ScienceExperiment.id ) && ( Situation.Body.Reached != null );
 
 			CompletedScience = ScienceSubject.science * HighLogic.CurrentGame.Parameters.Career.ScienceGainMultiplier;
 			TotalScience = ScienceSubject.scienceCap * HighLogic.CurrentGame.Parameters.Career.ScienceGainMultiplier;

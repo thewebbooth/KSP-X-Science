@@ -16,7 +16,7 @@ namespace ScienceChecklist {
 		/// <param name="situation">The ExperimentSituations flag which this situation is for.</param>
 		/// <param name="biome">Optionally, the biome which this situation is for.</param>
 		/// <param name="subBiome">Optionally, the KSC biome which this situation is for.</param>
-		public Situation (CelestialBody body, ExperimentSituations situation, string biome = null, string subBiome = null) {
+		public Situation( Body body, ExperimentSituations situation, string biome = null, string subBiome = null ) {
 			_body = body;
 			_situation = situation;
 			_biome = biome;
@@ -25,7 +25,7 @@ namespace ScienceChecklist {
 			_formattedSubBiome = BiomeToString(_subBiome);
 			_description = string.Format("{0} {1}{2}",
 				ToString(_situation),
-				Body.theName,
+				Body.CelestialBody.theName,
 				string.IsNullOrEmpty(_formattedBiome)
 					? string.Empty
 					: string.IsNullOrEmpty(_formattedSubBiome)
@@ -36,7 +36,7 @@ namespace ScienceChecklist {
 		/// <summary>
 		/// Gets the CelestialBody this situation is for.
 		/// </summary>
-		public CelestialBody        Body                { get { return _body; } }
+		public Body        Body                { get { return _body; } }
 		/// <summary>
 		/// Gets the ExperimentSituations this situation is for.
 		/// </summary>
@@ -95,7 +95,7 @@ namespace ScienceChecklist {
 			return Regex.Replace(biome ?? string.Empty, "((?<=[a-z])[A-Z]|[A-Z](?=[a-z]))", " $1").Replace("  ", " ").Trim();
 		}
 
-		private readonly CelestialBody        _body;
+		private readonly Body        _body;
 		private readonly ExperimentSituations _situation;
 		private readonly string               _biome;
 		private readonly string               _subBiome;

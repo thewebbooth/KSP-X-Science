@@ -11,15 +11,18 @@ using UnityEngine;
  * SCANSAT
  * RESOURCES
  * DMAGIC
- * Filter on reached bodies
  * Config for experiments
  * Asteroid science
  * recovered science
  * 
  * Situation needs to take body or make more classes static.
- * Experiment.IsUnlocked should take body.reached into account.
 
-
+ * 
+ * Check we aren't satrting coroutines too many times
+ * SOI chaeck for progress tracking
+ * instruments thingy
+ * config file
+ * 
 */
 
 
@@ -146,8 +149,9 @@ namespace ScienceChecklist {
 			_logger.Trace("Load");
 			if (_active) {
 				_logger.Info("Already loaded.");
-				_rndLoader = WaitForRnDAndPartLoader();
-				StartCoroutine(_rndLoader);
+//				_rndLoader = WaitForRnDAndPartLoader();
+				StartCoroutine( "WaitForRnDAndPartLoader" );
+
 				return;
 			}
 			if (HighLogic.CurrentGame.Mode != Game.Modes.CAREER && HighLogic.CurrentGame.Mode != Game.Modes.SCIENCE_SANDBOX) {
@@ -165,14 +169,14 @@ namespace ScienceChecklist {
 			ApplicationLauncher.Instance.AddOnShowCallback(Launcher_Show);
 			ApplicationLauncher.Instance.AddOnHideCallback(Launcher_Hide);
 
-			_rndLoader = WaitForRnDAndPartLoader();
-			StartCoroutine(_rndLoader);
+//			_rndLoader = WaitForRnDAndPartLoader();
+			StartCoroutine( "WaitForRnDAndPartLoader" );
 
-			_experimentUpdater = UpdateExperiments();
-			StartCoroutine(_experimentUpdater);
+//			_experimentUpdater = UpdateExperiments();
+			StartCoroutine( "UpdateExperiments" );
 
-			_filterRefresher = RefreshFilter();
-			StartCoroutine(_filterRefresher);
+//			_filterRefresher = RefreshFilter();
+			StartCoroutine( "RefreshFilter" );
 		}
 
 
@@ -200,24 +204,25 @@ namespace ScienceChecklist {
 			ApplicationLauncher.Instance.RemoveOnHideCallback(Launcher_Hide);
 			_launcherVisible = false;
 _logger.Trace( "Unload 1" );
-			if( _rndLoader != null && _rndLoader.Current != null )
+//if( _rndLoader != null )
 			{
-				StopCoroutine(_rndLoader);
+				_logger.Trace( "_rndLoader not null" );
+				StopCoroutine( "WaitForRnDAndPartLoader" );
 				_logger.Trace( "Stopped" );
 			}
 _logger.Trace( "Unload 2" );
 
 
 
-			if( _experimentUpdater != null && _experimentUpdater.Current != null )
+	//		if( _experimentUpdater != null )
 			{
-				StopCoroutine(_experimentUpdater);
+				StopCoroutine( "UpdateExperiments" );
 				_logger.Trace( "Stopped" );
 			}
 _logger.Trace( "Unload 3" );
-			if( _filterRefresher != null && _filterRefresher.Current != null )
+	//		if( _filterRefresher != null )
 			{
-				StopCoroutine(_filterRefresher);
+				StopCoroutine( "RefreshFilter" );
 				_logger.Trace( "Stopped" );
 			}
 _logger.Trace( "Unload Done" );
@@ -300,6 +305,7 @@ _logger.Trace( "Unload Done" );
 		/// </summary>
 		/// <returns>An IEnumerator that can be used to resume this method.</returns>
 		private IEnumerator WaitForRnDAndPartLoader () {
+			_logger.Info( "WaitForRnDAndPartLoader STARTED" );
 			if (!_active) {
 				yield break;
 			}
@@ -316,7 +322,9 @@ _logger.Trace( "Unload Done" );
 
 			_logger.Info("PartLoader ready");
 			_window.RefreshExperimentCache();
+
 			_rndLoader = null;
+			_logger.Info( "WaitForRnDAndPartLoader STOPPED" );
 		}
 
 

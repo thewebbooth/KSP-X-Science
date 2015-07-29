@@ -103,7 +103,7 @@ namespace ScienceChecklist
 
 
 			// Reached - bit of a palaver but Body.DiscoveryInfo isn't useful
-				_Reached = null;
+				_Reached = null; // Not reached yet
 				if( HighLogic.CurrentGame != null )
 				{
 					var node = new ConfigNode( );
@@ -126,6 +126,8 @@ namespace ScienceChecklist
 						}
 					}
 				}
+				if( _isHome && _Reached == null ) // KSP says you have to launch your first vessel to reach the homeworld
+					_Reached = 1; // I say the homeworld is always reached.
 		}
 	}
 }

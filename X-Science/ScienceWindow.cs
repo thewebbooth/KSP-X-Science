@@ -240,11 +240,11 @@ namespace ScienceChecklist {
 				UpdateExperiments();
 			}
 
-			if (_filter.CurrentSituation != null && _filter.CurrentSituation.Biome == biome && _filter.CurrentSituation.ExperimentSituation == situation && _filter.CurrentSituation.Body == body && _filter.CurrentSituation.SubBiome == subBiome) {
+			if (_filter.CurrentSituation != null && _filter.CurrentSituation.Biome == biome && _filter.CurrentSituation.ExperimentSituation == situation && _filter.CurrentSituation.Body.CelestialBody == body && _filter.CurrentSituation.SubBiome == subBiome) {
 				return;
 			}
-
-			_filter.CurrentSituation = new Situation(body, situation, biome, subBiome);
+			var Body = new Body( body );
+			_filter.CurrentSituation = new Situation(Body, situation, biome, subBiome);
 		}
 
 
@@ -312,12 +312,19 @@ namespace ScienceChecklist {
 			
 			GUILayout.BeginHorizontal();
 
-			_filter.DisplayMode = (DisplayMode) GUILayout.SelectionGrid((int) _filter.DisplayMode, new[] {
-				new GUIContent(_currentSituationTexture, "Show experiments available right now"),
-				new GUIContent(_currentVesselTexture, "Show experiments available on this vessel"),
-				new GUIContent(_unlockedTexture, "Show all unlocked experiments"),
-				new GUIContent(_allTexture, "Show all experiments"),
-			}, 4);
+
+			GUIContent[ ] FilterButtons = {
+					new GUIContent(_currentSituationTexture, "Show experiments available right now"),
+					new GUIContent(_currentVesselTexture, "Show experiments available on this vessel"),
+					new GUIContent(_unlockedTexture, "Show all unlocked experiments")
+				};
+			if( Config.AllFilter )
+			{
+				Array.Resize( ref FilterButtons, 4 );
+				FilterButtons[ 3 ] = new GUIContent(_allTexture, "Show all experiments");
+			}
+
+			_filter.DisplayMode = (DisplayMode)GUILayout.SelectionGrid( (int)_filter.DisplayMode, FilterButtons, 4 );
 
 			GUILayout.FlexibleSpace();
 

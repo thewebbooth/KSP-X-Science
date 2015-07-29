@@ -12,6 +12,7 @@ namespace ScienceChecklist {
 		public static bool UseBlizzysToolbar		{ get; set; }
 		public static bool CompleteWithoutRecovery	{ get; set; }
 		public static bool CheckDebris				{ get; set; }
+		public static bool AllFilter				{ get; set; }
 
 
 
@@ -25,6 +26,7 @@ namespace ScienceChecklist {
 			settings.AddValue( "UseBlizzysToolbar",			UseBlizzysToolbar );
 			settings.AddValue( "CompleteWithoutRecovery",	CompleteWithoutRecovery );
 			settings.AddValue( "CheckDebris",				CheckDebris );
+			settings.AddValue( "AllFilter",					AllFilter );
 
 
 
@@ -40,6 +42,7 @@ namespace ScienceChecklist {
 			UseBlizzysToolbar = false;
 			CompleteWithoutRecovery = false;
 			CheckDebris = false;
+			AllFilter = true;
 
 //			_logger.Trace("Load");
 //			_logger.Debug("Loading from " + _file);
@@ -65,7 +68,9 @@ namespace ScienceChecklist {
 					if( V != null )
 						CheckDebris = bool.Parse( V );
 
-
+					V = settings.GetValue( "AllFilter" );
+					if( V != null )
+						AllFilter = bool.Parse( V );
 
 
 //					_logger.Info("Loaded successfully.");

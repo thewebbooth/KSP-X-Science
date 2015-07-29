@@ -49,6 +49,15 @@ namespace ScienceChecklist
 			if( _unlockedExperiments.ContainsKey( Id ) )
 				return _unlockedExperiments[ Id ];
 
+
+
+/*THIS NEEDS TO GO HERE SOME HOW
+ * 
+ * if( experiment.requiredExperimentLevel > RnDLevel )
+				continue; // Need to upgrade the RnD facility in career mode.
+				*/
+
+
 			bool IsUnlocked = PartLoader.Instance.parts.Any
 			(
 				x => ResearchAndDevelopment.PartModelPurchased( x ) &&
