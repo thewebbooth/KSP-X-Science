@@ -7,21 +7,16 @@ using System.Text;
 using UnityEngine;
 
 /*
- * RECOVERY
+ * Situation needs to take body or make more classes static.
+ * SOI check for progress tracking
+ * Instruments Class
+ * Config file to fix DMagic and Solar Science problems
+ * RECOVERY science
  * SCANSAT
  * RESOURCES
  * DMAGIC
  * Config for experiments
  * Asteroid science
- * recovered science
- * 
- * Situation needs to take body or make more classes static.
-
- * 
- * Check we aren't satrting coroutines too many times
- * SOI chaeck for progress tracking
- * instruments thingy
- * config file
  * 
 */
 
@@ -70,12 +65,7 @@ namespace ScienceChecklist {
 			GameEvents.OnScienceChanged.Add( new EventData<float, TransactionReasons>.OnEvent( this.ScienceChanged ) );
 			GameEvents.OnScienceRecieved.Add( new EventData<float, ScienceSubject, ProtoVessel, bool>.OnEvent( this.ScienceRecieved ) );
 			GameEvents.onVesselRename.Add( new EventData<GameEvents.HostedFromToAction<Vessel, string>>.OnEvent( this.VesselRename ) );
-
-
 			GameEvents.OnKSCFacilityUpgraded.Add( new EventData<Upgradeables.UpgradeableFacility, int>.OnEvent( this.FacilityUpgrade ) );
-//			GameEvents.OnKSCFacilityUpgrading.Add();
-//			GameEvents.OnUpgradeableObjLevelChange.Add();
-
 		}
 
 		/// <summary>
@@ -149,7 +139,6 @@ namespace ScienceChecklist {
 			_logger.Trace("Load");
 			if (_active) {
 				_logger.Info("Already loaded.");
-//				_rndLoader = WaitForRnDAndPartLoader();
 				StartCoroutine( "WaitForRnDAndPartLoader" );
 
 				return;
@@ -164,18 +153,11 @@ namespace ScienceChecklist {
 			_active = true;
 
 			InitializeButton();
-
 			_launcherVisible = true;
 			ApplicationLauncher.Instance.AddOnShowCallback(Launcher_Show);
 			ApplicationLauncher.Instance.AddOnHideCallback(Launcher_Hide);
-
-//			_rndLoader = WaitForRnDAndPartLoader();
 			StartCoroutine( "WaitForRnDAndPartLoader" );
-
-//			_experimentUpdater = UpdateExperiments();
 			StartCoroutine( "UpdateExperiments" );
-
-//			_filterRefresher = RefreshFilter();
 			StartCoroutine( "RefreshFilter" );
 		}
 
@@ -185,51 +167,29 @@ namespace ScienceChecklist {
 		/// Unloads the addon if it has been loaded.
 		/// Callback from onGUIApplicationLauncherDestroyed
 		/// </summary>
-		private void Unload () {
-			_logger.Trace("Unload");
-			if (!_active) {
-				_logger.Info("Already unloaded.");
+		private void Unload( )
+		{
+			if( !_active )
+			{
+				_logger.Info( "Already unloaded." );
 				return;
 			}
 			_active = false;
-
-
+			_logger.Info( "UNLOADING..." );
 
 			if( _button != null )
-				_button.Remove();
-
-
+				_button.Remove( );
 			
-			ApplicationLauncher.Instance.RemoveOnShowCallback(Launcher_Show);
-			ApplicationLauncher.Instance.RemoveOnHideCallback(Launcher_Hide);
+			ApplicationLauncher.Instance.RemoveOnShowCallback( Launcher_Show );
+			ApplicationLauncher.Instance.RemoveOnHideCallback( Launcher_Hide );
 			_launcherVisible = false;
-_logger.Trace( "Unload 1" );
-//if( _rndLoader != null )
-			{
-				_logger.Trace( "_rndLoader not null" );
-				StopCoroutine( "WaitForRnDAndPartLoader" );
-				_logger.Trace( "Stopped" );
-			}
-_logger.Trace( "Unload 2" );
-
-
-
-	//		if( _experimentUpdater != null )
-			{
-				StopCoroutine( "UpdateExperiments" );
-				_logger.Trace( "Stopped" );
-			}
-_logger.Trace( "Unload 3" );
-	//		if( _filterRefresher != null )
-			{
-				StopCoroutine( "RefreshFilter" );
-				_logger.Trace( "Stopped" );
-			}
-_logger.Trace( "Unload Done" );
+			StopCoroutine( "WaitForRnDAndPartLoader" );
+			StopCoroutine( "UpdateExperiments" );
+			StopCoroutine( "RefreshFilter" );
+			_logger.Info( "UNLOADED" );
 		}
 
-
-
+		
 
 		private void VesselWasModified( Vessel V )
 		{
@@ -304,26 +264,28 @@ _logger.Trace( "Unload Done" );
 		/// Waits for the ResearchAndDevelopment and PartLoader instances to be available.
 		/// </summary>
 		/// <returns>An IEnumerator that can be used to resume this method.</returns>
-		private IEnumerator WaitForRnDAndPartLoader () {
+		private IEnumerator WaitForRnDAndPartLoader( )
+		{
 			_logger.Info( "WaitForRnDAndPartLoader STARTED" );
-			if (!_active) {
+			if( !_active )
+			{
 				yield break;
 			}
 
-			while (ResearchAndDevelopment.Instance == null) {
+			while( ResearchAndDevelopment.Instance == null )
+			{
 				yield return 0;
 			}
 
-			_logger.Info("Science ready");
+			_logger.Info( "Science ready" );
 
-			while (PartLoader.Instance == null) {
+			while( PartLoader.Instance == null )
+			{
 				yield return 0;
 			}
 
 			_logger.Info("PartLoader ready");
-			_window.RefreshExperimentCache();
-
-			_rndLoader = null;
+			_window.RefreshExperimentCache( );
 			_logger.Info( "WaitForRnDAndPartLoader STOPPED" );
 		}
 
@@ -333,7 +295,9 @@ _logger.Trace( "Unload Done" );
 		/// Coroutine to throttle calls to _window.UpdateExperiments.
 		/// </summary>
 		/// <returns></returns>
-		private IEnumerator UpdateExperiments () {
+		private IEnumerator UpdateExperiments( )
+		{
+			_logger.Info( "UpdateExperiments STARTED" );
 			while (true) {
 				if (_window.IsVisible && _nextExperimentUpdate != null && _nextExperimentUpdate.Value < DateTime.Now) {
 					if( _mustDoFullRefresh )
@@ -354,7 +318,9 @@ _logger.Trace( "Unload Done" );
 		/// Coroutine to throttle calls to _window.RefreshFilter.
 		/// </summary>
 		/// <returns></returns>
-		private IEnumerator RefreshFilter () {
+		private IEnumerator RefreshFilter( )
+		{
+			_logger.Info( "RefreshFilter STARTED" );
 			var nextCheck = DateTime.Now;
 			while (true) {
 				if (_window.IsVisible && _filterRefreshPending && DateTime.Now > nextCheck) {
@@ -506,24 +472,17 @@ _logger.Trace( "Unload Done" );
 		#endregion
 
 		#region FIELDS
-
-		private DateTime _nextSituationUpdate;
-		private bool _active;
-		private Logger _logger;
-		private IToolbarButton _button;
-		private bool _launcherVisible;
-		private bool _windowVisible;
-		private ScienceWindow _window;
-		private IEnumerator _rndLoader;
-
-		private DateTime? _nextExperimentUpdate;
-		private bool _mustDoFullRefresh;
-		private IEnumerator _experimentUpdater;
-		private bool _filterRefreshPending;
-		private IEnumerator _filterRefresher;
-
-		private static bool _addonInitialized;
-
+		private DateTime		_nextSituationUpdate;
+		private bool			_active;
+		private Logger			_logger;
+		private IToolbarButton	_button;
+		private bool			_launcherVisible;
+		private bool			_windowVisible;
+		private ScienceWindow	_window;
+		private DateTime?		_nextExperimentUpdate;
+		private bool			_mustDoFullRefresh;
+		private bool			_filterRefreshPending;
+		private static bool		_addonInitialized;
 		#endregion
 	}
 }

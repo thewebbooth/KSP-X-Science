@@ -104,6 +104,7 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Deploy.cs</LastGenOutput>
     </None>
+    <None Include="GameData\[x] Science!\settings.cfg" />
     <None Include="GameData\[x] Science!\[x] Science!.version">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
