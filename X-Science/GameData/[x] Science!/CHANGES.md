@@ -3,9 +3,12 @@
 
 4.8
 ---
-23-July-2015 Bug fixes for KSP V1.0.4
+03-Aug-2015 Bug fixes + modified filters for KSP V1.0.4
 * Loading settings is a bit more robust
 * Fixed an exception if Blizzy78's toolbar is missing
+* Better analysis of planet's properties, should work better with modified solar system.
+* Filtered results includes only biomes of visited bodies
+* Option to hide the "Show All" button to prevent discovery of biomes on unexplored bodies
 
 
 4.7
