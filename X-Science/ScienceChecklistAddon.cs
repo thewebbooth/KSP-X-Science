@@ -66,6 +66,9 @@ namespace ScienceChecklist {
 			GameEvents.OnScienceRecieved.Add( new EventData<float, ScienceSubject, ProtoVessel, bool>.OnEvent( this.ScienceRecieved ) );
 			GameEvents.onVesselRename.Add( new EventData<GameEvents.HostedFromToAction<Vessel, string>>.OnEvent( this.VesselRename ) );
 			GameEvents.OnKSCFacilityUpgraded.Add( new EventData<Upgradeables.UpgradeableFacility, int>.OnEvent( this.FacilityUpgrade ) );
+
+			GameEvents.onDominantBodyChange.Add( new EventData<GameEvents.FromToAction<CelestialBody, CelestialBody>>.OnEvent( this.DominantBodyChange ) );
+			GameEvents.onVesselSOIChanged.Add( new EventData<GameEvents.HostedFromToAction<Vessel, CelestialBody>>.OnEvent( this.VesselSOIChanged ) );
 		}
 
 		/// <summary>
@@ -175,7 +178,6 @@ namespace ScienceChecklist {
 				return;
 			}
 			_active = false;
-			_logger.Info( "UNLOADING..." );
 
 			if( _button != null )
 				_button.Remove( );
@@ -186,7 +188,6 @@ namespace ScienceChecklist {
 			StopCoroutine( "WaitForRnDAndPartLoader" );
 			StopCoroutine( "UpdateExperiments" );
 			StopCoroutine( "RefreshFilter" );
-			_logger.Info( "UNLOADED" );
 		}
 
 		
@@ -258,6 +259,18 @@ namespace ScienceChecklist {
 			ScheduleExperimentUpdate( true );
 		}
 
+		private void DominantBodyChange( GameEvents.FromToAction<CelestialBody, CelestialBody> Data )
+		{
+//			_logger.Trace( "Callback: DominantBodyChange" );
+			ScheduleExperimentUpdate( true );
+		}
+
+		private void VesselSOIChanged( GameEvents.HostedFromToAction<Vessel, CelestialBody> Data )
+		{
+//			_logger.Trace( "Callback: VesselSOIChanged" );
+			ScheduleExperimentUpdate( true );
+		}
+
 
 
 		/// <summary>
@@ -266,7 +279,6 @@ namespace ScienceChecklist {
 		/// <returns>An IEnumerator that can be used to resume this method.</returns>
 		private IEnumerator WaitForRnDAndPartLoader( )
 		{
-			_logger.Info( "WaitForRnDAndPartLoader STARTED" );
 			if( !_active )
 			{
 				yield break;
@@ -286,7 +298,6 @@ namespace ScienceChecklist {
 
 			_logger.Info("PartLoader ready");
 			_window.RefreshExperimentCache( );
-			_logger.Info( "WaitForRnDAndPartLoader STOPPED" );
 		}
 
 
@@ -297,7 +308,6 @@ namespace ScienceChecklist {
 		/// <returns></returns>
 		private IEnumerator UpdateExperiments( )
 		{
-			_logger.Info( "UpdateExperiments STARTED" );
 			while (true) {
 				if (_window.IsVisible && _nextExperimentUpdate != null && _nextExperimentUpdate.Value < DateTime.Now) {
 					if( _mustDoFullRefresh )
@@ -320,7 +330,6 @@ namespace ScienceChecklist {
 		/// <returns></returns>
 		private IEnumerator RefreshFilter( )
 		{
-			_logger.Info( "RefreshFilter STARTED" );
 			var nextCheck = DateTime.Now;
 			while (true) {
 				if (_window.IsVisible && _filterRefreshPending && DateTime.Now > nextCheck) {
@@ -344,7 +353,7 @@ namespace ScienceChecklist {
 			if (!_active) {
 				return;
 			}
-			_logger.Trace("Button_Open");
+//			_logger.Trace("Button_Open");
 			_windowVisible = true;
 			UpdateVisibility();
 		}
@@ -360,7 +369,7 @@ namespace ScienceChecklist {
 			if (!_active) {
 				return;
 			}
-			_logger.Trace("Button_Close");
+//			_logger.Trace("Button_Close");
 			_windowVisible = false;
 			UpdateVisibility();
 		}
@@ -383,7 +392,7 @@ namespace ScienceChecklist {
 			if (!_active) {
 				return;
 			}
-			_logger.Trace("Open");
+//			_logger.Trace("Open");
 			_launcherVisible = true;
 			UpdateVisibility();
 		}
@@ -397,7 +406,7 @@ namespace ScienceChecklist {
 			if (!_active) {
 				return;
 			}
-			_logger.Trace("Close");
+//			_logger.Trace("Close");
 			_launcherVisible = false;
 			UpdateVisibility();
 		}
@@ -411,7 +420,7 @@ namespace ScienceChecklist {
 			if (!_active) {
 				return;
 			}
-			_logger.Trace("UpdateVisibility");
+//			_logger.Trace("UpdateVisibility");
 			_window.IsVisible = _launcherVisible && _windowVisible;
 			ScheduleExperimentUpdate();
 		}

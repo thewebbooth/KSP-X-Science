@@ -80,7 +80,7 @@ namespace ScienceChecklist {
 
 			// Return the dictionary
 				Elapsed = DateTime.Now - Start;
-				_logger.Trace( "GetOnboardScience took " + Elapsed.ToString( ) + "ms and found " + onboardScience.Count( ) + " ScienceData" );
+//				_logger.Trace( "GetOnboardScience took " + Elapsed.ToString( ) + "ms and found " + onboardScience.Count( ) + " ScienceData" );
 				return onboardScienceDict;
 		}
 

@@ -9,7 +9,7 @@ namespace ScienceChecklist
 {
 	internal sealed class Body
 	{
-		private readonly Logger	_logger;
+//		private readonly Logger	_logger;
 		private string[ ] _biomes;
 		private bool _hasBiomes;
 		private bool _hasAtmosphere;
@@ -52,7 +52,7 @@ namespace ScienceChecklist
 		public Body( CelestialBody Body )
 		{
 			// Init
-				_logger = new Logger( "Body: " + Body.name );
+//				_logger = new Logger( "Body: " + Body.name );
 
 			// Store this!
 				_celestialBody = Body;
@@ -104,6 +104,24 @@ namespace ScienceChecklist
 
 			// Reached - bit of a palaver but Body.DiscoveryInfo isn't useful
 				_Reached = null; // Not reached yet
+				if( _isHome ) // KSP says you have to launch your first vessel to reach the homeworld
+					_Reached = 1; // I say the homeworld is always reached.
+				else
+				{
+					// If we are here then it's reached
+					// ProgressTracking node is slow to react.
+					// Maybe you need to change vessels to force the save
+					if( HighLogic.LoadedScene == GameScenes.FLIGHT )
+					{
+						if( FlightGlobals.ActiveVessel.mainBody.flightGlobalsIndex == Body.flightGlobalsIndex )
+							_Reached = 1;
+					}
+				}
+
+
+
+				// Do this whatever happened above then the "1" can be overwritten
+				// by the real thing
 				if( HighLogic.CurrentGame != null )
 				{
 					var node = new ConfigNode( );
@@ -126,8 +144,6 @@ namespace ScienceChecklist
 						}
 					}
 				}
-				if( _isHome && _Reached == null ) // KSP says you have to launch your first vessel to reach the homeworld
-					_Reached = 1; // I say the homeworld is always reached.
 		}
 	}
 }

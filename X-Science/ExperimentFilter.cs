@@ -185,7 +185,7 @@ namespace ScienceChecklist {
 
 
 
-foreach( var P in PartLoader.Instance.parts )
+/*foreach( var P in PartLoader.Instance.parts )
 {
 	var Modules = P.partPrefab.FindModulesImplementing<ModuleScienceExperiment>( );
 	if( Modules.Count > 0 )
@@ -195,7 +195,7 @@ foreach( var P in PartLoader.Instance.parts )
 			_logger.Debug( "PART " + P.name + " HAS EXPERIMENT " + M.experimentID );
 		}
 	}
-}
+}*/
 			// Find all experiments - These should be in an object
 				var experiments = PartLoader.Instance.parts
 					.SelectMany( x => x.partPrefab.FindModulesImplementing<ModuleScienceExperiment>( ) )
@@ -206,14 +206,14 @@ foreach( var P in PartLoader.Instance.parts )
 					.Where( x => x.Experiment != null )
 					.GroupBy( x => x.Experiment )
 					.ToDictionary( x => x.Key, x => x.First( ).Module );
-//				experiments.Remove( ResearchAndDevelopment.GetExperiment( "evaReport" ) );
-//				experiments.Remove( ResearchAndDevelopment.GetExperiment( "surfaceSample" ) );
-			_logger.Debug( "Found " + experiments.Count + " experimnents" );
-			foreach( var XX in experiments )
-			{
-				if( XX.Value != null )
-					_logger.Debug( "EXPERIMENT " + XX.Key.experimentTitle );
-			}
+				/*//				experiments.Remove( ResearchAndDevelopment.GetExperiment( "evaReport" ) ); Now we need these two lines
+				//				experiments.Remove( ResearchAndDevelopment.GetExperiment( "surfaceSample" ) );
+							_logger.Debug( "Found " + experiments.Count + " experimnents" );
+							foreach( var XX in experiments )
+							{
+								if( XX.Value != null )
+									_logger.Debug( "EXPERIMENT " + XX.Key.experimentTitle );
+							}*/
 
 
 			// Find all celestial bodies
@@ -266,7 +266,7 @@ foreach( var P in PartLoader.Instance.parts )
 							if( sitMaskField != null )
 							{
 								sitMask = (uint)(int)sitMaskField.GetValue( experiments[ experiment ] );
-								_logger.Debug( "Setting sitMask to " + sitMask + " for " + experiment.experimentTitle );
+//								_logger.Debug( "Setting sitMask to " + sitMask + " for " + experiment.experimentTitle );
 							}
 
 							if( biomeMask == 0 )
@@ -275,7 +275,7 @@ foreach( var P in PartLoader.Instance.parts )
 								if( biomeMaskField != null )
 								{
 									biomeMask = (uint)(int)biomeMaskField.GetValue( experiments[ experiment ] );
-									_logger.Debug( "Setting biomeMask to " + biomeMask + " for " + experiment.experimentTitle );
+//									_logger.Debug( "Setting biomeMask to " + biomeMask + " for " + experiment.experimentTitle );
 								}
 							}
 						}

@@ -20,7 +20,7 @@ namespace ScienceChecklist
 
 		public void Clear( )
 		{
-			var _logger = new Logger( "UnlockedExperimentList" );
+//			var _logger = new Logger( "UnlockedExperimentList" );
 			_unlockedExperiments = new Dictionary<string, bool>( );
 			float RnDLevel = ScenarioUpgradeableFacilities.GetFacilityLevel( SpaceCenterFacility.ResearchAndDevelopment );
 			//			_logger.Trace( "RnDLevel " + RnDLevel );
