@@ -6,6 +6,12 @@ using System.Text;
 
 
 
+/* 
+ * THIS IS A STATIC CLASS
+ */
+
+
+
 namespace ScienceChecklist {
 	internal static class Config {
 		public static bool HideCompleteExperiments	{ get; set; }

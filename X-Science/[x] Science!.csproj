@@ -49,13 +49,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AllBodies.cs" />
+    <Compile Include="CelestialBodyFilters.cs" />
+    <Compile Include="ScienceContext.cs" />
     <Compile Include="Body.cs" />
     <Compile Include="Buttons\BlizzysToolbarButton.cs" />
     <Compile Include="Buttons\IToolbarButton.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="DisplayMode.cs" />
-    <Compile Include="Experiment.cs" />
+    <Compile Include="ScienceInstance.cs" />
     <Compile Include="ExperimentFilter.cs" />
     <Compile Include="GameHelper.cs" />
     <Compile Include="ScienceChecklistAddon.cs" />
@@ -68,7 +69,7 @@
     <Compile Include="Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Buttons\ToolbarWrapper.cs" />
-    <Compile Include="UnlockedExperimentList.cs" />
+    <Compile Include="UnlockedInstrumentList.cs" />
     <None Include="GameData\[x] Science!\CHANGES.md" />
     <None Include="Deploy.cs">
       <AutoGen>True</AutoGen>
@@ -104,6 +105,7 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Deploy.cs</LastGenOutput>
     </None>
+    <None Include="GameData\[x] Science!\science.cfg" />
     <None Include="GameData\[x] Science!\settings.cfg" />
     <None Include="GameData\[x] Science!\[x] Science!.version">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

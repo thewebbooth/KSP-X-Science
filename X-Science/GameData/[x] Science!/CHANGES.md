@@ -1,6 +1,14 @@
 [x] Science!
 ============
 
+
+4.9
+---
+xx-Aug-2015 Bug fixes + modified filters for KSP V1.0.4
+
+
+
+
 4.8
 ---
 03-Aug-2015 Bug fixes + modified filters for KSP V1.0.4

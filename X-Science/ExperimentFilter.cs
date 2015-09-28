@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using UnityEngine;
+using System.IO;
 
 
 
@@ -30,21 +30,19 @@ namespace ScienceChecklist {
 			_logger = new Logger(this);
 			_displayMode = DisplayMode.Unlocked;
 			_text = string.Empty;
-			_kscBiomes = new List<string>();
-			AllExperiments = new List<Experiment>();
-			DisplayExperiments = new List<Experiment>();
+			AllScienceInstances = new List<ScienceInstance>( );
+			DisplayScienceInstances = new List<ScienceInstance>( );
 			CompleteCount = TotalCount = 0;
-			AvailableExperiments = new UnlockedExperimentList( );
 		}
 
 		/// <summary>
 		/// Gets all experiments that are available in the game.
 		/// </summary>
-		public IList<Experiment> AllExperiments     { get; private set; }
+		public IList<ScienceInstance> AllScienceInstances { get; private set; }
 		/// <summary>
 		/// Gets the experiments that should currently be displayed in the experiment list.
 		/// </summary>
-		public IList<Experiment> DisplayExperiments { get; private set; }
+		public IList<ScienceInstance> DisplayScienceInstances { get; private set; }
 		/// <summary>
 		/// Gets the number of display experiments that are complete.
 		/// </summary>
@@ -53,7 +51,7 @@ namespace ScienceChecklist {
 		/// Gets the total number of display experiments.
 		/// </summary>
 		public int               TotalCount         { get; private set; }
-		public UnlockedExperimentList AvailableExperiments { get; private set; }
+
 
 
 		/// <summary>
@@ -104,24 +102,6 @@ namespace ScienceChecklist {
 
 
 
-		public Dictionary<string,ScienceSubject> GetScienceSubjects( )
-		{
-//			var StartTime = DateTime.Now;
-			
-			
-			
-			var SciSubjects = ( ResearchAndDevelopment.GetSubjects( ) ?? new List<ScienceSubject>( ) );
-			Dictionary<string,ScienceSubject> SciDict = SciSubjects.ToDictionary( p => p.id );
-
-
-
-//			_logger.Trace( "Science Subjects contains " + SciSubjects.Count.ToString( ) + " items" );
-//			_logger.Trace( "Science Subjects contains " + SciDict.Count.ToString( ) + " items" );
-//			var Elapsed = DateTime.Now - StartTime;
-//			_logger.Trace( "GetScienceSubjects Done - " + Elapsed.ToString( ) + "ms" );
-			return SciDict;
-		}
-
 
 
 		/// <summary>
@@ -131,18 +111,18 @@ namespace ScienceChecklist {
 		{
 			var StartTime = DateTime.Now;
 //			_logger.Trace( "UpdateExperiments" );
-			var onboardScience = GameHelper.GetOnboardScience( Config.CheckDebris );
+			ScienceContext Sci = new ScienceContext( );
 
-			var SciDict = GetScienceSubjects( );
+
 //			_logger.Trace( "onboardScience contains " + onboardScience.Count() + " items" );
 //			_logger.Trace( "AllExperiments contains " + AllExperiments.Count( ) + " items" );
 //			_logger.Trace( "SciDict contains " + SciDict.Count( ) + " items" );
 //			foreach( var K in SciDict.Keys )
 //				_logger.Trace( K + "=" + SciDict[K].title );
 
-			foreach( var exp in AllExperiments )
+			foreach( var exp in AllScienceInstances )
 			{
-				exp.Update( onboardScience, SciDict, AvailableExperiments );
+				exp.Update( Sci );
 			}
 			var Elapsed = DateTime.Now - StartTime;
 			_logger.Trace( "UpdateExperiments Done - " + Elapsed.ToString( ) + "ms" );
@@ -157,132 +137,91 @@ namespace ScienceChecklist {
 		public void RefreshExperimentCache( )
 		{
 			// Init
-			var StartTime = DateTime.Now;
-//			_logger.Info( "RefreshExperimentCache" );
+				var StartTime = DateTime.Now;
+				ScienceContext Sci = new ScienceContext( );
+//				_logger.Info( "RefreshExperimentCache" );
 
 
 			// Quick check for things we depend on
-				if( ResearchAndDevelopment.Instance == null )
+				if( ResearchAndDevelopment.Instance == null || PartLoader.Instance == null )
 				{
-					_logger.Debug( "ResearchAndDevelopment not instantiated." );
-					AllExperiments = new List<Experiment>( );
+					_logger.Debug( "ResearchAndDevelopment and PartLoader must be instantiated." );
+					AllScienceInstances = new List<ScienceInstance>( );
 					UpdateFilter( );
 					return;
 				}
 
-				if (PartLoader.Instance == null)
-				{
-					_logger.Debug( "PartLoader not instantiated." );
-					AllExperiments = new List<Experiment>( );
-					UpdateFilter( );
-					return;
-				}
+
 
 			// Temporary experiment list
-				var exps = new List<Experiment>( );
+				var exps = new List<ScienceInstance>( );
 
 
-
-
-
-/*foreach( var P in PartLoader.Instance.parts )
-{
-	var Modules = P.partPrefab.FindModulesImplementing<ModuleScienceExperiment>( );
-	if( Modules.Count > 0 )
-	{
-		foreach( var M in Modules )
-		{
-			_logger.Debug( "PART " + P.name + " HAS EXPERIMENT " + M.experimentID );
-		}
-	}
-}*/
-			// Find all experiments - These should be in an object
-				var experiments = PartLoader.Instance.parts
-					.SelectMany( x => x.partPrefab.FindModulesImplementing<ModuleScienceExperiment>( ) )
-					.Select( x => new {
-						Module = x,
-						Experiment = ResearchAndDevelopment.GetExperiment( x.experimentID ),
-					})
-					.Where( x => x.Experiment != null )
-					.GroupBy( x => x.Experiment )
-					.ToDictionary( x => x.Key, x => x.First( ).Module );
-				/*//				experiments.Remove( ResearchAndDevelopment.GetExperiment( "evaReport" ) ); Now we need these two lines
-				//				experiments.Remove( ResearchAndDevelopment.GetExperiment( "surfaceSample" ) );
-							_logger.Debug( "Found " + experiments.Count + " experimnents" );
-							foreach( var XX in experiments )
-							{
-								if( XX.Value != null )
-									_logger.Debug( "EXPERIMENT " + XX.Key.experimentTitle );
-							}*/
-
-
-			// Find all celestial bodies
-				var bodies = new AllBodies( );
 
 			// Find all situations
 				var situations = Enum.GetValues( typeof( ExperimentSituations ) ).Cast<ExperimentSituations>( );
 
-			// Find the KSC baby biomes /* MOVE THIS ELSE WHERE */
-				_kscBiomes = new List<string>( );
-				_kscBiomes = _kscBiomes.Any () ? _kscBiomes : UnityEngine.Object.FindObjectsOfType<Collider>( )
-					.Where(x => x.gameObject.layer == 15)
-					.Select(x => x.gameObject.tag)
-					.Where(x => x != "Untagged")
-					.Where(x => !x.Contains("KSC_Runway_Light"))
-					.Where(x => !x.Contains("KSC_Pad_Flag_Pole"))
-					.Where(x => !x.Contains("Ladder"))
-					.Select(x => Vessel.GetLandedAtString(x))
-					.Select(x => x.Replace(" ", ""))
-					.Distinct()
-					.ToList();
 
-			// Unlocked experiment list - Maybe merge with "var experiments" above
-				AvailableExperiments.Clear( );
 
-			// Grab the list of science experiments
-				var SciDict = GetScienceSubjects( );
+			// Unlocked experiment list
+				UnlockedInstrumentList.Clear( );
 
-			// Find the science stored in vessels
-				var onboardScience = GameHelper.GetOnboardScience( Config.CheckDebris );
-
-			// We need the level of the RnD facility in career mode
-				float RnDLevel = ScenarioUpgradeableFacilities.GetFacilityLevel( SpaceCenterFacility.ResearchAndDevelopment );
 
 
 			// Loop around all experiments
-				foreach( var experiment in experiments.Keys )
+				foreach( var X in Sci.Experiments )
 				{
-/*CANT DO THIS HERE
- * // Examine each experiment in turn
+					var experiment = X.Key;
 
-*/
+
+_logger.Trace( experiment.experimentTitle );
+					// Where the experiment is possible
 						var sitMask = experiment.situationMask;
 						var biomeMask = experiment.biomeMask;
-				
-						// OrbitalScience support
-						if( sitMask == 0 && experiments[ experiment ] != null )
+
+
+
+					// OrbitalScience support - where the experiment is possible
+						if( sitMask == 0 && Sci.Experiments[ experiment ] != null )
 						{
-							var sitMaskField = experiments[ experiment ].GetType( ).GetField( "sitMask" );
+							var sitMaskField = Sci.Experiments[ experiment ].GetType( ).GetField( "sitMask" );
 							if( sitMaskField != null )
 							{
-								sitMask = (uint)(int)sitMaskField.GetValue( experiments[ experiment ] );
-//								_logger.Debug( "Setting sitMask to " + sitMask + " for " + experiment.experimentTitle );
+								sitMask = (uint)(int)sitMaskField.GetValue( Sci.Experiments[ experiment ] );
+								_logger.Trace( "Setting sitMask to " + sitMask + " for " + experiment.experimentTitle );
 							}
 
 							if( biomeMask == 0 )
 							{
-								var biomeMaskField = experiments[ experiment ].GetType( ).GetField( "bioMask" );
+								var biomeMaskField = Sci.Experiments[ experiment ].GetType( ).GetField( "bioMask" );
 								if( biomeMaskField != null )
 								{
-									biomeMask = (uint)(int)biomeMaskField.GetValue( experiments[ experiment ] );
-//									_logger.Debug( "Setting biomeMask to " + biomeMask + " for " + experiment.experimentTitle );
+									biomeMask = (uint)(int)biomeMaskField.GetValue( Sci.Experiments[ experiment ] );
+									_logger.Trace( "Setting biomeMask to " + biomeMask + " for " + experiment.experimentTitle );
 								}
 							}
 						}
 
+
+
+					// Check for CelestialBodyFilter
+						if( Sci.Experiments[ experiment ] != null )
+						{
+							_logger.Trace( Sci.Experiments[ experiment ].experimentID );
+							if( CelestialBodyFilters.Filters.HasValue( Sci.Experiments[ experiment ].experimentID ) )
+							{
+								string FilterText = CelestialBodyFilters.Filters.GetValue( Sci.Experiments[ experiment ].experimentID );
+								_logger.Trace( FilterText );
+
+
+
+							}
+						}
+
+						
 		
 					// Check this experiment in all biomes on all bodies
-						foreach( var b in bodies.List )
+						foreach( var b in Sci.BodyList )
 						{
 							var body = b.Value;
 							if( experiment.requireAtmosphere && !body.HasAtmosphere )
@@ -304,25 +243,53 @@ namespace ScienceChecklist {
 								if( body.Biomes.Any( ) && ( biomeMask & (uint)situation ) != 0 )
 								{
 									foreach( var biome in body.Biomes )
-										exps.Add( new Experiment( experiment, new Situation( body, situation, biome ), onboardScience, SciDict, AvailableExperiments ) );
-
-									/* MOVE THIS OUT OF THE LOOP - HANDLE IT SEPERATLY */
-									// Can't really avoid magic constants here - Kerbin and Shores 
-									if( ( body.Name == "Kerbin" ) && situation == ExperimentSituations.SrfLanded )
-									{
-										foreach( var kscBiome in _kscBiomes ) // Ew.
-											exps.Add( new Experiment( experiment, new Situation( body, situation, "Shores", kscBiome ), onboardScience, SciDict, AvailableExperiments ) );
-									}
+										exps.Add( new ScienceInstance( experiment, new Situation( body, situation, biome ), Sci ) );
 								}
 								else
-									exps.Add( new Experiment( experiment, new Situation( body, situation ), onboardScience, SciDict, AvailableExperiments ) );
+									exps.Add( new ScienceInstance( experiment, new Situation( body, situation ), Sci ) );
 							}
+						}
+
+
+
+						// Can't really avoid magic constants here - Kerbin and Shores
+						if( Sci.Kerbin != null && Sci.KscBiomes.Count > 0 )
+						{
+							foreach( var kscBiome in Sci.KscBiomes ) // Ew.
+								exps.Add( new ScienceInstance( experiment, new Situation( Sci.BodyList[ Sci.Kerbin ], ExperimentSituations.SrfLanded, "Shores", kscBiome ), Sci ) );
 						}
 				}
 
 
-			// Done replace the old list with the new one
-				AllExperiments = exps;
+
+				/*
+
+				# Reverse-engineered caps for recovery missions.  The values for SubOrbited
+				# and Orbited are inverted on Kerbin, handled later.
+				my %recoCap = (
+						   Flew => 6,
+						   FlewBy => 7.2,
+						   SubOrbited => 12,
+						   Orbited => 9.6,
+						   Surfaced => 18
+						  );
+				recovery@KerbinFlew
+				 * recovery@KerbinSubOrbited
+				 * recovery@KerbinOrbited
+				 * recovery@MunFlewBy
+				 * recovery@MunOrbited
+				 * recovery@MinmusOrbited
+				 * recovery@MunSurfaced
+				 * recovery@MinmusSurfaced
+				 * recovery@MinmusFlewBy
+				 * recovery@SunOrbited
+				*/
+
+
+
+
+				// Done replace the old list with the new one
+				AllScienceInstances = exps;
 
 			// We need to redo the filter
 				UpdateFilter( );
@@ -341,7 +308,7 @@ namespace ScienceChecklist {
 		public void UpdateFilter () {
 			var StartTime = DateTime.Now;
 //			_logger.Trace("UpdateFilter");
-			var query = AllExperiments.AsEnumerable();
+			var query = AllScienceInstances.AsEnumerable( );
 			switch (_displayMode) {
 				case DisplayMode.All:
 					break;
@@ -380,12 +347,12 @@ namespace ScienceChecklist {
 			if( Config.CompleteWithoutRecovery ) // Lab lander mode.  Complete is a green bar ( Recovered+OnBoard )
 			{
 				CompleteCount = query.Count( x => x.IsCollected );
-				DisplayExperiments = query.Where( x => !Config.HideCompleteExperiments || !x.IsCollected ).ToList( );		
+				DisplayScienceInstances = query.Where( x => !Config.HideCompleteExperiments || !x.IsCollected ).ToList( );		
 			}
 			else // Normal mode, must recover/transmit to KSC
 			{
 				CompleteCount = query.Count(x => x.IsComplete);
-				DisplayExperiments = query.Where (x => !Config.HideCompleteExperiments || !x.IsComplete).ToList( );
+				DisplayScienceInstances = query.Where( x => !Config.HideCompleteExperiments || !x.IsComplete ).ToList( );
 			}
 
 			var Elapsed = DateTime.Now - StartTime;
@@ -400,16 +367,16 @@ namespace ScienceChecklist {
 		/// </summary>
 		/// <param name="src">The source experiment collection.</param>
 		/// <returns>A filtered collection of experiments that can be performed on the current vessel.</returns>
-		private IEnumerable<Experiment> ApplyActiveVesselFilter (IEnumerable<Experiment> src) {
+		private IEnumerable<ScienceInstance> ApplyActiveVesselFilter (IEnumerable<ScienceInstance> src) {
 			switch (HighLogic.LoadedScene) {
 				case GameScenes.FLIGHT:
 					var vessel = FlightGlobals.ActiveVessel;
 					return vessel == null
-						? Enumerable.Empty<Experiment> ()
+						? Enumerable.Empty<ScienceInstance> ()
 						: ApplyPartFilter(src, vessel.FindPartModulesImplementing<ModuleScienceExperiment>(), vessel.GetCrewCount() > 0);
 				case GameScenes.EDITOR:
 					return EditorLogic.SortedShipList == null
-						? Enumerable.Empty<Experiment> ()
+						? Enumerable.Empty<ScienceInstance> ()
 						: ApplyPartFilter(src, EditorLogic.SortedShipList.SelectMany(x => x.Modules.OfType<ModuleScienceExperiment> ()), EditorLogic.SortedShipList.Any (x => x != null && x.CrewCapacity > 0));
 				case GameScenes.CREDITS:
 				case GameScenes.LOADING:
@@ -421,7 +388,7 @@ namespace ScienceChecklist {
 				case GameScenes.TRACKSTATION:
 				default:
 					// No active vessel for these scenes.
-					return Enumerable.Empty<Experiment> ();
+					return Enumerable.Empty<ScienceInstance> ();
 			}
 		}
 
@@ -434,7 +401,7 @@ namespace ScienceChecklist {
 		/// <param name="modules">The available modules.</param>
 		/// <param name="hasCrew">A flag indicating whether the modules currently have crew onboard.</param>
 		/// <returns>A filtered collection of experiments that can be performed on a vessel made from the given modules.</returns>
-		private IEnumerable<Experiment> ApplyPartFilter (IEnumerable<Experiment> src, IEnumerable<ModuleScienceExperiment> modules, bool hasCrew) {
+		private IEnumerable<ScienceInstance> ApplyPartFilter (IEnumerable<ScienceInstance> src, IEnumerable<ModuleScienceExperiment> modules, bool hasCrew) {
 			var experiments = modules
 				.Select(x => x.experimentID)
 				.Distinct();
@@ -451,14 +418,14 @@ namespace ScienceChecklist {
 		/// </summary>
 		/// <param name="src">The source experiment collection</param>
 		/// <returns>A filtered collection of experiments that can be performed in the current situation.</returns>
-		private IEnumerable<Experiment> ApplyCurrentSituationFilter (IEnumerable<Experiment> src) {
+		private IEnumerable<ScienceInstance> ApplyCurrentSituationFilter (IEnumerable<ScienceInstance> src) {
 			if (HighLogic.LoadedScene != GameScenes.FLIGHT || CurrentSituation == null) {
-				return Enumerable.Empty<Experiment>();
+				return Enumerable.Empty<ScienceInstance>();
 			}
 
 			var vessel = FlightGlobals.ActiveVessel;
 			if (vessel == null) {
-				return Enumerable.Empty<Experiment>();
+				return Enumerable.Empty<ScienceInstance>();
 			}
 
 			src = ApplyActiveVesselFilter(src);
@@ -475,7 +442,6 @@ namespace ScienceChecklist {
 		private DisplayMode		_displayMode;
 		private string			_text;
 		private Situation		_situation;
-		private IList<string>	_kscBiomes;
 		private readonly Logger	_logger;
 	}
 }

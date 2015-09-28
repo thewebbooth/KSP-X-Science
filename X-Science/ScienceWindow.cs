@@ -288,21 +288,22 @@ namespace ScienceChecklist {
 			GUILayout.EndHorizontal();
 
 			_scrollPos = GUILayout.BeginScrollView(_scrollPos, _skin.scrollView);
-			var i = 0; 
-			if( _filter.DisplayExperiments == null )
+			var i = 0;
+			if( _filter.DisplayScienceInstances == null )
 				_logger.Trace( "DisplayExperiments is null" );
 			else
 			{
 
 
 
-			for (; i < _filter.DisplayExperiments.Count; i++) {
-				var rect = new Rect(5, 20 * i, _filter.DisplayExperiments.Count > 13 ? 490 : 500, 20);
+				for( ; i < _filter.DisplayScienceInstances.Count; i++ )
+				{
+					var rect = new Rect( 5, 20 * i, _filter.DisplayScienceInstances.Count > 13 ? 490 : 500, 20 );
 				if (rect.yMax < _scrollPos.y || rect.yMin > _scrollPos.y + 400) {
 					continue;
 				}
 
-				var experiment = _filter.DisplayExperiments[i];
+				var experiment = _filter.DisplayScienceInstances[ i ];
 				DrawExperiment(experiment, rect, false, _labelStyle);
 			}
 			}
@@ -377,16 +378,17 @@ namespace ScienceChecklist {
 			GUILayout.BeginVertical();
 			_compactScrollPos = GUILayout.BeginScrollView(_compactScrollPos);
 			var i = 0;
-			if( _filter.DisplayExperiments != null )
+			if( _filter.DisplayScienceInstances != null )
 			{
-				for (; i < _filter.DisplayExperiments.Count; i++) {
+				for( ; i < _filter.DisplayScienceInstances.Count; i++ )
+				{
 
-					var rect = new Rect(5, 15 * i, _filter.DisplayExperiments.Count > 11 ? 405 : 420, 20);
+					var rect = new Rect( 5, 15 * i, _filter.DisplayScienceInstances.Count > 11 ? 405 : 420, 20 );
 					if (rect.yMax < _compactScrollPos.y || rect.yMin > _compactScrollPos.y + 400) {
 						continue;
 					}
 
-					var experiment = _filter.DisplayExperiments[i];
+					var experiment = _filter.DisplayScienceInstances[ i ];
 					DrawExperiment(experiment, rect, true, _compactLabelStyle);
 				}
 			}
@@ -436,7 +438,7 @@ namespace ScienceChecklist {
 		/// <param name="rect">The rect inside which the experiment should be rendered.</param>
 		/// <param name="compact">Whether this experiment is compact.</param>
 		/// <param name="labelStyle">The style to use for labels.</param>
-		private void DrawExperiment (Experiment exp, Rect rect, bool compact, GUIStyle labelStyle) {
+		private void DrawExperiment (ScienceInstance exp, Rect rect, bool compact, GUIStyle labelStyle) {
 			labelStyle.normal.textColor = exp.IsComplete ? Color.green : Color.yellow;
 			var labelRect = new Rect(rect) {
 				y = rect.y + (compact ? 1 : 3),

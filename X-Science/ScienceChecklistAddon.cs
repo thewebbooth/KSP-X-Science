@@ -35,25 +35,35 @@ namespace ScienceChecklist {
 		/// Called by Unity once to initialize the class.
 		/// </summary>
 		public void Awake () {
-			if (_addonInitialized == true) {
+			_logger = new Logger( this );
+			_logger.Trace( "Awake" );
+		}
+
+		/// <summary>
+		/// Called by Unity once to initialize the class, just before Update is called.
+		/// </summary>
+		public void Start () {
+			_logger.Trace("Start");
+
+
+			if( _addonInitialized == true )
+			{
 				// For some reason the addon can be instantiated several times by the KSP addon loader (generally when going to/from the VAB),
 				// even though we set onlyOnce to true in the KSPAddon attribute.
 				return;
 			}
 
-			Config.Load();
+			Config.Load( );
 
 			_addonInitialized = true;
 			_active = false;
-			_logger = new Logger(this);
-			_logger.Trace("Awake");
-			_window = new ScienceWindow();
+			_window = new ScienceWindow( );
 			_window.Settings.UseBlizzysToolbarChanged += Settings_UseBlizzysToolbarChanged;
 			_window.OnCloseEvent += OnWindowClosed;
-			
+
 			_nextSituationUpdate = DateTime.Now;
-			GameEvents.onGUIApplicationLauncherReady.Add(Load);
-			GameEvents.onGUIApplicationLauncherDestroyed.Add(Unload);
+			GameEvents.onGUIApplicationLauncherReady.Add( Load );
+			GameEvents.onGUIApplicationLauncherDestroyed.Add( Unload );
 
 			GameEvents.onVesselWasModified.Add( new EventData<Vessel>.OnEvent( this.VesselWasModified ) );
 			GameEvents.onVesselChange.Add( new EventData<Vessel>.OnEvent( this.VesselChange ) );
@@ -69,13 +79,7 @@ namespace ScienceChecklist {
 
 			GameEvents.onDominantBodyChange.Add( new EventData<GameEvents.FromToAction<CelestialBody, CelestialBody>>.OnEvent( this.DominantBodyChange ) );
 			GameEvents.onVesselSOIChanged.Add( new EventData<GameEvents.HostedFromToAction<Vessel, CelestialBody>>.OnEvent( this.VesselSOIChanged ) );
-		}
-
-		/// <summary>
-		/// Called by Unity once to initialize the class, just before Update is called.
-		/// </summary>
-		public void Start () {
-			_logger.Trace("Start");
+			
 			DontDestroyOnLoad(this);
 		}
 

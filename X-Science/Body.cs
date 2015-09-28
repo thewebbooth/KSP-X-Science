@@ -23,7 +23,7 @@ namespace ScienceChecklist
 		private bool _isMoon;
 
 		private bool _isGasGiant; // No surface but isn't a star
-		private int? _parent; // Note: flightGlobalsIndex or null for the sun
+		private CelestialBody _parent; // Note: flightGlobalsIndex or null for the sun
 
 		private string _type;
 		private string _name;
@@ -44,11 +44,13 @@ namespace ScienceChecklist
 		public bool IsMoon { get { return _isMoon; } }
 		public string Type { get { return _type; } }
 		public string Name { get { return _name; } }
-		public int? Parent { get { return _parent; } }
+		public CelestialBody Parent { get { return _parent; } }
 		public CelestialBody CelestialBody { get { return _celestialBody; } }
 
 
 
+		// This could fail if some mode changes celestial bodies on the fly
+		// Just don't want to stick too much stuff into Update()
 		public Body( CelestialBody Body )
 		{
 			// Init
@@ -58,92 +60,99 @@ namespace ScienceChecklist
 				_celestialBody = Body;
 
 			// Name
-				_name = Body.name;
+				_name = _celestialBody.name;
 
 			// Biomes
 				_hasBiomes = false;
-				if( Body.BiomeMap != null )
-					_biomes = Body.BiomeMap.Attributes.Select( y => y.name ).ToArray( );
+				if( _celestialBody.BiomeMap != null )
+					_biomes = _celestialBody.BiomeMap.Attributes.Select( y => y.name ).ToArray( );
 				else
 					_biomes = new string[ 0 ];
 				if( _biomes.Length > 0 )
 					_hasBiomes = true;
 
 			// Surface
-				_hasSurface = Body.pqsController != null;
+				_hasSurface = _celestialBody.pqsController != null;
 
 			// Atmosphere
-				_hasAtmosphere = Body.atmosphere;
-				_hasOxygen = Body.atmosphereContainsOxygen;
+				_hasAtmosphere = _celestialBody.atmosphere;
+				_hasOxygen = _celestialBody.atmosphereContainsOxygen;
 
 			// Ocean
-				_hasOcean = Body.ocean;
+				_hasOcean = _celestialBody.ocean;
 
 			// Homeworld
-				_isHome = Body.isHomeWorld;
+				_isHome = _celestialBody.isHomeWorld;
 
 			// Star detection
-				_isStar = Sun.Instance.sun.flightGlobalsIndex == Body.flightGlobalsIndex;
+				_isStar = Sun.Instance.sun == Body;
 
 			// GasGiant detection
 				_isGasGiant = !_isStar && !_hasSurface;
 
 			// Type
-				_type = Body.RevealType( ); // Not sure we can trust this
+				_type = _celestialBody.RevealType( ); // Not sure we can trust this
 
 			// Moon detection + Parent
 				_parent = null; // No parent -  a star
-				if( Body.orbit != null && Body.orbit.referenceBody != null ) // Otherwise it is the sun
+				if( _celestialBody.orbit != null && _celestialBody.orbit.referenceBody != null ) // Otherwise it is the sun
 				{
-					_parent = Body.orbit.referenceBody.flightGlobalsIndex;
-					if( Body.orbit.referenceBody.flightGlobalsIndex != Sun.Instance.sun.flightGlobalsIndex ) // A moon - parent isn't the sun
+					_parent = _celestialBody.orbit.referenceBody;
+					if( _celestialBody.orbit.referenceBody != Sun.Instance.sun ) // A moon - parent isn't the sun
 						_isMoon = true;
 				}
 
 
+			// Progress tracking changes
+				Update( );
+		}
 
+
+
+		public void Update(  )
+		{
 			// Reached - bit of a palaver but Body.DiscoveryInfo isn't useful
-				_Reached = null; // Not reached yet
-				if( _isHome ) // KSP says you have to launch your first vessel to reach the homeworld
-					_Reached = 1; // I say the homeworld is always reached.
-				else
+			_Reached = null; // Not reached yet
+			if( _isHome ) // KSP says you have to launch your first vessel to reach the homeworld
+				_Reached = 1; // I say the homeworld is always reached.
+			else
+			{
+				// If we are here then it's reached
+				// ProgressTracking node is slow to react.
+				// Maybe you need to change vessels to force the save
+				if( HighLogic.LoadedScene == GameScenes.FLIGHT )
 				{
-					// If we are here then it's reached
-					// ProgressTracking node is slow to react.
-					// Maybe you need to change vessels to force the save
-					if( HighLogic.LoadedScene == GameScenes.FLIGHT )
-					{
-						if( FlightGlobals.ActiveVessel.mainBody.flightGlobalsIndex == Body.flightGlobalsIndex )
-							_Reached = 1;
-					}
+					if( FlightGlobals.ActiveVessel.mainBody == CelestialBody )
+						_Reached = 1;
 				}
+			}
 
 
 
-				// Do this whatever happened above then the "1" can be overwritten
-				// by the real thing
-				if( HighLogic.CurrentGame != null )
+			// Do this whatever happened above then the "1" can be overwritten
+			// by the real thing
+			if( HighLogic.CurrentGame != null )
+			{
+				var node = new ConfigNode( );
+				var Progress = HighLogic.CurrentGame.scenarios.Find( s => s.moduleName == "ProgressTracking" );
+				Progress.Save( node );
+
+				ConfigNode[] P = node.GetNodes( "Progress" );
+				if( P.Count( ) > 0 )
 				{
-					var node = new ConfigNode( );
-					var Progress = HighLogic.CurrentGame.scenarios.Find( s => s.moduleName == "ProgressTracking" );
-					Progress.Save( node );
-
-					ConfigNode[] P = node.GetNodes( "Progress" );
-					if( P.Count( ) > 0 )
+					ConfigNode[] B = P[ 0 ].GetNodes( _name );
+					if( B.Count( ) > 0 )
 					{
-						ConfigNode[] B = P[ 0 ].GetNodes( _name );
-						if( B.Count( ) > 0 )
+						var V = B[ 0 ].GetValue( "reached" );
+						if( !string.IsNullOrEmpty( V ) )
 						{
-							var V = B[ 0 ].GetValue( "reached" );
-							if( !string.IsNullOrEmpty( V ) )
-							{
-								double R;
-								if( double.TryParse( V, out R ) )
-									_Reached = R;
-							}
+							double R;
+							if( double.TryParse( V, out R ) )
+								_Reached = R;
 						}
 					}
 				}
+			}
 		}
 	}
 }

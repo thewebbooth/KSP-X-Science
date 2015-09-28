@@ -6,23 +6,24 @@ using System.Text.RegularExpressions;
 
 
 
+
 namespace ScienceChecklist {
 	/// <summary>
 	/// An object that represents a ScienceExperiement in a given situation.
 	/// </summary>
-	internal sealed class Experiment {
+	internal sealed class ScienceInstance {
 		/// <summary>
 		/// Creates a new instance of the Experiment class.
 		/// </summary>
 		/// <param name="experiment">The ScienceExperiment to be used.</param>
 		/// <param name="situation">The Situation this experiment is valid in.</param>
 		/// <param name="onboardScience">A collection of all onboard ScienceData.</param>
-		public Experiment( ScienceExperiment experiment, Situation situation, Dictionary<string, List<ScienceData>> onboardScience, Dictionary<string, ScienceSubject> SciDict, UnlockedExperimentList AvailableExperiments )
+		public ScienceInstance( ScienceExperiment experiment, Situation situation, ScienceContext Sci )
 		{
 			_experiment = experiment;
 			_situation = situation;
 			ScienceSubject = null;
-			Update( onboardScience, SciDict, AvailableExperiments );
+			Update( Sci );
 		}
 
 		#region PROPERTIES
@@ -66,12 +67,12 @@ namespace ScienceChecklist {
 		/// <summary>
 		/// Completed Science + Onboard Science science
 		/// </summary>
-		public bool	IsCollected { get; private set; }
+		public bool	IsCollected			{ get; private set; }
 
 		/// <summary>
 		/// Gets the amount of science for this experiment that is currently stored on vessels.
 		/// </summary>
-		public float OnboardScience    { get; private set; }
+		public float OnboardScience		{ get; private set; }
 		/// <summary>
 		/// Gets the ScienceSubject containing information on how much science has been retrieved from this experiment.
 		/// </summary>
@@ -97,14 +98,14 @@ namespace ScienceChecklist {
 		/// Updates the IsUnlocked, CompletedScience, TotalScience, OnboardScience, and IsComplete fields.
 		/// </summary>
 		/// <param name="onboardScience">The total onboard ScienceData.</param>
-		public void Update( Dictionary<string, List<ScienceData>> onboardScience, Dictionary<string, ScienceSubject> SciDict, UnlockedExperimentList AvailableExperiments )
+		public void Update( ScienceContext Sci )
 		{
-			if( SciDict.ContainsKey( Id ) )
-				ScienceSubject = SciDict[ Id ];
+			if( Sci.ScienceSubjects.ContainsKey( Id ) )
+				ScienceSubject = Sci.ScienceSubjects[ Id ];
 			else ScienceSubject = new ScienceSubject(ScienceExperiment, Situation.ExperimentSituation, Situation.Body.CelestialBody, Situation.SubBiome ?? Situation.Biome ?? string.Empty);
 
 
-			IsUnlocked = AvailableExperiments.IsUnlocked( ScienceExperiment.id ) && ( Situation.Body.Reached != null );
+			IsUnlocked = UnlockedInstrumentList.IsUnlocked( ScienceExperiment.id ) && ( Situation.Body.Reached != null );
 
 			CompletedScience = ScienceSubject.science * HighLogic.CurrentGame.Parameters.Career.ScienceGainMultiplier;
 			TotalScience = ScienceSubject.scienceCap * HighLogic.CurrentGame.Parameters.Career.ScienceGainMultiplier;
@@ -115,9 +116,9 @@ namespace ScienceChecklist {
 
 
 			OnboardScience = 0;
-			if( onboardScience.ContainsKey( ScienceSubject.id ) )
+			if( Sci.OnboardScienceList.ContainsKey( ScienceSubject.id ) )
 			{
-				var data = onboardScience[ ScienceSubject.id ];
+				var data = Sci.OnboardScienceList[ ScienceSubject.id ];
 //				var _logger = new Logger( "Experiment" );
 //				_logger.Trace( ScienceSubject.id + " found " + data.Count( ) + " items" );
 				foreach (var i in data)
