@@ -19,10 +19,11 @@ namespace ScienceChecklist
 		private bool _isHome;
 		private double? _Reached; // Or null, if player hasn't reached it yet
 
-		private bool _isStar; // If it isn't a moon or a star, then it is a planet
+		private bool _isPlanet;
+		private bool _isStar;
 		private bool _isMoon;
-
 		private bool _isGasGiant; // No surface but isn't a star
+
 		private CelestialBody _parent; // Note: flightGlobalsIndex or null for the sun
 
 		private string _type;
@@ -39,6 +40,7 @@ namespace ScienceChecklist
 		public bool HasSurface { get { return _hasSurface; } }
 		public bool IsHome { get { return _isHome; } }
 		public double? Reached { get { return _Reached; } }
+		public bool IsPlanet { get { return _isPlanet; } }
 		public bool IsStar { get { return _isStar; } }
 		public bool IsGasGiant { get { return _isGasGiant; } }
 		public bool IsMoon { get { return _isMoon; } }
@@ -95,11 +97,14 @@ namespace ScienceChecklist
 
 			// Moon detection + Parent
 				_parent = null; // No parent -  a star
+				_isPlanet = _isMoon = false;
 				if( _celestialBody.orbit != null && _celestialBody.orbit.referenceBody != null ) // Otherwise it is the sun
 				{
 					_parent = _celestialBody.orbit.referenceBody;
-					if( _celestialBody.orbit.referenceBody != Sun.Instance.sun ) // A moon - parent isn't the sun
-						_isMoon = true;
+					if( _celestialBody.orbit.referenceBody == Sun.Instance.sun )
+						_isPlanet = true;
+					else
+						_isMoon = true; // A moon - parent isn't the sun
 				}
 
 

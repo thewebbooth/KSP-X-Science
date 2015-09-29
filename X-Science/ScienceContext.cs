@@ -9,7 +9,7 @@ using UnityEngine; // For Collider
 
 namespace ScienceChecklist
 {
-	internal class ScienceContext
+	internal sealed class ScienceContext
 	{
 		private readonly Logger	_logger;
 		private Dictionary<CelestialBody, Body> _bodyList;

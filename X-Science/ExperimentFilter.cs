@@ -13,6 +13,29 @@ using System.IO;
 //ResourceMap.Instance.IsPlanetScanned(body.flightGlobalsIndex);
 
 
+/*
+
+# Reverse-engineered caps for recovery missions.  The values for SubOrbited
+# and Orbited are inverted on Kerbin, handled later.
+my %recoCap = (
+		   Flew => 6,
+		   FlewBy => 7.2,
+		   SubOrbited => 12,
+		   Orbited => 9.6,
+		   Surfaced => 18
+		  );
+recovery@KerbinFlew
+ * recovery@KerbinSubOrbited
+ * recovery@KerbinOrbited
+ * recovery@MunFlewBy
+ * recovery@MunOrbited
+ * recovery@MinmusOrbited
+ * recovery@MunSurfaced
+ * recovery@MinmusSurfaced
+ * recovery@MinmusFlewBy
+ * recovery@SunOrbited
+*/
+
 
 
 
@@ -102,8 +125,6 @@ namespace ScienceChecklist {
 
 
 
-
-
 		/// <summary>
 		/// Calls the Update method on all experiments.
 		/// </summary>
@@ -139,6 +160,7 @@ namespace ScienceChecklist {
 			// Init
 				var StartTime = DateTime.Now;
 				ScienceContext Sci = new ScienceContext( );
+				BodyFilter BodyFilter = new BodyFilter( );
 //				_logger.Info( "RefreshExperimentCache" );
 
 
@@ -174,7 +196,7 @@ namespace ScienceChecklist {
 					var experiment = X.Key;
 
 
-_logger.Trace( experiment.experimentTitle );
+//_logger.Trace( experiment.experimentTitle );
 					// Where the experiment is possible
 						var sitMask = experiment.situationMask;
 						var biomeMask = experiment.biomeMask;
@@ -188,7 +210,7 @@ _logger.Trace( experiment.experimentTitle );
 							if( sitMaskField != null )
 							{
 								sitMask = (uint)(int)sitMaskField.GetValue( Sci.Experiments[ experiment ] );
-								_logger.Trace( "Setting sitMask to " + sitMask + " for " + experiment.experimentTitle );
+//								_logger.Trace( "Setting sitMask to " + sitMask + " for " + experiment.experimentTitle );
 							}
 
 							if( biomeMask == 0 )
@@ -197,12 +219,13 @@ _logger.Trace( experiment.experimentTitle );
 								if( biomeMaskField != null )
 								{
 									biomeMask = (uint)(int)biomeMaskField.GetValue( Sci.Experiments[ experiment ] );
-									_logger.Trace( "Setting biomeMask to " + biomeMask + " for " + experiment.experimentTitle );
+//									_logger.Trace( "Setting biomeMask to " + biomeMask + " for " + experiment.experimentTitle );
 								}
 							}
 						}
 
 
+						List<Body> BodyList = new List<Body>( Sci.BodyList.Values.ToList( ) );
 
 					// Check for CelestialBodyFilter
 						if( Sci.Experiments[ experiment ] != null )
@@ -211,19 +234,15 @@ _logger.Trace( experiment.experimentTitle );
 							if( CelestialBodyFilters.Filters.HasValue( Sci.Experiments[ experiment ].experimentID ) )
 							{
 								string FilterText = CelestialBodyFilters.Filters.GetValue( Sci.Experiments[ experiment ].experimentID );
-								_logger.Trace( FilterText );
-
-
-
+								BodyFilter.Filter( BodyList, FilterText );
 							}
 						}
 
 						
 		
 					// Check this experiment in all biomes on all bodies
-						foreach( var b in Sci.BodyList )
+						foreach( var body in BodyList )
 						{
-							var body = b.Value;
 							if( experiment.requireAtmosphere && !body.HasAtmosphere )
 								continue; // If the whole planet doesn't have an atmosphere, then there's not much point continuing.
 							foreach( var situation in situations )
@@ -255,36 +274,13 @@ _logger.Trace( experiment.experimentTitle );
 						// Can't really avoid magic constants here - Kerbin and Shores
 						if( Sci.Kerbin != null && Sci.KscBiomes.Count > 0 )
 						{
-							foreach( var kscBiome in Sci.KscBiomes ) // Ew.
+							if( BodyList.Contains( Sci.BodyList[ Sci.Kerbin ] ) ) // If we haven't filtered it out
+							{
+								foreach( var kscBiome in Sci.KscBiomes ) // Ew.
 								exps.Add( new ScienceInstance( experiment, new Situation( Sci.BodyList[ Sci.Kerbin ], ExperimentSituations.SrfLanded, "Shores", kscBiome ), Sci ) );
+							}
 						}
 				}
-
-
-
-				/*
-
-				# Reverse-engineered caps for recovery missions.  The values for SubOrbited
-				# and Orbited are inverted on Kerbin, handled later.
-				my %recoCap = (
-						   Flew => 6,
-						   FlewBy => 7.2,
-						   SubOrbited => 12,
-						   Orbited => 9.6,
-						   Surfaced => 18
-						  );
-				recovery@KerbinFlew
-				 * recovery@KerbinSubOrbited
-				 * recovery@KerbinOrbited
-				 * recovery@MunFlewBy
-				 * recovery@MunOrbited
-				 * recovery@MinmusOrbited
-				 * recovery@MunSurfaced
-				 * recovery@MinmusSurfaced
-				 * recovery@MinmusFlewBy
-				 * recovery@SunOrbited
-				*/
-
 
 
 
