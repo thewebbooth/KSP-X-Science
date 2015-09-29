@@ -259,8 +259,8 @@ namespace ScienceChecklist {
 
 		private void FacilityUpgrade( Upgradeables.UpgradeableFacility Data, int V )
 		{
-//			_logger.Trace( "Callback: KSP Facility Upgraded" );
-			ScheduleExperimentUpdate( true );
+			_logger.Trace( "Callback: KSP Facility Upgraded" );
+			ScheduleExperimentUpdate( true, 5 );
 		}
 
 		private void DominantBodyChange( GameEvents.FromToAction<CelestialBody, CelestialBody> Data )
@@ -379,13 +379,12 @@ namespace ScienceChecklist {
 		}
 
 
+
 		public void OnWindowClosed( object sender, EventArgs e  )
 		{
 			_button.SetOff( );
 			_windowVisible = false;
 		}
-
-
 
 
 
@@ -434,9 +433,9 @@ namespace ScienceChecklist {
 		/// <summary>
 		/// Schedules a full experiment update in 1 second.
 		/// </summary>
-		private void ScheduleExperimentUpdate ( bool FullRefresh = false )
+		private void ScheduleExperimentUpdate ( bool FullRefresh = false, int AddTime = 1 )
 		{
-			_nextExperimentUpdate = DateTime.Now.AddSeconds( 1 );
+			_nextExperimentUpdate = DateTime.Now.AddSeconds( AddTime );
 			if( FullRefresh )
 				_mustDoFullRefresh = true;
 		}

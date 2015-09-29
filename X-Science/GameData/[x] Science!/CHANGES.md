@@ -4,9 +4,9 @@
 
 4.9
 ---
-xx-Aug-2015 Bug fixes + modified filters for KSP V1.0.4
-
-
+29-Sept-2015 Celestial Body filters for KSP V1.0.4
+* A fairly major code reorganisation
+* A new config file for filtering science according to the properties of celestial bodies
 
 
 4.8

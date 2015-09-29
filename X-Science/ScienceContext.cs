@@ -247,6 +247,7 @@ namespace ScienceChecklist
 
 
 			// Find the KSC baby biomes
+			// This is throwing exceptions.  I think the callback is being thrown before the world is finished updating.
 				if( _kerbin != null )
 				{
 					_kscBiomes = UnityEngine.Object.FindObjectsOfType<Collider>( )
