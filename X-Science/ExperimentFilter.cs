@@ -198,8 +198,8 @@ namespace ScienceChecklist {
 
 //_logger.Trace( experiment.experimentTitle );
 					// Where the experiment is possible
-						var sitMask = experiment.situationMask;
-						var biomeMask = experiment.biomeMask;
+						uint sitMask = experiment.situationMask;
+						uint biomeMask = experiment.biomeMask;
 
 
 
@@ -219,10 +219,11 @@ namespace ScienceChecklist {
 								if( biomeMaskField != null )
 								{
 									biomeMask = (uint)(int)biomeMaskField.GetValue( Sci.Experiments[ experiment ] );
-//									_logger.Trace( "Setting biomeMask to " + biomeMask + " for " + experiment.experimentTitle );
+	//								_logger.Trace( "Setting biomeMask to " + biomeMask + " for " + experiment.experimentTitle );
 								}
 							}
 						}
+
 
 
 						List<Body> BodyList = new List<Body>( Sci.BodyList.Values.ToList( ) );
@@ -230,7 +231,7 @@ namespace ScienceChecklist {
 					// Check for CelestialBodyFilter
 						if( Sci.Experiments[ experiment ] != null )
 						{
-							_logger.Trace( Sci.Experiments[ experiment ].experimentID );
+//							_logger.Trace( Sci.Experiments[ experiment ].experimentID );
 							if( CelestialBodyFilters.Filters.HasValue( Sci.Experiments[ experiment ].experimentID ) )
 							{
 								string FilterText = CelestialBodyFilters.Filters.GetValue( Sci.Experiments[ experiment ].experimentID );
@@ -271,17 +272,21 @@ namespace ScienceChecklist {
 
 
 
-						// Can't really avoid magic constants here - Kerbin and Shores
-						if( Sci.Kerbin != null && Sci.KscBiomes.Count > 0 )
-						{
-							if( BodyList.Contains( Sci.BodyList[ Sci.Kerbin ] ) ) // If we haven't filtered it out
-							{
-								foreach( var kscBiome in Sci.KscBiomes ) // Ew.
-								exps.Add( new ScienceInstance( experiment, new Situation( Sci.BodyList[ Sci.Kerbin ], ExperimentSituations.SrfLanded, "Shores", kscBiome ), Sci ) );
-							}
-						}
-				}
 
+				// Can't really avoid magic constants here - Kerbin and Shores
+				if( ( ( sitMask & (uint)ExperimentSituations.SrfLanded ) != 0 ) && ( ( biomeMask & (uint)ExperimentSituations.SrfLanded ) != 0 ) )
+				{
+					if( Sci.Kerbin != null && Sci.KscBiomes.Count > 0 )
+					{
+						if( BodyList.Contains( Sci.BodyList[ Sci.Kerbin ] ) ) // If we haven't filtered it out
+						{
+//							_logger.Trace( "BabyBiomes " + experiment.experimentTitle + ": " + sitMask );
+							foreach( var kscBiome in Sci.KscBiomes ) // Ew.
+								exps.Add( new ScienceInstance( experiment, new Situation( Sci.BodyList[ Sci.Kerbin ], ExperimentSituations.SrfLanded, "Shores", kscBiome ), Sci ) );
+						}
+					}
+				}
+				}
 
 
 				// Done replace the old list with the new one

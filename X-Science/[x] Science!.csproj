@@ -117,9 +117,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy "$(TargetPath)" "C:\Games\KSP\KSP_Test\GameData\[x] Science!"
-copy "$(TargetDir)\MiniAVC.dll" "C:\Games\KSP\KSP_Test\GameData\[x] Science!"
-robocopy "$(ProjectDir)\GameData\[x] Science!" "C:\Games\KSP\KSP_Test\GameData\[x] Science!"
+    <PostBuildEvent>copy "$(TargetPath)" "C:\Games\KSP\KSP-Real\GameData\[x] Science!"
+copy "$(TargetDir)\MiniAVC.dll" "C:\Games\KSP\KSP-Real\GameData\[x] Science!"
+robocopy "$(ProjectDir)\GameData\[x] Science!" "C:\Games\KSP\KSP-Real\GameData\[x] Science!"
 exit 0</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>

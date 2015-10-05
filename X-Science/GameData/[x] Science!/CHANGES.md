@@ -1,6 +1,11 @@
 [x] Science!
 ============
 
+4.10
+---
+4-Oct-2015 Bug fix version for KSP V1.0.4
+* Fix bug where situation filters aren't applied to KSC baby biomes
+
 
 4.9
 ---

@@ -259,7 +259,7 @@ namespace ScienceChecklist {
 
 		private void FacilityUpgrade( Upgradeables.UpgradeableFacility Data, int V )
 		{
-			_logger.Trace( "Callback: KSP Facility Upgraded" );
+//			_logger.Trace( "Callback: KSP Facility Upgraded" );
 			ScheduleExperimentUpdate( true, 5 );
 		}
 
