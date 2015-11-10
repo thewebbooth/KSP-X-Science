@@ -160,7 +160,7 @@ namespace ScienceChecklist {
 			// Init
 				var StartTime = DateTime.Now;
 				ScienceContext Sci = new ScienceContext( );
-				BodyFilter BodyFilter = new BodyFilter( );
+				BodySituationFilter BodyFilter = new BodySituationFilter( );
 //				_logger.Info( "RefreshExperimentCache" );
 
 
@@ -177,11 +177,6 @@ namespace ScienceChecklist {
 
 			// Temporary experiment list
 				var exps = new List<ScienceInstance>( );
-
-
-
-			// Find all situations
-				var situations = Enum.GetValues( typeof( ExperimentSituations ) ).Cast<ExperimentSituations>( );
 
 
 
@@ -226,7 +221,10 @@ namespace ScienceChecklist {
 
 
 
+						List<ExperimentSituations> SituationList = Enum.GetValues( typeof( ExperimentSituations ) ).Cast<ExperimentSituations>( ).ToList<ExperimentSituations>( );
 						List<Body> BodyList = new List<Body>( Sci.BodyList.Values.ToList( ) );
+
+
 
 					// Check for CelestialBodyFilter
 						if( Sci.Experiments[ experiment ] != null )
@@ -235,7 +233,7 @@ namespace ScienceChecklist {
 							if( CelestialBodyFilters.Filters.HasValue( Sci.Experiments[ experiment ].experimentID ) )
 							{
 								string FilterText = CelestialBodyFilters.Filters.GetValue( Sci.Experiments[ experiment ].experimentID );
-								BodyFilter.Filter( BodyList, FilterText );
+								BodyFilter.Filter( BodyList, SituationList, FilterText );
 							}
 						}
 
@@ -246,7 +244,7 @@ namespace ScienceChecklist {
 						{
 							if( experiment.requireAtmosphere && !body.HasAtmosphere )
 								continue; // If the whole planet doesn't have an atmosphere, then there's not much point continuing.
-							foreach( var situation in situations )
+							foreach( var situation in SituationList )
 							{
 								if( situation == ExperimentSituations.SrfSplashed && !body.HasOcean )
 									continue; // Some planets don't have an ocean for us to be splashed down in.

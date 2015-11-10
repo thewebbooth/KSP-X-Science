@@ -1,6 +1,13 @@
 [x] Science!
 ============
 
+4.11
+---
+10-Nov-2015 Updated for KSP V1.0.5
+* New situation filters
+* Recompiled for KSP V1.0.5
+
+
 4.10
 ---
 4-Oct-2015 Bug fix version for KSP V1.0.4

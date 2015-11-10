@@ -5,12 +5,12 @@ using System.Text;
 
 namespace ScienceChecklist
 {
-	internal sealed class BodyFilter
+	internal sealed class BodySituationFilter
 	{
 		private readonly Logger	_logger;
 
 
-		public BodyFilter( )
+		public BodySituationFilter( )
 		{
 			// Init
 				_logger = new Logger( this );
@@ -18,19 +18,19 @@ namespace ScienceChecklist
 
 
 
-		public void Filter( List<Body> BodyList, String FilterString )
+		public void Filter( List<Body> BodyList, List<ExperimentSituations> SituationList, String FilterString )
 		{
 			List<string> Filters = FilterString.Split( ',' ).Select( s => s.Trim( ) ).ToList<string>( );
 			foreach( string F in Filters )
 			{
 //				_logger.Trace( F );
-				ApplyOneFilter( BodyList, F );
+				ApplyOneFilter( BodyList, SituationList, F );
 			}
 		}
 
 
 
-		private void ApplyOneFilter( List<Body> BodyList, String FilterName )
+		private void ApplyOneFilter( List<Body> BodyList, List<ExperimentSituations> SituationList, String FilterName )
 		{
 			switch( FilterName )
 			{
@@ -120,6 +120,51 @@ namespace ScienceChecklist
 					break;
 				case "AvoidSurface":
 					BodyList.RemoveAll( x => x.HasSurface == true );
+					break;
+
+
+
+				// --- Situation filters -------------------------------------
+				case "NeedsSrfLanded":
+					SituationList.RemoveAll( x => x != ExperimentSituations.SrfLanded );
+					break;
+				case "AvoidSrfLanded":
+					SituationList.RemoveAll( x => x == ExperimentSituations.SrfLanded );
+					break;
+
+				case "NeedsSrfSplashed":
+					SituationList.RemoveAll( x => x != ExperimentSituations.SrfSplashed );
+					break;
+				case "AvoidSrfSplashed":
+					SituationList.RemoveAll( x => x == ExperimentSituations.SrfSplashed );
+					break;
+
+				case "NeedsFlyingLow":
+					SituationList.RemoveAll( x => x != ExperimentSituations.FlyingLow );
+					break;
+				case "AvoidFlyingLow":
+					SituationList.RemoveAll( x => x == ExperimentSituations.FlyingLow );
+					break;
+
+				case "NeedsFlyingHigh":
+					SituationList.RemoveAll( x => x != ExperimentSituations.FlyingHigh );
+					break;
+				case "AvoidFlyingHigh":
+					SituationList.RemoveAll( x => x == ExperimentSituations.FlyingHigh );
+					break;
+
+				case "NeedsInSpaceLow":
+					SituationList.RemoveAll( x => x != ExperimentSituations.InSpaceLow );
+					break;
+				case "AvoidInSpaceLow":
+					SituationList.RemoveAll( x => x == ExperimentSituations.InSpaceLow );
+					break;
+
+				case "NeedsInSpaceHigh":
+					SituationList.RemoveAll( x => x != ExperimentSituations.InSpaceHigh );
+					break;
+				case "AvoidInSpaceHigh":
+					SituationList.RemoveAll( x => x == ExperimentSituations.InSpaceHigh );
 					break;
 			}
 		}

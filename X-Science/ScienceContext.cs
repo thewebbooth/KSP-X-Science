@@ -63,8 +63,8 @@ namespace ScienceChecklist
 			// Handle added and updated bodies
 				foreach( var CelBody in bodies )
 				{
-					String s = String.Format( "Body {0} - {1}.", CelBody.flightGlobalsIndex, CelBody.name );
-					_logger.Trace( s );
+//					String s = String.Format( "Body {0} - {1}.", CelBody.flightGlobalsIndex, CelBody.name );
+//					_logger.Trace( s );
 					if( !_bodyList.ContainsKey( CelBody ) )
 					{
 						var B = new Body( CelBody );
@@ -184,8 +184,6 @@ namespace ScienceChecklist
 
 
 
-
-
 		private void UpdateExperiments( )
 		{
 
@@ -263,7 +261,5 @@ namespace ScienceChecklist
 						.ToList( );
 				}
 		}
-
-
 	}
 }
