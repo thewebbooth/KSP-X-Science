@@ -7,15 +7,9 @@ using System.Text;
 using UnityEngine;
 
 /*
- * Situation needs to take body or make more classes static.
- * SOI check for progress tracking
- * Instruments Class
- * Config file to fix DMagic and Solar Science problems
  * RECOVERY science
  * SCANSAT
  * RESOURCES
- * DMAGIC
- * Config for experiments
  * Asteroid science
  * 
 */
@@ -34,17 +28,10 @@ namespace ScienceChecklist {
 		/// <summary>
 		/// Called by Unity once to initialize the class.
 		/// </summary>
-		public void Awake () {
+		public void Awake( )
+		{
 			_logger = new Logger( this );
 			_logger.Trace( "Awake" );
-		}
-
-		/// <summary>
-		/// Called by Unity once to initialize the class, just before Update is called.
-		/// </summary>
-		public void Start () {
-			_logger.Trace("Start");
-
 
 			if( _addonInitialized == true )
 			{
@@ -52,6 +39,14 @@ namespace ScienceChecklist {
 				// even though we set onlyOnce to true in the KSPAddon attribute.
 				return;
 			}
+		}
+
+		/// <summary>
+		/// Called by Unity once to initialize the class, just before Update is called.
+		/// </summary>
+		public void Start( )
+		{
+			_logger.Trace( "Start" );
 
 			Config.Load( );
 
@@ -60,6 +55,8 @@ namespace ScienceChecklist {
 			_window = new ScienceWindow( );
 			_window.Settings.UseBlizzysToolbarChanged += Settings_UseBlizzysToolbarChanged;
 			_window.OnCloseEvent += OnWindowClosed;
+
+
 
 			_nextSituationUpdate = DateTime.Now;
 			GameEvents.onGUIApplicationLauncherReady.Add( Load );
@@ -79,8 +76,8 @@ namespace ScienceChecklist {
 
 			GameEvents.onDominantBodyChange.Add( new EventData<GameEvents.FromToAction<CelestialBody, CelestialBody>>.OnEvent( this.DominantBodyChange ) );
 			GameEvents.onVesselSOIChanged.Add( new EventData<GameEvents.HostedFromToAction<Vessel, CelestialBody>>.OnEvent( this.VesselSOIChanged ) );
-			
-			DontDestroyOnLoad(this);
+
+			DontDestroyOnLoad( this );
 		}
 
 		/// <summary>
@@ -142,27 +139,44 @@ namespace ScienceChecklist {
 		/// Initializes the addon if it hasn't already been loaded.
 		/// Callback from onGUIApplicationLauncherReady
 		/// </summary>
-		private void Load () {
-			_logger.Trace("Load");
-			if (_active) {
-				_logger.Info("Already loaded.");
-				StartCoroutine( "WaitForRnDAndPartLoader" );
-
+		private void Load( )
+		{
+			_logger.Trace( "Load" );
+			if( !GameHelper.WindowVisibility( ) )
+			{
+				_logger.Trace( "Not Now" );
 				return;
 			}
-			if (HighLogic.CurrentGame.Mode != Game.Modes.CAREER && HighLogic.CurrentGame.Mode != Game.Modes.SCIENCE_SANDBOX) {
-				_logger.Info("Game type is " + HighLogic.CurrentGame.Mode + ". Deactivating.");
+
+
+			
+			if( _active )
+			{
+				_logger.Info( "Already loaded." );
+				StartCoroutine( "WaitForRnDAndPartLoader" );
+				return;
+			}
+			
+
+			
+			if( HighLogic.CurrentGame.Mode != Game.Modes.CAREER && HighLogic.CurrentGame.Mode != Game.Modes.SCIENCE_SANDBOX )
+			{
+				_logger.Info( "Game type is " + HighLogic.CurrentGame.Mode + ". Deactivating." );
 				_active = false;
 				return;
 			}
-
-			_logger.Info("Game type is " + HighLogic.CurrentGame.Mode + ". Activating.");
+			_logger.Info( "Game type is " + HighLogic.CurrentGame.Mode + ". Activating." );
 			_active = true;
 
-			InitializeButton();
+
+
+			InitializeButton( );
 			_launcherVisible = true;
-			ApplicationLauncher.Instance.AddOnShowCallback(Launcher_Show);
-			ApplicationLauncher.Instance.AddOnHideCallback(Launcher_Hide);
+			ApplicationLauncher.Instance.AddOnShowCallback( Launcher_Show );
+			ApplicationLauncher.Instance.AddOnHideCallback( Launcher_Hide );
+
+
+
 			StartCoroutine( "WaitForRnDAndPartLoader" );
 			StartCoroutine( "UpdateExperiments" );
 			StartCoroutine( "RefreshFilter" );
@@ -183,15 +197,18 @@ namespace ScienceChecklist {
 			}
 			_active = false;
 
+_logger.Info( "Removing Button" );
 			if( _button != null )
 				_button.Remove( );
-			
+_logger.Info( "Removing Callbacks" );
 			ApplicationLauncher.Instance.RemoveOnShowCallback( Launcher_Show );
 			ApplicationLauncher.Instance.RemoveOnHideCallback( Launcher_Hide );
 			_launcherVisible = false;
+_logger.Info( "Removing Coroutines" );
 			StopCoroutine( "WaitForRnDAndPartLoader" );
 			StopCoroutine( "UpdateExperiments" );
 			StopCoroutine( "RefreshFilter" );
+_logger.Info( "Unload Done" );
 		}
 
 		
