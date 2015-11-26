@@ -8,13 +8,20 @@ using System.Text;
 /* 
  * THIS IS A STATIC CLASS
  * 
- * According to the conventions of this code an Experiment is an experiment conducted in a particular situation
+ * According to the conventions of Brodrik's code an "Experiment" is an experiment conducted in a particular situation
  * 
- * This class is an an experiment on an instrument part that can be carried around as a bit of a ship.
+ * This class lists experiments on instrument parts that can be carried around as a bit of a ship.
  * It isn't the actual instrument itsself because there are plenty of mods that let you run a goo experiment from a more
- * convient object.  It is an experiment that the part can do.
+ * convient object.  This lists the experiments that the parts can do.
  *
  * This class just stores the experiment names as strings and a bool as to wether they are unlocked or not (player bought the shape from the R+D lab, for example)
+ * 
+ * 
+ * I've been renaming stuff this could well become "UnlockedScienceExperimentList" could also enter "ScienceContext" - need to check if
+ * being a static class is making any speed diference
+ * 
+ * 
+ * 
 */
 
 namespace ScienceChecklist
@@ -39,8 +46,9 @@ namespace ScienceChecklist
 
 
 
-/* According to the UI you need the AstronautComplex upgraded to do surface samples.  Turns out that is rubbish.
-			float AstroLevel = ScenarioUpgradeableFacilities.GetFacilityLevel( SpaceCenterFacility.AstronautComplex );*/
+/* According to the UI you need the AstronautComplex upgraded to do surface samples.  Turns out that is rubbish.  You just need to upgrade the science lab.
+ * Upgrading the AstronautComplex does help with EVAs.  But there are always cargo bays _grin_
+float AstroLevel = ScenarioUpgradeableFacilities.GetFacilityLevel( SpaceCenterFacility.AstronautComplex );*/
 
 
 

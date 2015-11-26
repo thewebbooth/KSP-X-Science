@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 
 namespace ScienceChecklist {
 	/// <summary>
-	/// An object that represents a ScienceExperiement in a given situation.
+	/// An object that represents a ScienceExperiement in a given Situation.
 	/// </summary>
 	internal sealed class ScienceInstance {
 		/// <summary>

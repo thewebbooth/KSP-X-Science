@@ -1,6 +1,12 @@
 [x] Science!
 ============
 
+4.12
+---
+26-Nov-2015 Bug fix version KSP V1.0.5
+* Only initialise if we need to.  Avoids an exception when moving scene from settings to main menu
+
+
 4.11
 ---
 10-Nov-2015 Updated for KSP V1.0.5

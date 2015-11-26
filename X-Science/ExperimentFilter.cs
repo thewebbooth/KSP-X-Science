@@ -198,6 +198,12 @@ namespace ScienceChecklist {
 
 
 
+/* Need to look at
+	public bool BiomeIsRelevantWhile( ExperimentSituations situation );
+	public bool IsAvailableWhile( ExperimentSituations situation, CelestialBody body );
+On ScienceExperiment
+*/
+
 					// OrbitalScience support - where the experiment is possible
 						if( sitMask == 0 && Sci.Experiments[ experiment ] != null )
 						{

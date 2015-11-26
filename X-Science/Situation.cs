@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
+
+
 namespace ScienceChecklist {
 	/// <summary>
-	/// A location in which an experiment is valid.
+	/// A location in which experiments may be conducted.
+	/// Many experiments may, perhaps, be conducted.  Those create "ScienceInstance"s
 	/// </summary>
 	internal sealed class Situation {
 		/// <summary>
