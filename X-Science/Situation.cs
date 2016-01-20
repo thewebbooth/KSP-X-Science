@@ -65,6 +65,8 @@ namespace ScienceChecklist {
 		/// </summary>
 		public string               Description         { get { return _description; } }
 
+		
+
 		/// <summary>
 		/// Converts an ExperimentSituations to a human-readable representation.
 		/// </summary>

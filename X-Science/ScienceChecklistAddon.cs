@@ -7,10 +7,20 @@ using System.Text;
 using UnityEngine;
 
 /*
+ * TO DO
+ * 
+ * Tool tip height + padding
+ * Merge F2 HideUI into the is visible flag to prevent recalculating science but must refresh when UI is reactivated
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
  * RECOVERY science
  * SCANSAT
  * RESOURCES
- * Asteroid science
+ * Asteroid science - NO, too spammy
  * 
 */
 
@@ -55,6 +65,7 @@ namespace ScienceChecklist {
 			_window = new ScienceWindow( );
 			_window.Settings.UseBlizzysToolbarChanged += Settings_UseBlizzysToolbarChanged;
 			_window.OnCloseEvent += OnWindowClosed;
+			_window.UIHidden = false;
 
 
 
@@ -76,6 +87,10 @@ namespace ScienceChecklist {
 
 			GameEvents.onDominantBodyChange.Add( new EventData<GameEvents.FromToAction<CelestialBody, CelestialBody>>.OnEvent( this.DominantBodyChange ) );
 			GameEvents.onVesselSOIChanged.Add( new EventData<GameEvents.HostedFromToAction<Vessel, CelestialBody>>.OnEvent( this.VesselSOIChanged ) );
+			GameEvents.onHideUI.Add( OnHideUI );
+			GameEvents.onShowUI.Add( OnShowUI );
+
+
 
 			DontDestroyOnLoad( this );
 		}
@@ -126,8 +141,12 @@ namespace ScienceChecklist {
 		/// Called by Unity to draw the GUI - can be called many times per frame.
 		/// </summary>
 		public void OnGUI () {
-			_window.Draw();
+			_window.Draw( );
 		}
+
+
+
+
 
 		#endregion
 
@@ -204,6 +223,9 @@ _logger.Info( "Removing Callbacks" );
 			ApplicationLauncher.Instance.RemoveOnShowCallback( Launcher_Show );
 			ApplicationLauncher.Instance.RemoveOnHideCallback( Launcher_Hide );
 			_launcherVisible = false;
+
+
+
 _logger.Info( "Removing Coroutines" );
 			StopCoroutine( "WaitForRnDAndPartLoader" );
 			StopCoroutine( "UpdateExperiments" );
@@ -211,7 +233,15 @@ _logger.Info( "Removing Coroutines" );
 _logger.Info( "Unload Done" );
 		}
 
-		
+
+		void OnHideUI( )
+		{
+			_window.UIHidden = true;
+		}
+		void OnShowUI( )
+		{
+			_window.UIHidden = false;
+		}
 
 		private void VesselWasModified( Vessel V )
 		{

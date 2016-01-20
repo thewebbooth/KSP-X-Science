@@ -53,7 +53,7 @@ namespace ScienceChecklist {
 		public void Draw () {
 			GUILayout.BeginVertical();
 			bool save = false;
-			var toggle = GUILayout.Toggle(Config.HideCompleteExperiments, "Hide complete experiments");
+			var toggle = GUILayout.Toggle(Config.HideCompleteExperiments, new GUIContent( "Hide complete experiments", "Experiments considered complete will not be shown." ) );
 			if (toggle != Config.HideCompleteExperiments) {
 				Config.HideCompleteExperiments = toggle;
 				OnHideCompleteEventsChanged();
@@ -61,7 +61,7 @@ namespace ScienceChecklist {
 			}
 
 			if (BlizzysToolbarButton.IsAvailable) {
-				toggle = GUILayout.Toggle(Config.UseBlizzysToolbar, "Use blizzy78's toolbar");
+				toggle = GUILayout.Toggle(Config.UseBlizzysToolbar, new GUIContent( "Use blizzy78's toolbar", "Remove [x] Science button from stock toolbar and add to blizzy78 toolbar." ) );
 				if (toggle != Config.UseBlizzysToolbar) {
 					Config.UseBlizzysToolbar = toggle;
 					OnUseBlizzysToolbarChanged();
@@ -69,7 +69,7 @@ namespace ScienceChecklist {
 				}
 			}
 
-			toggle = GUILayout.Toggle( Config.CompleteWithoutRecovery, "Complete without recovery" );
+			toggle = GUILayout.Toggle( Config.CompleteWithoutRecovery, new GUIContent( "Complete without recovery", "Show experiments as completed even if they have not been recovered yet.\nYou still need to recover the science to get the points!\nJust easier to see what is left." ) );
 			if( toggle != Config.CompleteWithoutRecovery )
 			{
 				Config.CompleteWithoutRecovery = toggle;
@@ -77,7 +77,7 @@ namespace ScienceChecklist {
 				save = true;
 			}
 
-			toggle = GUILayout.Toggle( Config.CheckDebris, "Check debris" );
+			toggle = GUILayout.Toggle( Config.CheckDebris, new GUIContent( "Check debris", "Vessels marked as debris will be checked for recoverable science." ) );
 			if( toggle != Config.CheckDebris )
 			{
 				Config.CheckDebris = toggle;
@@ -85,7 +85,7 @@ namespace ScienceChecklist {
 				save = true;
 			}
 
-			toggle = GUILayout.Toggle( Config.AllFilter, "Allow all filter" );
+			toggle = GUILayout.Toggle( Config.AllFilter, new GUIContent( "Allow all filter", "Adds a filter button showing all experiments, even on unexplored bodies using unavailable instruments.\nMight be considered cheating." ) );
 			if( toggle != Config.AllFilter )
 			{
 				Config.AllFilter = toggle;

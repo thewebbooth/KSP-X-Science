@@ -51,6 +51,7 @@ namespace ScienceChecklist {
 		/// Gets or sets a value indicating whether this window should be drawn.
 		/// </summary>
 		public bool IsVisible { get; set; }
+		public bool UIHidden { get; set; }
 
 		/// <summary>
 		/// Gets the settings for this window.
@@ -68,6 +69,11 @@ namespace ScienceChecklist {
 		/// </summary>
 		public void Draw( )
 		{
+			if( UIHidden )
+			{
+				return;
+			} 
+			
 			if( !IsVisible )
 			{
 				return;
@@ -77,7 +83,6 @@ namespace ScienceChecklist {
 				IsVisible = false;
 				OnCloseEvent( this, EventArgs.Empty );
 			}
-
 
 			if( _skin == null )
 			{
@@ -107,6 +112,7 @@ namespace ScienceChecklist {
 					fontStyle = FontStyle.Normal,
 					fixedHeight = 25,
 					contentOffset = new Vector2(0, 6),
+					wordWrap = true,
 					normal = {
 						textColor = new Color(0.7f, 0.8f, 0.8f),
 					},
@@ -152,15 +158,10 @@ namespace ScienceChecklist {
 			if( _compactMode )
 			{
 				_rect3 = GUILayout.Window(_window3Id, _rect3, DrawCompactControls, string.Empty, _compactWindowStyle);
-			} else {
-				_rect = GUILayout.Window(_windowId, _rect, DrawControls, "[x] Science!");
-				var ClosePos = new Rect( _rect.xMin + _rect.width - 20, _rect.yMin + 2, 18, 18 );
-				--GUI.depth;
-				if( GUI.Button( ClosePos, "X", _closeButtonStyle ) )
-				{
-					IsVisible = false;
-					OnCloseEvent( this, EventArgs.Empty );
-				}
+			}
+			else
+			{
+				_rect = GUILayout.Window( _windowId, _rect, DrawControls, "[x] Science!");
 			}
 
 
@@ -168,12 +169,22 @@ namespace ScienceChecklist {
 			if (!string.IsNullOrEmpty(_lastTooltip)) {
 				_tooltipStyle = _tooltipStyle ?? new GUIStyle(_skin.window) {
 					normal = {
-						background = _emptyTexture,
+						background = GUI.skin.window.normal.background
 					},
+					wordWrap = true
 				};
-				GUI.Window(_window2Id, new Rect(Mouse.screenPos.x + 15, Mouse.screenPos.y + 15, 500, 30), x => {
+				/*GUI.Window(_window2Id, new Rect(Mouse.screenPos.x + 15, Mouse.screenPos.y + 15, 200, 75), x => {
 					GUI.Label(new Rect(), _lastTooltip);
 				}, string.Empty, _tooltipStyle);
+				 
+				  float oneLineHeight = _tooltipStyle.CalcHeight(new GUIContent(""), 500);
+ float answerHeight = _tooltipStyle.CalcHeight(new GUIContent(answer1), 500);
+				 
+				 */
+				//				int w = 7 * GUI.tooltip.Length;
+GUI.Window(_window2Id, new Rect(Mouse.screenPos.x + 15, Mouse.screenPos.y + 15, 200, 200), x => {
+ 				GUI.Box( new Rect( 5, 5, 190, 190 ), _lastTooltip );
+}, string.Empty, _tooltipStyle );
 			}
 
 			GUI.skin = oldSkin;
@@ -258,9 +269,13 @@ namespace ScienceChecklist {
 		/// </summary>
 		/// <param name="windowId"></param>
 		private void DrawControls (int windowId) {
+
+			if( GUI.Button( new Rect( _rect.width - 20, 4, 18, 18 ), new GUIContent( "X", "Close [x] Science" ), _closeButtonStyle ) )
+			{
+				IsVisible = false;
+				OnCloseEvent( this, EventArgs.Empty );
+			}
 			GUILayout.BeginHorizontal ();
-
-
 
 			GUILayout.BeginVertical(GUILayout.Width(480), GUILayout.ExpandHeight(true));
 
@@ -331,7 +346,7 @@ namespace ScienceChecklist {
 
 			if (_filter.CurrentSituation != null) {
 				var desc = _filter.CurrentSituation.Description;
-				GUILayout.Label(char.ToUpper(desc[0]) + desc.Substring(1), _situationStyle);
+				GUILayout.Box(char.ToUpper(desc[0]) + desc.Substring(1), _situationStyle);
 			}
 
 			GUILayout.FlexibleSpace();
@@ -399,7 +414,6 @@ namespace ScienceChecklist {
 			GUILayout.EndVertical();
 
 			GUILayout.BeginHorizontal();
-
 
 
 
