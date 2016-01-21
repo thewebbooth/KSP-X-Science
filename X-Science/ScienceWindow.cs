@@ -51,7 +51,7 @@ namespace ScienceChecklist {
 		/// Gets or sets a value indicating whether this window should be drawn.
 		/// </summary>
 		public bool IsVisible { get; set; }
-		public bool UIHidden { get; set; }
+
 
 		/// <summary>
 		/// Gets the settings for this window.
@@ -69,11 +69,6 @@ namespace ScienceChecklist {
 		/// </summary>
 		public void Draw( )
 		{
-			if( UIHidden )
-			{
-				return;
-			} 
-			
 			if( !IsVisible )
 			{
 				return;
@@ -148,7 +143,7 @@ namespace ScienceChecklist {
 				_closeButtonStyle = new GUIStyle( _skin.button )
 				{
 					// int left, int right, int top, int bottom
-					padding = new RectOffset( 2, 2, 6, 2 ),
+					padding = new RectOffset( 2, 2, 6, 2 )
 				};
 			}
 
@@ -173,18 +168,19 @@ namespace ScienceChecklist {
 					},
 					wordWrap = true
 				};
-				/*GUI.Window(_window2Id, new Rect(Mouse.screenPos.x + 15, Mouse.screenPos.y + 15, 200, 75), x => {
-					GUI.Label(new Rect(), _lastTooltip);
-				}, string.Empty, _tooltipStyle);
-				 
-				  float oneLineHeight = _tooltipStyle.CalcHeight(new GUIContent(""), 500);
- float answerHeight = _tooltipStyle.CalcHeight(new GUIContent(answer1), 500);
-				 
-				 */
-				//				int w = 7 * GUI.tooltip.Length;
-GUI.Window(_window2Id, new Rect(Mouse.screenPos.x + 15, Mouse.screenPos.y + 15, 200, 200), x => {
- 				GUI.Box( new Rect( 5, 5, 190, 190 ), _lastTooltip );
-}, string.Empty, _tooltipStyle );
+
+				_tooltipBoxStyle = _tooltipBoxStyle ?? new GUIStyle( _skin.box )
+				{
+					// int left, int right, int top, int bottom
+					padding = new RectOffset( 4, 4, 4, 4 ),
+					wordWrap = true
+				};
+
+				float boxHeight = _tooltipBoxStyle.CalcHeight( new GUIContent( _lastTooltip ), 190 );
+				GUI.Window( _window2Id, new Rect( Mouse.screenPos.x + 15, Mouse.screenPos.y + 15, 200, boxHeight + 10 ), x =>
+				{
+					GUI.Box( new Rect( 5, 5, 190, boxHeight ), _lastTooltip, _tooltipBoxStyle );
+				}, string.Empty, _tooltipStyle );
 			}
 
 			GUI.skin = oldSkin;
@@ -532,6 +528,7 @@ GUI.Window(_window2Id, new Rect(Mouse.screenPos.x + 15, Mouse.screenPos.y + 15, 
 		private GUIStyle _situationStyle;
 		private GUIStyle _experimentProgressLabelStyle;
 		private GUIStyle _tooltipStyle;
+		private GUIStyle _tooltipBoxStyle;
 		private GUIStyle _compactWindowStyle;
 		private GUIStyle _compactLabelStyle;
 		private GUIStyle _compactSituationStyle;

@@ -9,18 +9,9 @@ using UnityEngine;
 /*
  * TO DO
  * 
- * Tool tip height + padding
- * Merge F2 HideUI into the is visible flag to prevent recalculating science but must refresh when UI is reactivated
- * 
- * 
- * 
- * 
- * 
- * 
  * RECOVERY science
  * SCANSAT
  * RESOURCES
- * Asteroid science - NO, too spammy
  * 
 */
 
@@ -65,7 +56,6 @@ namespace ScienceChecklist {
 			_window = new ScienceWindow( );
 			_window.Settings.UseBlizzysToolbarChanged += Settings_UseBlizzysToolbarChanged;
 			_window.OnCloseEvent += OnWindowClosed;
-			_window.UIHidden = false;
 
 
 
@@ -236,11 +226,23 @@ _logger.Info( "Unload Done" );
 
 		void OnHideUI( )
 		{
-			_window.UIHidden = true;
+			if( !_active )
+			{
+				return;
+			}
+			//			_logger.Trace("UiHidden");
+			_UiHidden = true;
+			UpdateVisibility( );
 		}
 		void OnShowUI( )
 		{
-			_window.UIHidden = false;
+			if( !_active )
+			{
+				return;
+			}
+			//			_logger.Trace("UiShown");
+			_UiHidden = false;
+			UpdateVisibility( );
 		}
 
 		private void VesselWasModified( Vessel V )
@@ -471,7 +473,7 @@ _logger.Info( "Unload Done" );
 				return;
 			}
 //			_logger.Trace("UpdateVisibility");
-			_window.IsVisible = _launcherVisible && _windowVisible;
+			_window.IsVisible = _launcherVisible && _windowVisible && !_UiHidden;
 			ScheduleExperimentUpdate();
 		}
 
@@ -537,6 +539,7 @@ _logger.Info( "Unload Done" );
 		private IToolbarButton	_button;
 		private bool			_launcherVisible;
 		private bool			_windowVisible;
+		private bool			_UiHidden;
 		private ScienceWindow	_window;
 		private DateTime?		_nextExperimentUpdate;
 		private bool			_mustDoFullRefresh;
