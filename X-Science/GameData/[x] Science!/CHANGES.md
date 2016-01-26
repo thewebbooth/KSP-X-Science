@@ -3,9 +3,8 @@
 
 4.14
 ---
-19-Jan-2016 Minor GUI changes KSP V1.0.5
+26-Jan-2016 Minor GUI changes KSP V1.0.5
 * Supports F2
-* Word wrap on long text
 * More tooltips
 * Close button z-sorts correctly
 
