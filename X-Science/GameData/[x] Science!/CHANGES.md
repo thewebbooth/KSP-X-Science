@@ -1,6 +1,12 @@
 [x] Science!
 ============
 
+4.15
+---
+20-Apr-2016 Built against KSP V1.1.0
+* Built against KSP V1.1.0
+
+
 4.14
 ---
 26-Jan-2016 Minor GUI changes KSP V1.0.5

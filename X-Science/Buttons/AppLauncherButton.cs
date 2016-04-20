@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using UnityEngine;
+using KSP.UI.Screens;
 
 namespace ScienceChecklist.Buttons {
 	/// <summary>
@@ -48,7 +49,7 @@ namespace ScienceChecklist.Buttons {
 			
 			texture.LoadImage(iconStream);
 			texture.Apply();
-			
+
 //			_logger.Info("Adding button");
 			_button = ApplicationLauncher.Instance.AddModApplication(
 				OnToggleOn,

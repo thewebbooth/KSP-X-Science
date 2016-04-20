@@ -1,6 +1,16 @@
+1.0.3.0
+    Added: Remote version files take priority when local/remote add-on versions are the same.
+    Added: 'Any' type versions are now fully supported.
+    Added: Wildcards for version fields with '-1'.
+    
+1.0.2.4
+    Updated for KSP v0.25.0
+    Fixed: Typo in AddonInfo.ToString()
+    Fixed: Bug with empty version files.
+
 1.0.2.3
     Changed: Done a lot of under the hood refactoring.
-    Fixed: Bug which would freeze the computer when checking many add-ons.
+    Fixed: Bug that would freeze the computer when checking many add-ons.
 
 1.0.2.2
 	Changed: Versions will always have the minimum formatting of 'x.x'.

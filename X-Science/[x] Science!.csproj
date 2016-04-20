@@ -34,16 +34,24 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\..\Games\KSP\KSP-Real\KSP_Data\Managed\Assembly-CSharp.dll</HintPath>
+    <Reference Include="Assembly-CSharp, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Games\KSP\KSP-Real\KSP_x64_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="MiniAVC">
-      <HintPath>Libraries\MiniAVC-1.0.2.3\MiniAVC.dll</HintPath>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>..\..\..\..\Games\KSP\KSP-Real\KSP_x64_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
+    <Reference Include="KSPUtil">
+      <HintPath>..\..\..\..\Games\KSP\KSP-Real\KSP_x64_Data\Managed\KSPUtil.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="UnityEngine">
-      <HintPath>..\..\..\..\Games\KSP\KSP-Real\KSP_Data\Managed\UnityEngine.dll</HintPath>
+    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Games\KSP\KSP-Real\KSP_x64_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\..\..\..\Games\KSP\KSP-Real\KSP_x64_Data\Managed\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -115,9 +123,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy "$(TargetPath)" "C:\Games\KSP\KSP_Test\GameData\[x] Science!"
-copy "$(TargetDir)\MiniAVC.dll" "C:\Games\KSP\KSP_Test\GameData\[x] Science!"
-robocopy "$(ProjectDir)\GameData\[x] Science!" "C:\Games\KSP\KSP_Test\GameData\[x] Science!"
+    <PostBuildEvent>copy "$(TargetPath)" "C:\Games\KSP\KSP-Real\GameData\[x] Science!"
+copy "$(TargetDir)\MiniAVC.dll" "C:\Games\KSP\KSP-Real\GameData\[x] Science!"
+robocopy "$(ProjectDir)\GameData\[x] Science!" "C:\Games\KSP\KSP-Real\GameData\[x] Science!"
 exit 0</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
