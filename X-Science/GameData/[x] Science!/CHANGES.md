@@ -1,6 +1,11 @@
 [x] Science!
 ============
 
+4.17
+---
+03-May-2016 Built against KSP V1.1.2
+* Built against KSP V1.1.2
+
 4.16
 ---
 29-Apr-2016 Built against KSP V1.1.1
