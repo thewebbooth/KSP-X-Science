@@ -31,14 +31,14 @@ namespace ScienceChecklist
 				string assemblyPath = Path.GetDirectoryName( typeof( ScienceChecklistAddon ).Assembly.Location );
 				string filePath = Path.Combine( assemblyPath, "science.cfg" );
 
-				_logger.Trace( "Loading settings file:" + filePath );
+//				_logger.Trace( "Loading settings file:" + filePath );
 				if( File.Exists( filePath ) )
 				{
 					var node = ConfigNode.Load( filePath );
 					var root = node.GetNode( "ScienceChecklist" );
 					Filters = root.GetNode( "CelestialBodyFilters" );
 				}
-				_logger.Trace( "DONE Loading settings file" );
+//				_logger.Trace( "DONE Loading settings file" );
 			}
 			catch( Exception e )
 			{

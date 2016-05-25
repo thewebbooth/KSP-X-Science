@@ -17,9 +17,11 @@ namespace ScienceChecklist {
 
 	
 		// All the Scenes, which ones are kosher?
-		public static bool WindowVisibility( )
+		public static bool AllowWindow( GameScenes? Scene = null )
 		{
-			switch( HighLogic.LoadedScene )
+			if( Scene == null )
+				Scene = HighLogic.LoadedScene;
+			switch( Scene )
 			{
 				case GameScenes.LOADING:
 				case GameScenes.LOADINGBUFFER:

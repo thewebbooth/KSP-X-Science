@@ -1,6 +1,16 @@
 [x] Science!
 ============
 
+4.18
+---
+24-May-2016 Built against KSP V1.1.2
+* Remembers window positions
+* Changed location of settings file
+* New tool tip for experiment count and value
+* Current situation text word-wraps
+* Removed coroutines - refreshes from Update()
+* New event handler class
+
 4.17
 ---
 03-May-2016 Built against KSP V1.1.2

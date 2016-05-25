@@ -6,6 +6,8 @@ using System.Text;
 using UnityEngine;
 using KSP.UI.Screens;
 
+
+
 namespace ScienceChecklist.Buttons {
 	/// <summary>
 	/// A button that is rendered to the KSP toolbar.

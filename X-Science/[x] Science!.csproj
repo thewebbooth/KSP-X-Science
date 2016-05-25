@@ -60,6 +60,8 @@
   <ItemGroup>
     <Compile Include="CelestialBodyFilters.cs" />
     <Compile Include="BodySituationFilter.cs" />
+    <Compile Include="WindowSettings.cs" />
+    <Compile Include="xScienceEventHandler.cs" />
     <Compile Include="ScienceContext.cs" />
     <Compile Include="Body.cs" />
     <Compile Include="Buttons\BlizzysToolbarButton.cs" />
@@ -81,13 +83,9 @@
     <Compile Include="Buttons\ToolbarWrapper.cs" />
     <Compile Include="UnlockedInstrumentList.cs" />
     <None Include="GameData\[x] Science!\CHANGES.md" />
-    <None Include="Deploy.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Deploy.tt</DependentUpon>
-    </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="ToDo.txt" />
     <EmbeddedResource Include="icons\scienceCompleteCompact.png" />
     <EmbeddedResource Include="icons\scienceProgressCompact.png" />
     <EmbeddedResource Include="icons\scienceComplete.png" />
@@ -107,12 +105,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="GameData\[x] Science!\README.md" />
-    <None Include="Deploy.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Deploy.cs</LastGenOutput>
-    </None>
     <None Include="GameData\[x] Science!\science.cfg" />
-    <None Include="GameData\[x] Science!\settings.cfg" />
+    <None Include="GameData\[x] Science!\PluginData\[x] Science!\settings.cfg" />
     <None Include="GameData\[x] Science!\[x] Science!.version" />
   </ItemGroup>
   <ItemGroup>
@@ -120,9 +114,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy "$(TargetPath)" "C:\Games\KSP\KSP-Real\GameData\[x] Science!"
-copy "$(TargetDir)\MiniAVC.dll" "C:\Games\KSP\KSP-Real\GameData\[x] Science!"
-robocopy "$(ProjectDir)GameData\[x] Science!" "C:\Games\KSP\KSP-Real\GameData\[x] Science!"
+    <PostBuildEvent>copy "$(TargetPath)" "C:\Games\KSP\KSP-Test\GameData\[x] Science!"
+copy "$(TargetDir)\MiniAVC.dll" "C:\Games\KSP\KSP-Test\GameData\[x] Science!"
+robocopy "$(ProjectDir)GameData\[x] Science!" "C:\Games\KSP\KSP-Test\GameData\[x] Science!" /E
 exit 0</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>

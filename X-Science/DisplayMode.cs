@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+
+
 namespace ScienceChecklist {
 	/// <summary>
 	/// Enum to control which experiments should be displayed in the ScienceWindow.

@@ -1,0 +1,125 @@
+﻿
+/*
+ * TO DO
+ * 
+ * RECOVERY science
+ * SCANSAT
+ * RESOURCES
+ * Weird Orbital Science experiments
+ * 
+*/
+
+
+
+[DONE] Event handler and no coroutines
+[DONE] Window positions
+[DONE] Fix long text
+[DONE] Summary tooltip
+[DONE] Visibility doesn't stick
+
+
+
+* Window class
+* Button class
+* img/sprite class
+* Clear blue water between science and GUI
+* Difficult science filter
+
+
+
+ Sprite.Create(texture, rect, pivot);
+
+ 
+
+The rectangle parameter is the source rectangle on the texture. If you want to use the whole texture as the sprite, use new Rect(0, 0, texture.width, texture.height);
+
+I believe the pivot is actually a percentage and not a pixel/unit value. So if you wanted to pivot at the center of the texture you would use new Vector2(0.5f, 0.5f)
+
+Sorry for the pseudo code, away from Unity at the moment.
+
+Hope this helps!
+
+
+
+
+
+=======================================
+
+
+    http://unity3d.com/support/documentation/ScriptReference/Texture2D.GetPixels.html
+
+
+        function GetPixels (x : int, y : int, blockWidth : int, blockHeight : int, miplevel : int) : Color[]
+        Description
+
+        Get a block of pixel colors.
+
+        This function is an extended version of GetPixels above; it does not return the whole mip level but only blockWidth by blockHeight region starting at x,y. The block must fit into the used mip level. The returned array is blockWidth*blockHeight size.
+
+    to write them back:
+
+    http://unity3d.com/support/documentation/ScriptReference/Texture2D.SetPixels.html
+
+        function SetPixels (x : int, y : int, blockWidth : int, blockHeight : int, colors : Color[], miplevel : int) : void
+        Description
+
+        Set a block of pixel colors.
+
+        This function is an extended version of SetPixels above; it does not modify the whole mip level but modifies only blockWidth by blockHeight region starting at x,y. The colors array must be blockWidth*blockHeight size, and the modified block must fit into the used mip level.
+
+     
+
+==================
+
+    Check the GetPixels and SetPixels funcitons in Texture2D. It sounds like you should have a good idea of what to do from there.
+     
+=========================
+
+
+    You can also use this if you want to copy the whole texture:
+
+        // duplicate the original texture
+        var texture : Texture2D = Instantiate(renderer.material.mainTexture);
+
+    You can also reference the whole texture:
+
+        // reference the original texture
+        var texture : Texture2D = renderer.material.mainTexture;
+
+
+------------------------------------------------
+
+
+
+
+
+
+// Resource map
+//ResourceMap.Instance.IsPlanetScanned(body.flightGlobalsIndex);
+
+
+/*
+
+# Reverse-engineered caps for recovery missions.  The values for SubOrbited
+# and Orbited are inverted on Kerbin, handled later.
+my %recoCap = (
+		   Flew => 6,
+		   FlewBy => 7.2,
+		   SubOrbited => 12,
+		   Orbited => 9.6,
+		   Surfaced => 18
+		  );
+recovery@KerbinFlew
+ * recovery@KerbinSubOrbited
+ * recovery@KerbinOrbited
+ * recovery@MunFlewBy
+ * recovery@MunOrbited
+ * recovery@MinmusOrbited
+ * recovery@MunSurfaced
+ * recovery@MinmusSurfaced
+ * recovery@MinmusFlewBy
+ * recovery@SunOrbited
+*/
+
+
+-------------------------------------------------------------------------------

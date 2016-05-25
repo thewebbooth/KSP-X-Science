@@ -6,41 +6,6 @@ using System.IO;
 
 
 
-
-
-
-// Resource map
-//ResourceMap.Instance.IsPlanetScanned(body.flightGlobalsIndex);
-
-
-/*
-
-# Reverse-engineered caps for recovery missions.  The values for SubOrbited
-# and Orbited are inverted on Kerbin, handled later.
-my %recoCap = (
-		   Flew => 6,
-		   FlewBy => 7.2,
-		   SubOrbited => 12,
-		   Orbited => 9.6,
-		   Surfaced => 18
-		  );
-recovery@KerbinFlew
- * recovery@KerbinSubOrbited
- * recovery@KerbinOrbited
- * recovery@MunFlewBy
- * recovery@MunOrbited
- * recovery@MinmusOrbited
- * recovery@MunSurfaced
- * recovery@MinmusSurfaced
- * recovery@MinmusFlewBy
- * recovery@SunOrbited
-*/
-
-
-
-
-
-
 namespace ScienceChecklist {
 	/// <summary>
 	/// Stores a cache of experiments available in the game, and provides methods to manipulate a filtered view of this collection.
@@ -56,6 +21,7 @@ namespace ScienceChecklist {
 			AllScienceInstances = new List<ScienceInstance>( );
 			DisplayScienceInstances = new List<ScienceInstance>( );
 			CompleteCount = TotalCount = 0;
+			TotalScience = CompletedScience = OutstandingScience = 0;
 		}
 
 		/// <summary>
@@ -69,13 +35,15 @@ namespace ScienceChecklist {
 		/// <summary>
 		/// Gets the number of display experiments that are complete.
 		/// </summary>
-		public int               CompleteCount      { get; private set; }
+		public int              CompleteCount      { get; private set; }
 		/// <summary>
 		/// Gets the total number of display experiments.
 		/// </summary>
-		public int               TotalCount         { get; private set; }
+		public int              TotalCount         { get; private set; }
 
-
+		public float TotalScience { get; private set; }
+		public float CompletedScience { get; private set; }
+		public float OutstandingScience { get; private set; }
 
 		/// <summary>
 		/// Gets or sets a value indicating the current mode of the filter.
@@ -344,21 +312,36 @@ On ScienceExperiment
 				}));
 			}
 
-			query = query.OrderBy (x => x.TotalScience);
-			TotalCount = query.Count();
+			query = query.OrderBy( x => x.TotalScience );
+			TotalCount = query.Count( );
+			
+
+
 
 
 
 			if( Config.CompleteWithoutRecovery ) // Lab lander mode.  Complete is a green bar ( Recovered+OnBoard )
 			{
-				CompleteCount = query.Count( x => x.IsCollected );
-				DisplayScienceInstances = query.Where( x => !Config.HideCompleteExperiments || !x.IsCollected ).ToList( );		
+				DisplayScienceInstances = query.Where( x => !Config.HideCompleteExperiments || !x.IsCollected ).ToList( );
+
+				IList<ScienceInstance> RemainingExperiments = new List<ScienceInstance>( );
+				RemainingExperiments = query.Where( x => !x.IsCollected ).ToList( );
+				CompleteCount = TotalCount - RemainingExperiments.Count( );
+				TotalScience = RemainingExperiments.Sum( x => x.TotalScience );
+				CompletedScience = RemainingExperiments.Sum( x => x.CompletedScience );
 			}
 			else // Normal mode, must recover/transmit to KSC
 			{
-				CompleteCount = query.Count(x => x.IsComplete);
 				DisplayScienceInstances = query.Where( x => !Config.HideCompleteExperiments || !x.IsComplete ).ToList( );
+
+				IList<ScienceInstance> RemainingExperiments = new List<ScienceInstance>( );
+				RemainingExperiments = query.Where( x => !x.IsComplete ).ToList( );
+				CompleteCount = TotalCount - RemainingExperiments.Count( );
+				TotalScience = RemainingExperiments.Sum( x => x.TotalScience );
+				CompletedScience = RemainingExperiments.Sum( x => x.CompletedScience );
 			}
+
+
 
 			var Elapsed = DateTime.Now - StartTime;
 			_logger.Trace( "UpdateFilter Done - " + Elapsed.ToString( ) + "ms" );

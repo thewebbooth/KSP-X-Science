@@ -7,15 +7,6 @@ using System.Text;
 using UnityEngine;
 using KSP.UI.Screens;
 
-/*
- * TO DO
- * 
- * RECOVERY science
- * SCANSAT
- * RESOURCES
- * 
-*/
-
 
 
 namespace ScienceChecklist {
@@ -23,10 +14,24 @@ namespace ScienceChecklist {
 	/// The main entry point into the addon. Constructed by the KSP addon loader.
 	/// </summary>
 	[KSPAddon(KSPAddon.Startup.MainMenu, true)]
-	public sealed class ScienceChecklistAddon : MonoBehaviour {
+	public sealed class ScienceChecklistAddon : MonoBehaviour
+	{
+		#region FIELDS
+		private bool					_active;			// Are we actually running?
+		private bool					_launcherVisible;	// If the toolbar is shown
+		private bool					_UiHidden;			// If the user hit F2 
+		private static bool				_addonInitialized;	// Bug fix multiple inits, only init once
+
+
+		private Logger					_logger;
+		private IToolbarButton			_button;
+		private ScienceWindow			_window;
+		private xScienceEventHandler	_EventHandler;
+		#endregion
+
+
 
 		#region METHODS (PUBLIC)
-
 		/// <summary>
 		/// Called by Unity once to initialize the class.
 		/// </summary>
@@ -43,6 +48,8 @@ namespace ScienceChecklist {
 			}
 		}
 
+
+
 		/// <summary>
 		/// Called by Unity once to initialize the class, just before Update is called.
 		/// </summary>
@@ -57,34 +64,25 @@ namespace ScienceChecklist {
 			_window = new ScienceWindow( );
 			_window.Settings.UseBlizzysToolbarChanged += Settings_UseBlizzysToolbarChanged;
 			_window.OnCloseEvent += OnWindowClosed;
+			_window.OnOpenEvent += OnWindowOpened;
 
 
 
-			_nextSituationUpdate = DateTime.Now;
+			// Callbacks for buttons - we init when the button is ready
 			GameEvents.onGUIApplicationLauncherReady.Add( Load );
 			GameEvents.onGUIApplicationLauncherDestroyed.Add( Unload );
 
-			GameEvents.onVesselWasModified.Add( new EventData<Vessel>.OnEvent( this.VesselWasModified ) );
-			GameEvents.onVesselChange.Add( new EventData<Vessel>.OnEvent( this.VesselChange ) );
-			GameEvents.onEditorShipModified.Add( new EventData<ShipConstruct>.OnEvent( this.EditorShipModified ) );
+			// Start event handlers
+			_EventHandler = new xScienceEventHandler( this, _window );
 
-			GameEvents.onGameStateSave.Add( new EventData<ConfigNode>.OnEvent( this.GameStateSave ) );
-			GameEvents.OnPartPurchased.Add( new EventData<AvailablePart>.OnEvent( this.PartPurchased ) );
-			GameEvents.OnTechnologyResearched.Add( new EventData<GameEvents.HostTargetAction<RDTech, RDTech.OperationResult>>.OnEvent( this.TechnologyResearched ) );
-			GameEvents.OnScienceChanged.Add( new EventData<float, TransactionReasons>.OnEvent( this.ScienceChanged ) );
-			GameEvents.OnScienceRecieved.Add( new EventData<float, ScienceSubject, ProtoVessel, bool>.OnEvent( this.ScienceRecieved ) );
-			GameEvents.onVesselRename.Add( new EventData<GameEvents.HostedFromToAction<Vessel, string>>.OnEvent( this.VesselRename ) );
-			GameEvents.OnKSCFacilityUpgraded.Add( new EventData<Upgradeables.UpgradeableFacility, int>.OnEvent( this.FacilityUpgrade ) );
-
-			GameEvents.onDominantBodyChange.Add( new EventData<GameEvents.FromToAction<CelestialBody, CelestialBody>>.OnEvent( this.DominantBodyChange ) );
-			GameEvents.onVesselSOIChanged.Add( new EventData<GameEvents.HostedFromToAction<Vessel, CelestialBody>>.OnEvent( this.VesselSOIChanged ) );
+			// Callbacks for F2
 			GameEvents.onHideUI.Add( OnHideUI );
 			GameEvents.onShowUI.Add( OnShowUI );
 
-
-
 			DontDestroyOnLoad( this );
 		}
+
+
 
 		/// <summary>
 		/// Called by Unity when the application is destroyed.
@@ -99,6 +97,8 @@ namespace ScienceChecklist {
 			}
 		}
 
+
+
 		/// <summary>
 		/// Called by Unity when this instance is destroyed.
 		/// </summary>
@@ -111,33 +111,27 @@ namespace ScienceChecklist {
 			}
 		}
 
+
+
 		/// <summary>
 		/// Called by Unity once per frame.
 		/// </summary>
 		public void Update( )
 		{
-			if (!_window.IsVisible) {
-				return;
-			}
-
-			if (_nextSituationUpdate > DateTime.Now) {
-				return;
-			}
-
-			_nextSituationUpdate = DateTime.Now.AddSeconds(0.5);
-			_window.RecalculateSituation();
+			if( UiActive( ) && _window.IsVisible )
+				_EventHandler.Update( );
 		}
+
+
 
 		/// <summary>
 		/// Called by Unity to draw the GUI - can be called many times per frame.
 		/// </summary>
-		public void OnGUI () {
-			_window.Draw( );
+		public void OnGUI( )
+		{
+			if( UiActive( ) && _window.IsVisible )
+				_window.Draw( );
 		}
-
-
-
-
 
 		#endregion
 
@@ -152,22 +146,17 @@ namespace ScienceChecklist {
 		private void Load( )
 		{
 			_logger.Trace( "Load" );
-			if( !GameHelper.WindowVisibility( ) )
+			if( !GameHelper.AllowWindow( ) )
 			{
 				_logger.Trace( "Not Now" );
 				return;
 			}
-
-
 			
 			if( _active )
 			{
 				_logger.Info( "Already loaded." );
-				StartCoroutine( "WaitForRnDAndPartLoader" );
 				return;
 			}
-			
-
 			
 			if( HighLogic.CurrentGame.Mode != Game.Modes.CAREER && HighLogic.CurrentGame.Mode != Game.Modes.SCIENCE_SANDBOX )
 			{
@@ -178,18 +167,10 @@ namespace ScienceChecklist {
 			_logger.Info( "Game type is " + HighLogic.CurrentGame.Mode + ". Activating." );
 			_active = true;
 
-
-
 			InitializeButton( );
 			_launcherVisible = true;
 			ApplicationLauncher.Instance.AddOnShowCallback( Launcher_Show );
 			ApplicationLauncher.Instance.AddOnHideCallback( Launcher_Hide );
-
-
-
-			StartCoroutine( "WaitForRnDAndPartLoader" );
-			StartCoroutine( "UpdateExperiments" );
-			StartCoroutine( "RefreshFilter" );
 		}
 
 
@@ -207,193 +188,29 @@ namespace ScienceChecklist {
 			}
 			_active = false;
 
-_logger.Info( "Removing Button" );
+			_logger.Info( "Removing Button" );
 			if( _button != null )
 				_button.Remove( );
-_logger.Info( "Removing Callbacks" );
+			_logger.Info( "Removing Callbacks" );
 			ApplicationLauncher.Instance.RemoveOnShowCallback( Launcher_Show );
 			ApplicationLauncher.Instance.RemoveOnHideCallback( Launcher_Hide );
 			_launcherVisible = false;
 
-
-
-_logger.Info( "Removing Coroutines" );
-			StopCoroutine( "WaitForRnDAndPartLoader" );
-			StopCoroutine( "UpdateExperiments" );
-			StopCoroutine( "RefreshFilter" );
-_logger.Info( "Unload Done" );
+			_logger.Info( "Unload Done" );
 		}
 
 
+
+		// F2 support
 		void OnHideUI( )
 		{
-			if( !_active )
-			{
-				return;
-			}
-			//			_logger.Trace("UiHidden");
+//_logger.Trace("UiHidden");
 			_UiHidden = true;
-			UpdateVisibility( );
 		}
 		void OnShowUI( )
 		{
-			if( !_active )
-			{
-				return;
-			}
-			//			_logger.Trace("UiShown");
+//_logger.Trace("UiShown");
 			_UiHidden = false;
-			UpdateVisibility( );
-		}
-
-		private void VesselWasModified( Vessel V )
-		{
-//			_logger.Trace( "Callback: VesselWasModified" );
-			_filterRefreshPending = true;
-		}
-
-		private void VesselChange( Vessel V )
-		{
-//			_logger.Trace( "Callback: VesselChange" );
-			_filterRefreshPending = true;
-		}
-
-		private void EditorShipModified( ShipConstruct S )
-		{
-//			_logger.Trace( "Callback: EditorShipModified" );
-			_filterRefreshPending = true;
-		}
-
-		private void GameStateSave( ConfigNode C )
-		{
-//			_logger.Trace( "Callback: GameStateSave" );
-			ScheduleExperimentUpdate( );
-		}
-
-		private void PartPurchased( AvailablePart P )
-		{
-//			_logger.Trace( "Callback: PartPurchased" );
-			ScheduleExperimentUpdate( true );
-		}
-
-		private void TechnologyResearched( GameEvents.HostTargetAction<RDTech, RDTech.OperationResult> Data )
-		{
-			if( Data.target == RDTech.OperationResult.Successful )
-			{
-//				_logger.Trace( "Callback: TechnologyResearched" );
-				ScheduleExperimentUpdate( true );
-			}
-//			else
-//				_logger.Trace( "Callback: Technology Research Failed" );
-		}
-
-
-
-		private void ScienceChanged( float V, TransactionReasons R )
-		{
-//			_logger.Trace( "Callback: ScienceChanged" );
-			ScheduleExperimentUpdate( );
-		}
-
-		private void ScienceRecieved( float V, ScienceSubject S, ProtoVessel P, bool F )
-		{
-//			_logger.Trace( "Callback: ScienceRecieved" );
-			ScheduleExperimentUpdate( );
-		}
-
-		private void VesselRename( GameEvents.HostedFromToAction<Vessel, string> Data )
-		{
-//			_logger.Trace( "Callback: VesselRename" );
-			ScheduleExperimentUpdate( );
-		}
-
-		private void FacilityUpgrade( Upgradeables.UpgradeableFacility Data, int V )
-		{
-//			_logger.Trace( "Callback: KSP Facility Upgraded" );
-			ScheduleExperimentUpdate( true, 5 );
-		}
-
-		private void DominantBodyChange( GameEvents.FromToAction<CelestialBody, CelestialBody> Data )
-		{
-//			_logger.Trace( "Callback: DominantBodyChange" );
-			ScheduleExperimentUpdate( true );
-		}
-
-		private void VesselSOIChanged( GameEvents.HostedFromToAction<Vessel, CelestialBody> Data )
-		{
-//			_logger.Trace( "Callback: VesselSOIChanged" );
-			ScheduleExperimentUpdate( true );
-		}
-
-
-
-		/// <summary>
-		/// Waits for the ResearchAndDevelopment and PartLoader instances to be available.
-		/// </summary>
-		/// <returns>An IEnumerator that can be used to resume this method.</returns>
-		private IEnumerator WaitForRnDAndPartLoader( )
-		{
-			if( !_active )
-			{
-				yield break;
-			}
-
-			while( ResearchAndDevelopment.Instance == null )
-			{
-				yield return 0;
-			}
-
-			_logger.Info( "Science ready" );
-
-			while( PartLoader.Instance == null )
-			{
-				yield return 0;
-			}
-
-			_logger.Info("PartLoader ready");
-			_window.RefreshExperimentCache( );
-		}
-
-
-
-		/// <summary>
-		/// Coroutine to throttle calls to _window.UpdateExperiments.
-		/// </summary>
-		/// <returns></returns>
-		private IEnumerator UpdateExperiments( )
-		{
-			while (true) {
-				if (_window.IsVisible && _nextExperimentUpdate != null && _nextExperimentUpdate.Value < DateTime.Now) {
-					if( _mustDoFullRefresh )
-						_window.RefreshExperimentCache( );
-					else
-						_window.UpdateExperiments( );
-					_nextExperimentUpdate = null;
-					_mustDoFullRefresh = false;
-				}
-
-				yield return 0;
-			}
-		}
-
-
-
-		/// <summary>
-		/// Coroutine to throttle calls to _window.RefreshFilter.
-		/// </summary>
-		/// <returns></returns>
-		private IEnumerator RefreshFilter( )
-		{
-			var nextCheck = DateTime.Now;
-			while (true) {
-				if (_window.IsVisible && _filterRefreshPending && DateTime.Now > nextCheck) {
-					nextCheck = DateTime.Now.AddSeconds(0.5);
-					_window.RefreshFilter();
-					_filterRefreshPending = false;
-				}
-
-				yield return 0;
-			}
 		}
 
 
@@ -403,13 +220,12 @@ _logger.Info( "Unload Done" );
 		/// </summary>
 		/// <param name="sender">The sender of the event.</param>
 		/// <param name="e">The EventArgs of the event.</param>
-		private void Button_Open (object sender, EventArgs e) {
-			if (!_active) {
+		private void Button_Open( object sender, EventArgs e )
+		{
+			if( !_active )
 				return;
-			}
 //			_logger.Trace("Button_Open");
-			_windowVisible = true;
-			UpdateVisibility();
+			UpdateVisibility( true );
 		}
 
 
@@ -419,21 +235,31 @@ _logger.Info( "Unload Done" );
 		/// </summary>
 		/// <param name="sender">The sender of the event.</param>
 		/// <param name="e">The EventArgs of the event.</param>
-		private void Button_Close (object sender, EventArgs e) {
-			if (!_active) {
+		private void Button_Close( object sender, EventArgs e )
+		{
+			if( !_active )
 				return;
-			}
 //			_logger.Trace("Button_Close");
-			_windowVisible = false;
-			UpdateVisibility();
+			UpdateVisibility( false );
 		}
 
 
 
+		// We add this to our window as a callback
 		public void OnWindowClosed( object sender, EventArgs e  )
 		{
-			_button.SetOff( );
-			_windowVisible = false;
+//			_logger.Trace( "OnWindowClosed" ); 
+			if( _button != null )
+				_button.SetOff( );
+			UpdateVisibility( false );
+		}
+		// We add this to our window as a callback
+		public void OnWindowOpened( object sender, EventArgs e )
+		{
+//			_logger.Trace( "OnWindowOpened" );
+			if( _button != null )
+				_button.SetOn( );
+			UpdateVisibility( true );
 		}
 
 
@@ -441,13 +267,13 @@ _logger.Info( "Unload Done" );
 		/// <summary>
 		/// Called when the KSP toolbar is shown.
 		/// </summary>
-		private void Launcher_Show () {
-			if (!_active) {
+		private void Launcher_Show( )
+		{
+			if( !_active )
 				return;
-			}
-//			_logger.Trace("Open");
+
+//_logger.Trace("Launcher_Show");
 			_launcherVisible = true;
-			UpdateVisibility();
 		}
 
 
@@ -455,39 +281,28 @@ _logger.Info( "Unload Done" );
 		/// <summary>
 		/// Called when the KSP toolbar is hidden.
 		/// </summary>
-		private void Launcher_Hide () {
-			if (!_active) {
-				return;
-			}
-//			_logger.Trace("Close");
-			_launcherVisible = false;
-			UpdateVisibility();
-		}
-
-
-
-		/// <summary>
-		/// Shows or hides the ScienceWindow iff the KSP toolbar is visible and the toolbar button is toggled on.
-		/// </summary>
-		private void UpdateVisibility () {
-			if (!_active) {
-				return;
-			}
-//			_logger.Trace("UpdateVisibility");
-			_window.IsVisible = _launcherVisible && _windowVisible && !_UiHidden;
-			ScheduleExperimentUpdate();
-		}
-
-
-
-		/// <summary>
-		/// Schedules a full experiment update in 1 second.
-		/// </summary>
-		private void ScheduleExperimentUpdate ( bool FullRefresh = false, int AddTime = 1 )
+		private void Launcher_Hide( )
 		{
-			_nextExperimentUpdate = DateTime.Now.AddSeconds( AddTime );
-			if( FullRefresh )
-				_mustDoFullRefresh = true;
+			if( !_active )
+				return;
+//			_logger.Trace( "Launcher_Hide" );
+			_launcherVisible = false;
+		}
+
+
+
+		/// <summary>
+		/// Shows or hides the ScienceWindow if the KSP toolbar is visible and the toolbar button is toggled on.
+		/// </summary>
+		private void UpdateVisibility( bool NewVisibility )
+		{
+			if( !_active )
+				return;
+		
+//			_logger.Trace("UpdateVisibility");
+			_window.IsVisible = NewVisibility;
+			if( _window.IsVisible )
+				_EventHandler.ScheduleExperimentUpdate( );
 		}
 
 
@@ -497,12 +312,13 @@ _logger.Info( "Unload Done" );
 		/// </summary>
 		/// <param name="sender">The sender of the event.</param>
 		/// <param name="e">The EventArgs of the event.</param>
-		private void Settings_UseBlizzysToolbarChanged (object sender, EventArgs e) {
-			InitializeButton();
+		private void Settings_UseBlizzysToolbarChanged( object sender, EventArgs e )
+		{
+			InitializeButton( );
 
 
 			// Need to set this
-			if( _windowVisible )
+			if( _window.IsVisible )
 				_button.SetOn( );
 			else
 				_button.SetOff( );
@@ -513,39 +329,38 @@ _logger.Info( "Unload Done" );
 		/// <summary>
 		/// Initializes the toolbar button.
 		/// </summary>
-		private void InitializeButton () {
-			if (_button != null) {
+		private void InitializeButton( )
+		{
+			if( _button != null )
+			{
 				_button.Open -= Button_Open;
 				_button.Close -= Button_Close;
 				_button.Remove();
 				_button = null;
 			}
 
-			if (Config.UseBlizzysToolbar && BlizzysToolbarButton.IsAvailable) {
-				_button = new BlizzysToolbarButton();
-			} else {
-				_button = new AppLauncherButton();
+			if( Config.UseBlizzysToolbar && BlizzysToolbarButton.IsAvailable )
+			{
+				_button = new BlizzysToolbarButton( );
+			}
+			else
+			{
+				_button = new AppLauncherButton( );
 			}
 			_button.Open += Button_Open;
 			_button.Close += Button_Close;
-			_button.Add();
+			_button.Add( );
 		}
 
-		#endregion
 
-		#region FIELDS
-		private DateTime		_nextSituationUpdate;
-		private bool			_active;
-		private Logger			_logger;
-		private IToolbarButton	_button;
-		private bool			_launcherVisible;
-		private bool			_windowVisible;
-		private bool			_UiHidden;
-		private ScienceWindow	_window;
-		private DateTime?		_nextExperimentUpdate;
-		private bool			_mustDoFullRefresh;
-		private bool			_filterRefreshPending;
-		private static bool		_addonInitialized;
+
+		private bool UiActive( )
+		{
+			if( ( !_UiHidden ) && _active && _launcherVisible )
+				return true;
+			return false;
+		}
+
 		#endregion
 	}
 }

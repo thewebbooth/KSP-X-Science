@@ -6,7 +6,7 @@ using UnityEngine; // For Collider
 
 
 
-
+// The current state of science in KSP
 namespace ScienceChecklist
 {
 	internal sealed class ScienceContext

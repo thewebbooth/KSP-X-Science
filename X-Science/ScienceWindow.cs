@@ -43,6 +43,8 @@ namespace ScienceChecklist {
 
 
 		public event EventHandler OnCloseEvent;
+		public event EventHandler OnOpenEvent;
+
 
 
 		#region PROPERTIES
@@ -64,6 +66,44 @@ namespace ScienceChecklist {
 
 
 
+		public WindowSettings BuildSettings( )
+		{
+			WindowSettings W = new WindowSettings( );
+			W.Name = "ScienceCheckList";
+			W.Top = (int)_rect.yMin;
+			W.Left = (int)_rect.xMin;
+			W.CompactTop = (int)_rect3.yMin;
+			W.CompactLeft = (int)_rect3.xMin;
+			W.Visible = IsVisible;
+			W.Compacted = _compactMode;
+
+			return W;
+		}
+
+
+
+		public void ApplySettings( WindowSettings W )
+		{
+			_rect.yMin = W.Top;
+			_rect.xMin = W.Left;
+			_rect.yMax = W.Top + 400;
+			_rect.xMax = W.Left + 500;
+
+			_rect3.yMin = W.CompactTop;
+			_rect3.xMin = W.CompactLeft;
+			_rect3.yMax = W.CompactTop + 200;
+			_rect3.xMax = W.CompactLeft + 400;
+
+			_compactMode = W.Compacted;
+
+			if( W.Visible )
+				OnOpenEvent( this, EventArgs.Empty );
+			else
+				OnCloseEvent( this, EventArgs.Empty );
+		}
+
+
+
 		/// <summary>
 		/// Draws the window if it is visible.
 		/// </summary>
@@ -73,7 +113,7 @@ namespace ScienceChecklist {
 			{
 				return;
 			}
-			if( !GameHelper.WindowVisibility( ) )
+			if( !GameHelper.AllowWindow( ) )
 			{
 				IsVisible = false;
 				OnCloseEvent( this, EventArgs.Empty );
@@ -103,14 +143,14 @@ namespace ScienceChecklist {
 
 				_situationStyle = new GUIStyle(_progressLabelStyle) {
 					fontSize = 13,
-					alignment = TextAnchor.MiddleLeft,
+					alignment = TextAnchor.MiddleCenter,
 					fontStyle = FontStyle.Normal,
 					fixedHeight = 25,
 					contentOffset = new Vector2(0, 6),
 					wordWrap = true,
 					normal = {
 						textColor = new Color(0.7f, 0.8f, 0.8f),
-					},
+					}
 				};
 
 				_experimentProgressLabelStyle = new GUIStyle(_skin.label) {
@@ -264,7 +304,9 @@ namespace ScienceChecklist {
 		/// Draws the controls inside the window.
 		/// </summary>
 		/// <param name="windowId"></param>
-		private void DrawControls (int windowId) {
+		private void DrawControls (int windowId)
+		{
+
 
 			if( GUI.Button( new Rect( _rect.width - 20, 4, 18, 18 ), new GUIContent( "X", "Close [x] Science" ), _closeButtonStyle ) )
 			{
@@ -285,9 +327,16 @@ namespace ScienceChecklist {
 
 			GUILayout.Space(20);
 
-			GUILayout.BeginHorizontal();
-
-			GUILayout.Label(string.Format("{0}/{1} complete.", _filter.CompleteCount, _filter.TotalCount), _experimentProgressLabelStyle, GUILayout.Width(150));
+			GUILayout.BeginHorizontal( );
+			GUILayout.Label
+			(
+				new GUIContent(
+					string.Format("{0}/{1} complete.", _filter.CompleteCount, _filter.TotalCount),
+					string.Format( "{0} remaining\n{1:0.#} mits", _filter.TotalCount - _filter.CompleteCount, _filter.TotalScience - _filter.CompletedScience )
+				),
+				_experimentProgressLabelStyle,
+				GUILayout.Width( 150 )
+			);
 			GUILayout.FlexibleSpace();
 			GUILayout.Label(new GUIContent(_searchTexture));
 			_filter.Text = GUILayout.TextField(_filter.Text, GUILayout.Width(150));
@@ -304,9 +353,6 @@ namespace ScienceChecklist {
 				_logger.Trace( "DisplayExperiments is null" );
 			else
 			{
-
-
-
 				for( ; i < _filter.DisplayScienceInstances.Count; i++ )
 				{
 					var rect = new Rect( 5, 20 * i, _filter.DisplayScienceInstances.Count > 13 ? 490 : 500, 20 );
@@ -342,7 +388,7 @@ namespace ScienceChecklist {
 
 			if (_filter.CurrentSituation != null) {
 				var desc = _filter.CurrentSituation.Description;
-				GUILayout.Box(char.ToUpper(desc[0]) + desc.Substring(1), _situationStyle);
+				GUILayout.Box( char.ToUpper( desc[ 0 ] ) + desc.Substring( 1 ), _situationStyle, GUILayout.Width( 260 ) );
 			}
 
 			GUILayout.FlexibleSpace();
