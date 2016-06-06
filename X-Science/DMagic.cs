@@ -86,7 +86,7 @@ namespace ScienceChecklist
 
 					_MIgetBiome = tDMAPI.GetMethod("getBiome", BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
 					p = _MIgetBiome.GetParameters();
-					if (!((p.Count() == 2) && (p[0].ParameterType == typeof(ModuleScienceExperiment)) && (p[1].ParameterType == typeof(ExperimentSituations)) && _MIgetBiome.ReturnType == typeof(bool)))
+					if (!((p.Count() == 2) && (p[0].ParameterType == typeof(ModuleScienceExperiment)) && (p[1].ParameterType == typeof(ExperimentSituations)) && _MIgetBiome.ReturnType == typeof(string)))
 					{
 						_logger.Trace("DMAPI.getBiome method signature has changed. [x] Science may not work for DMagic experiments");
 						_MIgetBiome = null;
