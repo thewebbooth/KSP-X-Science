@@ -54,7 +54,7 @@ namespace ScienceChecklist
 
 			static DMAPI()
 			{
-				Type tDMAPI = Type.GetType("DMagic.DMAPI,DMagic", false) ?? Type.GetType("DMagic.DMAPI.dployDMExperiment,DMagicOrbitalScience", false);
+				Type tDMAPI = Type.GetType("DMagic.DMAPI,DMagic", false) ?? Type.GetType("DMagic.DMAPI,DMagicOrbitalScience", false);
 				if (tDMAPI != null)
 				{
 					_logger.Trace("DMagic API found. Validating Methods.");
