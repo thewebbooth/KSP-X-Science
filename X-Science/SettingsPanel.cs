@@ -45,8 +45,12 @@ namespace ScienceChecklist {
 		/// </summary>
 		public event EventHandler AllFilterChanged;
 
+		/// <summary>
+		/// Raised when the HideCompleteEvents settings has changed.
+		/// </summary>
+		public event EventHandler OnHideExperimentResultsChanged;
 
-		
+
 		/// <summary>
 		/// Renders this panel to the screen.
 		/// </summary>
@@ -93,6 +97,13 @@ namespace ScienceChecklist {
 				save = true;
 			}
 
+			toggle = GUILayout.Toggle(Config.HideExperimentResultsDialog, new GUIContent("Hide Experiment Run Results", "Hides experiment result window when experiments are run in active vessel mode."));
+			if (toggle != Config.HideExperimentResultsDialog)
+			{
+				Config.HideExperimentResultsDialog = toggle;
+				OnHideExperimentResultsDialog();
+				save = true;
+			}
 
 
 
@@ -139,6 +150,14 @@ namespace ScienceChecklist {
 			if( AllFilterChanged != null )
 			{
 				AllFilterChanged( this, EventArgs.Empty );
+			}
+		}
+
+		private void OnHideExperimentResultsDialog()
+		{
+			if (OnHideExperimentResultsChanged != null)
+			{
+				OnHideExperimentResultsChanged(this, EventArgs.Empty);
 			}
 		}
 

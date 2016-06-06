@@ -23,11 +23,12 @@ namespace ScienceChecklist {
 
 
 		// Members
-			public static bool HideCompleteExperiments	{ get; set; }
-			public static bool UseBlizzysToolbar		{ get; set; }
-			public static bool CompleteWithoutRecovery	{ get; set; }
-			public static bool CheckDebris				{ get; set; }
-			public static bool AllFilter				{ get; set; }
+			public static bool HideCompleteExperiments		{ get; set; }
+			public static bool UseBlizzysToolbar			{ get; set; }
+			public static bool CompleteWithoutRecovery		{ get; set; }
+			public static bool CheckDebris					{ get; set; }
+			public static bool AllFilter					{ get; set; }
+			public static bool HideExperimentResultsDialog	{ get; set; }
 
 
 
@@ -90,11 +91,12 @@ namespace ScienceChecklist {
 
 
 			
-			settings.AddValue( "HideCompleteExperiments",	HideCompleteExperiments );
-			settings.AddValue( "UseBlizzysToolbar",			UseBlizzysToolbar );
-			settings.AddValue( "CompleteWithoutRecovery",	CompleteWithoutRecovery );
-			settings.AddValue( "CheckDebris",				CheckDebris );
-			settings.AddValue( "AllFilter",					AllFilter );
+			settings.AddValue( "HideCompleteExperiments",		HideCompleteExperiments );
+			settings.AddValue( "UseBlizzysToolbar",				UseBlizzysToolbar );
+			settings.AddValue( "CompleteWithoutRecovery",		CompleteWithoutRecovery );
+			settings.AddValue( "CheckDebris",					CheckDebris );
+			settings.AddValue( "AllFilter",						AllFilter );
+			settings.AddValue( "HideExperimentResultsDialog",	HideExperimentResultsDialog);
 
 
 
@@ -123,11 +125,13 @@ namespace ScienceChecklist {
 
 		public static void Load( )
 		{
-			HideCompleteExperiments =	false;
-			UseBlizzysToolbar =			false;
-			CompleteWithoutRecovery =	false;
-			CheckDebris =				false;
-			AllFilter =					true;
+			HideCompleteExperiments =		false;
+			UseBlizzysToolbar =				false;
+			CompleteWithoutRecovery =		false;
+			CheckDebris =					false;
+			AllFilter =						true;
+			HideExperimentResultsDialog =	false;
+
 
 
 
@@ -164,6 +168,9 @@ namespace ScienceChecklist {
 					if( V != null )
 						AllFilter = bool.Parse( V );
 
+					V = settings.GetValue("HideExperimentResultsDialog");
+					if (V != null)
+						HideExperimentResultsDialog = bool.Parse(V);
 
 
 					var windowSettings = root.GetNode( "Windows" );

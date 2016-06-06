@@ -18,19 +18,25 @@ namespace ScienceChecklist {
 			_rect3 = new Rect(40, 40, 400, 200);
 			_scrollPos = new Vector2();
 			_filter = new ExperimentFilter();
-			_progressTexture =			TextureHelper.FromResource( "ScienceChecklist.icons.scienceProgress.png", 13, 13 );
-			_completeTexture =			TextureHelper.FromResource( "ScienceChecklist.icons.scienceComplete.png", 13, 13 );
-			_progressTextureCompact =	TextureHelper.FromResource( "ScienceChecklist.icons.scienceProgressCompact.png", 8, 8 );
-			_completeTextureCompact =	TextureHelper.FromResource( "ScienceChecklist.icons.scienceCompleteCompact.png", 8, 8 );
-			_currentSituationTexture =	TextureHelper.FromResource( "ScienceChecklist.icons.currentSituation.png", 25, 21 );
-			_currentVesselTexture =		TextureHelper.FromResource( "ScienceChecklist.icons.currentVessel.png", 25, 21 );
-			_unlockedTexture =			TextureHelper.FromResource( "ScienceChecklist.icons.unlocked.png", 25, 21 );
-			_allTexture =				TextureHelper.FromResource( "ScienceChecklist.icons.all.png", 25, 21 );
-			_searchTexture =			TextureHelper.FromResource( "ScienceChecklist.icons.search.png", 25, 21 );
-			_clearSearchTexture =		TextureHelper.FromResource( "ScienceChecklist.icons.clearSearch.png", 25, 21 );
-			_settingsTexture =			TextureHelper.FromResource( "ScienceChecklist.icons.settings.png", 25, 21 );
-			_maximizeTexture =			TextureHelper.FromResource( "ScienceChecklist.icons.minimize.png", 25, 21 );
-			_minimizeTexture =			TextureHelper.FromResource( "ScienceChecklist.icons.maximize.png", 25, 21 );
+			_vExperiments = new VesselExperiments( _filter );
+			_progressTexture =						TextureHelper.FromResource( "ScienceChecklist.icons.scienceProgress.png", 13, 13 );
+			_completeTexture =						TextureHelper.FromResource( "ScienceChecklist.icons.scienceComplete.png", 13, 13 );
+			_progressTextureCompact =				TextureHelper.FromResource( "ScienceChecklist.icons.scienceProgressCompact.png", 8, 8 );
+			_completeTextureCompact =				TextureHelper.FromResource( "ScienceChecklist.icons.scienceCompleteCompact.png", 8, 8 );
+			_currentSituationTexture =				TextureHelper.FromResource( "ScienceChecklist.icons.currentSituation.png", 25, 21 );
+			_currentVesselTexture =					TextureHelper.FromResource( "ScienceChecklist.icons.currentVessel.png", 25, 21 );
+			_unlockedTexture =						TextureHelper.FromResource( "ScienceChecklist.icons.unlocked.png", 25, 21 );
+			_allTexture =							TextureHelper.FromResource( "ScienceChecklist.icons.all.png", 25, 21 );
+			_searchTexture =						TextureHelper.FromResource( "ScienceChecklist.icons.search.png", 25, 21 );
+			_clearSearchTexture =					TextureHelper.FromResource( "ScienceChecklist.icons.clearSearch.png", 25, 21 );
+			_settingsTexture =						TextureHelper.FromResource( "ScienceChecklist.icons.settings.png", 25, 21 );
+			_maximizeTexture =						TextureHelper.FromResource( "ScienceChecklist.icons.minimize.png", 25, 21 );
+			_minimizeTexture =						TextureHelper.FromResource( "ScienceChecklist.icons.maximize.png", 25, 21 );
+			_runIncompleteExperimentsOnceTexture =	TextureHelper.FromResource( "ScienceChecklist.icons.runIncompleteExperimentsOnce.png", 25, 21 );
+			_runIncompleteExperimentsAllTexture =	TextureHelper.FromResource( "ScienceChecklist.icons.runIncompleteExperimentsAll.png", 25, 21 );
+			_runExperimentsOnceTexture =			TextureHelper.FromResource( "ScienceChecklist.icons.runExperimentsOnce.png", 25, 21 );
+			_runExperimentsAllTexture =				TextureHelper.FromResource( "ScienceChecklist.icons.runExperimentsAll.png", 25, 21 );
+			_runExperimentSmallTexture =			TextureHelper.FromResource( "ScienceChecklist.icons.runExperimentSmall.png", 12, 10 );
 
 			_emptyTexture = new Texture2D(1, 1, TextureFormat.ARGB32, false);
 			_emptyTexture.SetPixels(new[] { Color.clear });
@@ -258,6 +264,13 @@ namespace ScienceChecklist {
 			_filter.UpdateFilter( ); // Need to do this, otherwise complete count can be incorrect after vehicle recovery.
 		}
 
+		/// <summary>
+		/// Updates active vessel module cache
+		/// </summary>
+		public void RefreshVesselExperiments()
+		{
+			_vExperiments.RefreshModuleCache();
+		}
 
 
 		/// <summary>
@@ -307,8 +320,9 @@ namespace ScienceChecklist {
 		private void DrawControls (int windowId)
 		{
 
+			bool showExecutionButtons = (HighLogic.LoadedScene == GameScenes.FLIGHT && FlightGlobals.ActiveVessel != null && _filter.DisplayMode == DisplayMode.CurrentSituation);
 
-			if( GUI.Button( new Rect( _rect.width - 20, 4, 18, 18 ), new GUIContent( "X", "Close [x] Science" ), _closeButtonStyle ) )
+				if( GUI.Button( new Rect( _rect.width - 20, 4, 18, 18 ), new GUIContent( "X", "Close [x] Science" ), _closeButtonStyle ) )
 			{
 				IsVisible = false;
 				OnCloseEvent( this, EventArgs.Empty );
@@ -361,7 +375,7 @@ namespace ScienceChecklist {
 				}
 
 				var experiment = _filter.DisplayScienceInstances[ i ];
-				DrawExperiment(experiment, rect, false, _labelStyle);
+				DrawExperiment(experiment, rect, false, _labelStyle, showExecutionButtons);
 			}
 			}
 
@@ -392,8 +406,8 @@ namespace ScienceChecklist {
 			}
 
 			GUILayout.FlexibleSpace();
-			
-			var toggleSettings = GUILayout.Button(new GUIContent(_settingsTexture, "Settings"));
+
+            var toggleSettings = GUILayout.Button(new GUIContent(_settingsTexture, "Settings"));
 			if (toggleSettings) {
 				_showSettings = !_showSettings;
 				_rect.width = _showSettings ? 800 : 500;
@@ -405,6 +419,31 @@ namespace ScienceChecklist {
 			}
 			
 			GUILayout.EndHorizontal();
+			/* If we are in flight and only showing experiments on the active vessel, show the experiment execution buttons */
+			if (showExecutionButtons)
+			{
+				GUILayout.BeginHorizontal();
+
+				var runIncompleteExperimentsOnce = GUILayout.Button( new GUIContent( _runIncompleteExperimentsOnceTexture, "Run Incomplete Experiments Once Each" ) );
+				if (runIncompleteExperimentsOnce)
+					_vExperiments.RunExperimentsOnce( true );
+
+				var runIncompleteExperimentsAll = GUILayout.Button( new GUIContent( _runIncompleteExperimentsAllTexture, "Run Incomplete Experiments" ) );
+				if (runIncompleteExperimentsAll)
+					_vExperiments.RunEveryExperiment( true );
+
+				var runExperimentsOnce = GUILayout.Button( new GUIContent( _runExperimentsOnceTexture, "Run All Vessel Experiments Once Each" ) );
+				if (runExperimentsOnce)
+					_vExperiments.RunExperimentsOnce( false );
+
+				var runExperimentsAll = GUILayout.Button( new GUIContent( _runExperimentsAllTexture, "Run All Vessel Experiments" ) );
+				if (runExperimentsAll)
+					_vExperiments.RunEveryExperiment( false );
+				
+				GUILayout.FlexibleSpace();
+
+				GUILayout.EndHorizontal();
+			}
 			GUILayout.EndVertical ();
 
 			if (_showSettings) {
@@ -432,6 +471,8 @@ namespace ScienceChecklist {
 		/// </summary>
 		/// <param name="windowId"></param>
 		private void DrawCompactControls (int windowId) {
+			bool showExecutionButtons = (HighLogic.LoadedScene == GameScenes.FLIGHT && FlightGlobals.ActiveVessel != null && _filter.DisplayMode == DisplayMode.CurrentSituation);
+
 			GUILayout.BeginVertical();
 			_compactScrollPos = GUILayout.BeginScrollView(_compactScrollPos);
 			var i = 0;
@@ -446,7 +487,7 @@ namespace ScienceChecklist {
 					}
 
 					var experiment = _filter.DisplayScienceInstances[ i ];
-					DrawExperiment(experiment, rect, true, _compactLabelStyle);
+					DrawExperiment(experiment, rect, true, _compactLabelStyle, showExecutionButtons);
 				}
 			}
 			else
@@ -494,7 +535,7 @@ namespace ScienceChecklist {
 		/// <param name="rect">The rect inside which the experiment should be rendered.</param>
 		/// <param name="compact">Whether this experiment is compact.</param>
 		/// <param name="labelStyle">The style to use for labels.</param>
-		private void DrawExperiment (ScienceInstance exp, Rect rect, bool compact, GUIStyle labelStyle) {
+		private void DrawExperiment (ScienceInstance exp, Rect rect, bool compact, GUIStyle labelStyle, bool showExecutionButtons) {
 			labelStyle.normal.textColor = exp.IsComplete ? Color.green : Color.yellow;
 			var labelRect = new Rect(rect) {
 				y = rect.y + (compact ? 1 : 3),
@@ -504,6 +545,27 @@ namespace ScienceChecklist {
 				xMax = rect.xMax - (compact ? 40 : 40),
 				y = rect.y + (compact ? 1 : 3),
 			};
+
+			// Custom logic for eva reports and surface samples since they appear on list even when they can't be run
+			if (showExecutionButtons && (exp.ScienceExperiment.id != "evaReport" || _vExperiments.HasEVAReport) && (exp.ScienceExperiment.id != "surfaceSample" || _vExperiments.HasSurfaceSample))
+			{
+				var executeRect = new Rect( rect )
+				{
+					xMin = rect.xMax - (compact ? 110 : 125),
+					xMax = rect.xMax - (compact ? 95 : 110),
+					y = rect.y + (compact ? 0 : 2),
+					height = rect.height,
+					width = rect.height, // Square
+				};
+				bool runExperiment;
+				if (!compact) {
+					runExperiment = GUI.Button( executeRect, new GUIContent( _runExperimentSmallTexture ));
+				} else {
+					runExperiment = GUI.Button( executeRect, new GUIContent( _runExperimentSmallTexture ), _compactButtonStyle );
+				}
+				if (runExperiment)
+					_vExperiments.RunExperiment( exp );
+			}
 
 			GUI.Label(labelRect, exp.Description, labelStyle);
 			GUI.skin.horizontalScrollbar.fixedHeight = compact ? 8 : 13;
@@ -601,9 +663,16 @@ namespace ScienceChecklist {
 		private readonly Texture2D _settingsTexture;
 		private readonly Texture2D _minimizeTexture;
 		private readonly Texture2D _maximizeTexture;
+		private readonly Texture2D _runIncompleteExperimentsOnceTexture;
+		private readonly Texture2D _runIncompleteExperimentsAllTexture;
+		private readonly Texture2D _runExperimentsOnceTexture;
+		private readonly Texture2D _runExperimentsAllTexture;
+		private readonly Texture2D _runExperimentSmallTexture;
+
 		private readonly SettingsPanel _settingsPanel;
 
 		private readonly ExperimentFilter _filter;
+		private readonly VesselExperiments _vExperiments;
 		private readonly Logger _logger;
 		private readonly int _windowId = UnityEngine.Random.Range(0, int.MaxValue);
 		private readonly int _window2Id = UnityEngine.Random.Range(0, int.MaxValue);
