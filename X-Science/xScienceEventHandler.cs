@@ -13,6 +13,7 @@ namespace ScienceChecklist
 		private DateTime?				_nextExperimentUpdate;
 		private bool					_mustDoFullRefresh;
 		private bool					_filterRefreshPending;
+		private bool					_vExperimentsRefreshPending;
 		private	ScienceChecklistAddon	_parent;
 		private ScienceWindow			_window;
 
@@ -27,6 +28,7 @@ namespace ScienceChecklist
 			_nextExperimentUpdate = DateTime.Now;
 			_mustDoFullRefresh = true;
 			_filterRefreshPending = true;
+			_vExperimentsRefreshPending = true;
 
 
 			GameEvents.onGameSceneSwitchRequested.Add( new EventData<GameEvents.FromToAction<GameScenes, GameScenes>>.OnEvent( this.OnGameSceneSwitch ) );
@@ -63,9 +65,10 @@ namespace ScienceChecklist
 			}
 			UpdateExperiments( );
 			RefreshFilter( );
+			RefreshVesselExperiments();
 		}
 
-		
+
 
 		private void UpdateExperiments( )
 		{
@@ -90,6 +93,15 @@ namespace ScienceChecklist
 				nextCheck = DateTime.Now.AddSeconds( 0.5 );
 				_window.RefreshFilter( );
 				_filterRefreshPending = false;
+			}
+		}
+
+		private void RefreshVesselExperiments()
+		{
+			if (_window.IsVisible && _vExperimentsRefreshPending)
+			{
+				_window.RefreshVesselExperiments();
+				_vExperimentsRefreshPending = false;
 			}
 		}
 
@@ -119,6 +131,8 @@ namespace ScienceChecklist
 				WindowSettings W = Config.GetWindowConfig( "ScienceCheckList", Data.to );
 				_window.ApplySettings( W );
 			}
+
+			_vExperimentsRefreshPending = true;
 		}
 
 
@@ -126,12 +140,14 @@ namespace ScienceChecklist
 		{
 			//			_logger.Trace( "Callback: VesselWasModified" );
 			_filterRefreshPending = true;
+			_vExperimentsRefreshPending = true;
 		}
 
 		private void VesselChange( Vessel V )
 		{
 			//			_logger.Trace( "Callback: VesselChange" );
 			_filterRefreshPending = true;
+			_vExperimentsRefreshPending = true;
 		}
 
 		private void EditorShipModified( ShipConstruct S )
@@ -158,7 +174,7 @@ namespace ScienceChecklist
 			{
 				//				_logger.Trace( "Callback: TechnologyResearched" );
 				ScheduleExperimentUpdate( true );
-			}
+            }
 			//			else
 			//				_logger.Trace( "Callback: Technology Research Failed" );
 		}
@@ -169,7 +185,7 @@ namespace ScienceChecklist
 		{
 			//			_logger.Trace( "Callback: ScienceChanged" );
 			ScheduleExperimentUpdate( );
-		}
+        }
 
 		private void ScienceRecieved( float V, ScienceSubject S, ProtoVessel P, bool F )
 		{

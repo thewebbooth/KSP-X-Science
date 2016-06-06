@@ -60,6 +60,8 @@
   <ItemGroup>
     <Compile Include="CelestialBodyFilters.cs" />
     <Compile Include="BodySituationFilter.cs" />
+    <Compile Include="DMagic.cs" />
+    <Compile Include="VesselExperiments.cs" />
     <Compile Include="WindowSettings.cs" />
     <Compile Include="xScienceEventHandler.cs" />
     <Compile Include="ScienceContext.cs" />
@@ -85,6 +87,11 @@
     <None Include="GameData\[x] Science!\CHANGES.md" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="icons\runIncompleteExperimentsAll.png" />
+    <EmbeddedResource Include="icons\runExperimentsAll.png" />
+    <EmbeddedResource Include="icons\runExperimentsOnce.png" />
+    <EmbeddedResource Include="icons\runIncompleteExperimentsOnce.png" />
+    <EmbeddedResource Include="icons\runExperimentSmall.png" />
     <Content Include="ToDo.txt" />
     <EmbeddedResource Include="icons\scienceCompleteCompact.png" />
     <EmbeddedResource Include="icons\scienceProgressCompact.png" />
