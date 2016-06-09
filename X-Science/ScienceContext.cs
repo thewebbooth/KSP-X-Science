@@ -231,11 +231,11 @@ namespace ScienceChecklist
 			_kscBiomes = new List<string>( );
 
 
-
+			// Check "IsHome" since KSC can exist on other planets not named Kerbin (kopernicus and other mods)
 			// Do we have Kerbin
 				foreach( var body in _bodyList )
 				{
-					if( body.Value.Name == "Kerbin" )
+					if( body.Value.IsHome )
 					{
 						_kerbin = body.Key;
 						break;
@@ -251,10 +251,7 @@ namespace ScienceChecklist
 					_kscBiomes = UnityEngine.Object.FindObjectsOfType<Collider>( )
 						.Where( x => x.gameObject.layer == 15 )
 						.Select( x => x.gameObject.tag )
-						.Where( x => x != "Untagged" )
-						.Where( x => !x.Contains( "KSC_Runway_Light" ) )
-						.Where( x => !x.Contains( "KSC_Pad_Flag_Pole" ) )
-						.Where( x => !x.Contains( "Ladder" ) )
+						.Where( x => x != "Untagged" && !x.Contains( "KSC_Runway_Light" ) && !x.Contains( "KSC_Pad_Flag_Pole" ) && !x.Contains( "Ladder" ) )
 						.Select( x => Vessel.GetLandedAtString( x ) )
 						.Select( x => x.Replace( " ", "" ) )
 						.Distinct( )
