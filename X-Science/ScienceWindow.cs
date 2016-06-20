@@ -32,9 +32,8 @@ namespace ScienceChecklist {
 			_allTexture =							TextureHelper.FromResource( "ScienceChecklist.icons.all.png", 25, 21 );
 			_searchTexture =						TextureHelper.FromResource( "ScienceChecklist.icons.search.png", 25, 21 );
 			_clearSearchTexture =					TextureHelper.FromResource( "ScienceChecklist.icons.clearSearch.png", 25, 21 );
-//			_settingsTexture =						TextureHelper.FromResource( "ScienceChecklist.icons.settings.png", 25, 21 );
-			_maximizeTexture =						TextureHelper.FromResource( "ScienceChecklist.icons.minimize.png", 25, 21 );
-			_minimizeTexture =						TextureHelper.FromResource( "ScienceChecklist.icons.maximize.png", 25, 21 );
+			_minimizeTexture=						TextureHelper.FromResource( "ScienceChecklist.icons.minimize.png", 16, 16 );
+			_maximizeTexture =						TextureHelper.FromResource( "ScienceChecklist.icons.maximize.png", 16, 16 );
 			_closeTexture =							TextureHelper.FromResource( "ScienceChecklist.icons.close.png", 16, 16 );
 			_helpTexture =							TextureHelper.FromResource( "ScienceChecklist.icons.help.png", 16, 16 );
 			_settingsTexture =						TextureHelper.FromResource( "ScienceChecklist.icons.settings.png", 16, 16 );
@@ -484,7 +483,7 @@ namespace ScienceChecklist {
 		/// Draws the controls for the window in compact mode.
 		/// </summary>
 		/// <param name="windowId"></param>
-		private void DrawCompactControls (int windowId) {
+		private void DrawCompactControls( int windowId ) {
 //			bool showExecutionButtons = (HighLogic.LoadedScene == GameScenes.FLIGHT && FlightGlobals.ActiveVessel != null && _filter.DisplayMode == DisplayMode.CurrentSituation);
 
 			GUILayout.BeginHorizontal( );
@@ -521,7 +520,7 @@ namespace ScienceChecklist {
 				var desc = _filter.CurrentSituation.Description;
 				GUI.Box( new Rect( 28, 0, _rect3.width - 100, 16 ), char.ToUpper( desc[ 0 ] ) + desc.Substring( 1 ), _compactSituationStyle );
 			}
-			DrawTitleBarButtons( _rect3 );
+			DrawTitleBarButtons( _rect3, true );
 
 			
 
@@ -540,7 +539,7 @@ namespace ScienceChecklist {
 		}
 
 
-		private void DrawTitleBarButtons( Rect rect )
+		private void DrawTitleBarButtons( Rect rect, bool NeedMaxIcon = false )
 		{
 			var closeContent = ( _closeTexture != null ) ? new GUIContent( _closeTexture, "Close window" ) : new GUIContent( "X", "Close window" );
 			if( GUI.Button( new Rect( 4, 4, 20, 20 ), closeContent, _closeButtonStyle ) )
@@ -561,7 +560,11 @@ namespace ScienceChecklist {
 				_settingsWindow.ToggleVisible( );
 			}
 
-			var compactContent = ( _minimizeTexture != null ) ? new GUIContent( _minimizeTexture, "Compact mode" ) : new GUIContent( "S", "Compact mode" );
+			GUIContent compactContent;
+			if( NeedMaxIcon )
+				compactContent = ( _maximizeTexture != null ) ? new GUIContent( _maximizeTexture, "Maximise window" ) : new GUIContent( "S", "Maximise window" );
+			else
+				compactContent = ( _minimizeTexture != null ) ? new GUIContent( _minimizeTexture, "Compact window" ) : new GUIContent( "S", "Compact window" );
 			if( GUI.Button( new Rect( rect.width - 24, 4, 20, 20 ), compactContent, _closeButtonStyle ) )
 			{
 				_compactMode = !_compactMode;

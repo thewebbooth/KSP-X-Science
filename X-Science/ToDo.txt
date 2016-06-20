@@ -1,5 +1,4 @@
 ﻿
-
 [DONE] Event handler and no coroutines
 [DONE] Window positions
 [DONE] Fix long text
@@ -17,8 +16,7 @@
 [DONE] Help content
 [DONE] Science totals tool tip doesn't include partially collected science
 [DONE] Filter text + state
-
-* Finish icons
+[DONE] Finish icons
 
 
 
