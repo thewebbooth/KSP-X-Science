@@ -12,13 +12,16 @@ namespace ScienceChecklist {
 		/// <summary>
 		/// Creates a new instance of the ScienceWindow class.
 		/// </summary>
-		public ScienceWindow () {
+		public ScienceWindow ( SettingsWindow settingsWindow, HelpWindow helpWindow ) {
+
+			_settingsWindow = settingsWindow;
+			_helpWindow = helpWindow;
 			_logger = new Logger(this);
 			_rect = new Rect(40, 40, 500, 400);
 			_rect3 = new Rect(40, 40, 400, 200);
 			_scrollPos = new Vector2();
 			_filter = new ExperimentFilter();
-			_vExperiments = new VesselExperiments( _filter );
+//			_vExperiments = new VesselExperiments( _filter );
 			_progressTexture =						TextureHelper.FromResource( "ScienceChecklist.icons.scienceProgress.png", 13, 13 );
 			_completeTexture =						TextureHelper.FromResource( "ScienceChecklist.icons.scienceComplete.png", 13, 13 );
 			_progressTextureCompact =				TextureHelper.FromResource( "ScienceChecklist.icons.scienceProgressCompact.png", 8, 8 );
@@ -29,22 +32,25 @@ namespace ScienceChecklist {
 			_allTexture =							TextureHelper.FromResource( "ScienceChecklist.icons.all.png", 25, 21 );
 			_searchTexture =						TextureHelper.FromResource( "ScienceChecklist.icons.search.png", 25, 21 );
 			_clearSearchTexture =					TextureHelper.FromResource( "ScienceChecklist.icons.clearSearch.png", 25, 21 );
-			_settingsTexture =						TextureHelper.FromResource( "ScienceChecklist.icons.settings.png", 25, 21 );
+//			_settingsTexture =						TextureHelper.FromResource( "ScienceChecklist.icons.settings.png", 25, 21 );
 			_maximizeTexture =						TextureHelper.FromResource( "ScienceChecklist.icons.minimize.png", 25, 21 );
 			_minimizeTexture =						TextureHelper.FromResource( "ScienceChecklist.icons.maximize.png", 25, 21 );
-			_runIncompleteExperimentsOnceTexture =	TextureHelper.FromResource( "ScienceChecklist.icons.runIncompleteExperimentsOnce.png", 25, 21 );
+			_closeTexture =							TextureHelper.FromResource( "ScienceChecklist.icons.close.png", 16, 16 );
+			_helpTexture =							TextureHelper.FromResource( "ScienceChecklist.icons.help.png", 16, 16 );
+			_settingsTexture =						TextureHelper.FromResource( "ScienceChecklist.icons.settings.png", 16, 16 );
+
+/*			_runIncompleteExperimentsOnceTexture =	TextureHelper.FromResource( "ScienceChecklist.icons.runIncompleteExperimentsOnce.png", 25, 21 );
 			_runIncompleteExperimentsAllTexture =	TextureHelper.FromResource( "ScienceChecklist.icons.runIncompleteExperimentsAll.png", 25, 21 );
 			_runExperimentsOnceTexture =			TextureHelper.FromResource( "ScienceChecklist.icons.runExperimentsOnce.png", 25, 21 );
 			_runExperimentsAllTexture =				TextureHelper.FromResource( "ScienceChecklist.icons.runExperimentsAll.png", 25, 21 );
-			_runExperimentSmallTexture =			TextureHelper.FromResource( "ScienceChecklist.icons.runExperimentSmall.png", 12, 10 );
-
+			_runExperimentSmallTexture =			TextureHelper.FromResource( "ScienceChecklist.icons.runExperimentSmall.png", 12, 10 );*/
 			_emptyTexture = new Texture2D(1, 1, TextureFormat.ARGB32, false);
 			_emptyTexture.SetPixels(new[] { Color.clear });
 			_emptyTexture.Apply();
-			_settingsPanel = new SettingsPanel();
-			_settingsPanel.HideCompleteEventsChanged += (s, e) => _filter.UpdateFilter( );
-			_settingsPanel.CheckDebrisChanged += ( s, e ) => _filter.UpdateExperiments( );
-			_settingsPanel.CompleteWithoutRecoveryChanged += ( s, e ) => _filter.UpdateFilter( );
+
+			_settingsWindow.HideCompleteEventsChanged += ( s, e ) => _filter.UpdateFilter( );
+			_settingsWindow.CheckDebrisChanged += ( s, e ) => _filter.UpdateExperiments( );
+			_settingsWindow.CompleteWithoutRecoveryChanged += ( s, e ) => _filter.UpdateFilter( );
 		}
 
 
@@ -61,11 +67,11 @@ namespace ScienceChecklist {
 		public bool IsVisible { get; set; }
 
 
-		/// <summary>
+/*		/// <summary>
 		/// Gets the settings for this window.
 		/// </summary>
 		public SettingsPanel Settings { get { return _settingsPanel; } }
-
+		*/
 		#endregion
 
 		#region METHODS (PUBLIC)
@@ -82,6 +88,8 @@ namespace ScienceChecklist {
 			W.CompactLeft = (int)_rect3.xMin;
 			W.Visible = IsVisible;
 			W.Compacted = _compactMode;
+			W.FilterMode = _filter.DisplayMode;
+			W.FilterText = _filter.Text;
 
 			return W;
 		}
@@ -101,6 +109,9 @@ namespace ScienceChecklist {
 			_rect3.xMax = W.CompactLeft + 400;
 
 			_compactMode = W.Compacted;
+			_filter.DisplayMode = W.FilterMode;
+			_filter.Text = W.FilterText;
+			_filter.UpdateFilter( );
 
 			if( W.Visible )
 				OnOpenEvent( this, EventArgs.Empty );
@@ -179,7 +190,7 @@ namespace ScienceChecklist {
 
 				_compactSituationStyle = new GUIStyle(_situationStyle) {
 					fontSize = 11,
-					contentOffset = new Vector2(0, -3),
+					contentOffset = new Vector2( 0, 3 ),
 				};
 
 				_compactButtonStyle = new GUIStyle(_skin.button) {
@@ -189,7 +200,11 @@ namespace ScienceChecklist {
 				_closeButtonStyle = new GUIStyle( _skin.button )
 				{
 					// int left, int right, int top, int bottom
-					padding = new RectOffset( 2, 2, 6, 2 )
+					padding = new RectOffset(2, 2, 2, 2),
+					margin = new RectOffset(1, 1, 1, 1),
+					stretchWidth = false,
+					stretchHeight = false,
+					alignment = TextAnchor.MiddleCenter,
 				};
 			}
 
@@ -264,14 +279,14 @@ namespace ScienceChecklist {
 			_filter.UpdateFilter( ); // Need to do this, otherwise complete count can be incorrect after vehicle recovery.
 		}
 
-		/// <summary>
+/*		/// <summary>
 		/// Updates active vessel module cache
 		/// </summary>
 		public void RefreshVesselExperiments()
 		{
 			_vExperiments.RefreshModuleCache();
 		}
-
+*/
 
 		/// <summary>
 		/// Recalculates the current situation of the active vessel.
@@ -320,14 +335,13 @@ namespace ScienceChecklist {
 		private void DrawControls (int windowId)
 		{
 
-			bool showExecutionButtons = (HighLogic.LoadedScene == GameScenes.FLIGHT && FlightGlobals.ActiveVessel != null && _filter.DisplayMode == DisplayMode.CurrentSituation);
+//			bool showExecutionButtons = (HighLogic.LoadedScene == GameScenes.FLIGHT && FlightGlobals.ActiveVessel != null && _filter.DisplayMode == DisplayMode.CurrentSituation);
 
-				if( GUI.Button( new Rect( _rect.width - 20, 4, 18, 18 ), new GUIContent( "X", "Close [x] Science" ), _closeButtonStyle ) )
-			{
-				IsVisible = false;
-				OnCloseEvent( this, EventArgs.Empty );
-			}
-			GUILayout.BeginHorizontal ();
+
+			DrawTitleBarButtons( _rect );
+
+
+			GUILayout.BeginHorizontal( );
 
 			GUILayout.BeginVertical(GUILayout.Width(480), GUILayout.ExpandHeight(true));
 
@@ -375,7 +389,7 @@ namespace ScienceChecklist {
 				}
 
 				var experiment = _filter.DisplayScienceInstances[ i ];
-				DrawExperiment(experiment, rect, false, _labelStyle, showExecutionButtons);
+				DrawExperiment(experiment, rect, false, _labelStyle/*, showExecutionButtons */);
 			}
 			}
 
@@ -385,6 +399,8 @@ namespace ScienceChecklist {
 			GUILayout.BeginHorizontal();
 
 
+			var TextWidth = 290;
+			var NumButtons = 3;
 			GUIContent[ ] FilterButtons = {
 					new GUIContent(_currentSituationTexture, "Show experiments available right now"),
 					new GUIContent(_currentVesselTexture, "Show experiments available on this vessel"),
@@ -394,33 +410,31 @@ namespace ScienceChecklist {
 			{
 				Array.Resize( ref FilterButtons, 4 );
 				FilterButtons[ 3 ] = new GUIContent(_allTexture, "Show all experiments");
+				TextWidth = 260;
+				NumButtons = 4;
+			}
+			else
+			{
+				if( _filter.DisplayMode == DisplayMode.All )
+				{
+					_filter.DisplayMode = DisplayMode.Unlocked;
+					_filter.UpdateFilter( );
+				}
 			}
 
-			_filter.DisplayMode = (DisplayMode)GUILayout.SelectionGrid( (int)_filter.DisplayMode, FilterButtons, 4 );
+			_filter.DisplayMode = (DisplayMode)GUILayout.SelectionGrid( (int)_filter.DisplayMode, FilterButtons, NumButtons );
 
 			GUILayout.FlexibleSpace();
 
 			if (_filter.CurrentSituation != null) {
 				var desc = _filter.CurrentSituation.Description;
-				GUILayout.Box( char.ToUpper( desc[ 0 ] ) + desc.Substring( 1 ), _situationStyle, GUILayout.Width( 260 ) );
+				GUILayout.Box( char.ToUpper( desc[ 0 ] ) + desc.Substring( 1 ), _situationStyle, GUILayout.Width( TextWidth ) );
 			}
-
-			GUILayout.FlexibleSpace();
-
-            var toggleSettings = GUILayout.Button(new GUIContent(_settingsTexture, "Settings"));
-			if (toggleSettings) {
-				_showSettings = !_showSettings;
-				_rect.width = _showSettings ? 800 : 500;
-			}
-
-			var toggleCompact = GUILayout.Button(new GUIContent(_minimizeTexture, "Compact mode"));
-			if (toggleCompact) {
-				_compactMode = !_compactMode;
-			}
-			
+			GUILayout.FlexibleSpace( );
+		
 			GUILayout.EndHorizontal();
-			/* If we are in flight and only showing experiments on the active vessel, show the experiment execution buttons */
-			if (showExecutionButtons)
+			// If we are in flight and only showing experiments on the active vessel, show the experiment execution buttons
+/*			if (showExecutionButtons)
 			{
 				GUILayout.BeginHorizontal();
 
@@ -443,12 +457,12 @@ namespace ScienceChecklist {
 				GUILayout.FlexibleSpace();
 
 				GUILayout.EndHorizontal();
-			}
+			}*/
 			GUILayout.EndVertical ();
 
-			if (_showSettings) {
+/*			if (_showSettings) {
 				_settingsPanel.Draw();
-			}
+			}*/
 
 			GUILayout.EndHorizontal ();
 			GUI.DragWindow();
@@ -471,7 +485,11 @@ namespace ScienceChecklist {
 		/// </summary>
 		/// <param name="windowId"></param>
 		private void DrawCompactControls (int windowId) {
-			bool showExecutionButtons = (HighLogic.LoadedScene == GameScenes.FLIGHT && FlightGlobals.ActiveVessel != null && _filter.DisplayMode == DisplayMode.CurrentSituation);
+//			bool showExecutionButtons = (HighLogic.LoadedScene == GameScenes.FLIGHT && FlightGlobals.ActiveVessel != null && _filter.DisplayMode == DisplayMode.CurrentSituation);
+
+			GUILayout.BeginHorizontal( );
+			GUILayout.Label( "", GUILayout.Height( 20 ) );
+			GUILayout.EndHorizontal( );
 
 			GUILayout.BeginVertical();
 			_compactScrollPos = GUILayout.BeginScrollView(_compactScrollPos);
@@ -487,7 +505,7 @@ namespace ScienceChecklist {
 					}
 
 					var experiment = _filter.DisplayScienceInstances[ i ];
-					DrawExperiment(experiment, rect, true, _compactLabelStyle, showExecutionButtons);
+					DrawExperiment(experiment, rect, true, _compactLabelStyle/*, showExecutionButtons*/);
 				}
 			}
 			else
@@ -496,37 +514,61 @@ namespace ScienceChecklist {
 			GUILayout.EndScrollView();
 			GUILayout.EndVertical();
 
-			GUILayout.BeginHorizontal();
 
 
+			if( _filter.CurrentSituation != null )
+			{
+				var desc = _filter.CurrentSituation.Description;
+				GUI.Box( new Rect( 28, 0, _rect3.width - 100, 16 ), char.ToUpper( desc[ 0 ] ) + desc.Substring( 1 ), _compactSituationStyle );
+			}
+			DrawTitleBarButtons( _rect3 );
 
-			var CloseButton = GUILayout.Button( "X", _compactButtonStyle, GUILayout.Height( 16 ), GUILayout.Width( 16 ) );
-			if( CloseButton )
+			
+
+			GUI.DragWindow();
+			if( Event.current.type == EventType.Repaint && GUI.tooltip != _lastTooltip )
+			{
+				_lastTooltip = GUI.tooltip;
+			}
+
+			// If this window gets focus, it pushes the tooltip behind the window, which looks weird.
+			// Just hide the tooltip while mouse buttons are held down to avoid this.
+			if( Input.GetMouseButton( 0 ) || Input.GetMouseButton( 1 ) || Input.GetMouseButton( 2 ) )
+			{
+				_lastTooltip = string.Empty;
+			}
+		}
+
+
+		private void DrawTitleBarButtons( Rect rect )
+		{
+			var closeContent = ( _closeTexture != null ) ? new GUIContent( _closeTexture, "Close window" ) : new GUIContent( "X", "Close window" );
+			if( GUI.Button( new Rect( 4, 4, 20, 20 ), closeContent, _closeButtonStyle ) )
 			{
 				IsVisible = false;
 				OnCloseEvent( this, EventArgs.Empty );
 			}
 
-
-			GUILayout.FlexibleSpace();
-			if (_filter.CurrentSituation != null) {
-				var desc = _filter.CurrentSituation.Description;
-				GUILayout.Label(char.ToUpper(desc[0]) + desc.Substring(1), _compactSituationStyle, GUILayout.Height(16));
+			var helpContent = ( _helpTexture != null ) ? new GUIContent( _helpTexture, "Open help window" ) : new GUIContent( "?", "Open help window" );
+			if( GUI.Button( new Rect( rect.width - 72, 4, 20, 20 ), helpContent, _closeButtonStyle ) )
+			{
+				_helpWindow.ToggleVisible( );
 			}
 
+			var setingsContent = ( _settingsTexture != null ) ? new GUIContent( _settingsTexture, "Open settings window" ) : new GUIContent( "S", "Open settings window" );
+			if( GUI.Button( new Rect( rect.width - 48, 4, 20, 20 ), setingsContent, _closeButtonStyle ) )
+			{
+				_settingsWindow.ToggleVisible( );
+			}
 
-
-			GUILayout.FlexibleSpace();
-
-			var toggleCompact = GUILayout.Button(new GUIContent(_maximizeTexture, "Normal mode"), _compactButtonStyle, GUILayout.Height(16), GUILayout.Width(16));
-			if (toggleCompact) {
+			var compactContent = ( _minimizeTexture != null ) ? new GUIContent( _minimizeTexture, "Compact mode" ) : new GUIContent( "S", "Compact mode" );
+			if( GUI.Button( new Rect( rect.width - 24, 4, 20, 20 ), compactContent, _closeButtonStyle ) )
+			{
 				_compactMode = !_compactMode;
 			}
-			
-			GUILayout.EndHorizontal();
-
-			GUI.DragWindow();
 		}
+
+
 
 		/// <summary>
 		/// Draws an experiment inside the given Rect.
@@ -535,7 +577,7 @@ namespace ScienceChecklist {
 		/// <param name="rect">The rect inside which the experiment should be rendered.</param>
 		/// <param name="compact">Whether this experiment is compact.</param>
 		/// <param name="labelStyle">The style to use for labels.</param>
-		private void DrawExperiment (ScienceInstance exp, Rect rect, bool compact, GUIStyle labelStyle, bool showExecutionButtons) {
+		private void DrawExperiment (ScienceInstance exp, Rect rect, bool compact, GUIStyle labelStyle/*, bool showExecutionButtons*/) {
 			labelStyle.normal.textColor = exp.IsComplete ? Color.green : Color.yellow;
 			var labelRect = new Rect(rect) {
 				y = rect.y + (compact ? 1 : 3),
@@ -546,7 +588,7 @@ namespace ScienceChecklist {
 				y = rect.y + (compact ? 1 : 3),
 			};
 
-			// Custom logic for eva reports and surface samples since they appear on list even when they can't be run
+/*			// Custom logic for eva reports and surface samples since they appear on list even when they can't be run
 			if (showExecutionButtons && (exp.ScienceExperiment.id != "evaReport" || _vExperiments.HasEVAReport) && (exp.ScienceExperiment.id != "surfaceSample" || _vExperiments.HasSurfaceSample))
 			{
 				var executeRect = new Rect( rect )
@@ -565,7 +607,7 @@ namespace ScienceChecklist {
 				}
 				if (runExperiment)
 					_vExperiments.RunExperiment( exp );
-			}
+			}*/
 
 			GUI.Label(labelRect, exp.Description, labelStyle);
 			GUI.skin.horizontalScrollbar.fixedHeight = compact ? 8 : 13;
@@ -622,6 +664,8 @@ namespace ScienceChecklist {
 			}
 		}
 
+
+
 		#endregion
 
 		#region FIELDS
@@ -645,7 +689,7 @@ namespace ScienceChecklist {
 		private GUISkin _skin;
 
 		private string _lastTooltip;
-		private bool _showSettings;
+//		private bool _showSettings;
 		private int _lastDataCount;
 		private bool _compactMode;
 
@@ -660,23 +704,29 @@ namespace ScienceChecklist {
 		private readonly Texture2D _allTexture;
 		private readonly Texture2D _searchTexture;
 		private readonly Texture2D _clearSearchTexture;
-		private readonly Texture2D _settingsTexture;
+//		private readonly Texture2D _settingsTexture;
 		private readonly Texture2D _minimizeTexture;
 		private readonly Texture2D _maximizeTexture;
-		private readonly Texture2D _runIncompleteExperimentsOnceTexture;
+/*		private readonly Texture2D _runIncompleteExperimentsOnceTexture;
 		private readonly Texture2D _runIncompleteExperimentsAllTexture;
 		private readonly Texture2D _runExperimentsOnceTexture;
 		private readonly Texture2D _runExperimentsAllTexture;
-		private readonly Texture2D _runExperimentSmallTexture;
+		private readonly Texture2D _runExperimentSmallTexture;*/
+		private readonly Texture2D _closeTexture;
+		private readonly Texture2D _helpTexture;
+		private readonly Texture2D _settingsTexture;
 
-		private readonly SettingsPanel _settingsPanel;
+//		private readonly SettingsPanel _settingsPanel;
 
 		private readonly ExperimentFilter _filter;
-		private readonly VesselExperiments _vExperiments;
+//		private readonly VesselExperiments _vExperiments;
 		private readonly Logger _logger;
 		private readonly int _windowId = UnityEngine.Random.Range(0, int.MaxValue);
 		private readonly int _window2Id = UnityEngine.Random.Range(0, int.MaxValue);
 		private readonly int _window3Id = UnityEngine.Random.Range(0, int.MaxValue);
+
+		private SettingsWindow _settingsWindow;
+		private	HelpWindow _helpWindow;
 
 		#endregion
 	}

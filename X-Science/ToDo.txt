@@ -1,4 +1,46 @@
 ﻿
+
+[DONE] Event handler and no coroutines
+[DONE] Window positions
+[DONE] Fix long text
+[DONE] Summary tooltip
+[DONE] Visibility doesn't stick
+[DONE] Button class
+[DONE] Compact mode use same icons
+[DONE] Drag bar
+[DONE] Seperate settings window
+[DONE] Help window
+[DONE] Backup skin then restore
+[DONE] Window class
+[DONE] Merge settings panel into window
+[DONE] Setting events
+[DONE] Help content
+[DONE] Science totals tool tip doesn't include partially collected science
+[DONE] Filter text + state
+
+* Finish icons
+
+
+
+
+* Window class config
+* Window width
+* Store pre-calculated content where possible.
+* img/sprite class - Load all in one place
+
+
+
+* Clear blue water between science and GUI
+* Difficult science filter
+
+
+
+
+
+
+
+
+
 /*
  * TO DO
  * 
@@ -11,19 +53,26 @@
 
 
 
-[DONE] Event handler and no coroutines
-[DONE] Window positions
-[DONE] Fix long text
-[DONE] Summary tooltip
-[DONE] Visibility doesn't stick
+
+/* Detect RMB
+if (Input.GetMouseButtonUp(1))
+{
+onRightButtonStockClick();
+}
+else
+{
+onLeftButtonClick();
+}*/
 
 
 
-* Window class
-* Button class
-* img/sprite class
-* Clear blue water between science and GUI
-* Difficult science filter
+
+
+
+
+
+
+
 
 
 

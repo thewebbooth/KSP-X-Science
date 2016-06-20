@@ -13,7 +13,7 @@ namespace ScienceChecklist
 		private DateTime?				_nextExperimentUpdate;
 		private bool					_mustDoFullRefresh;
 		private bool					_filterRefreshPending;
-		private bool					_vExperimentsRefreshPending;
+//		private bool					_vExperimentsRefreshPending;
 		private	ScienceChecklistAddon	_parent;
 		private ScienceWindow			_window;
 
@@ -28,7 +28,7 @@ namespace ScienceChecklist
 			_nextExperimentUpdate = DateTime.Now;
 			_mustDoFullRefresh = true;
 			_filterRefreshPending = true;
-			_vExperimentsRefreshPending = true;
+//			_vExperimentsRefreshPending = true;
 
 
 			GameEvents.onGameSceneSwitchRequested.Add( new EventData<GameEvents.FromToAction<GameScenes, GameScenes>>.OnEvent( this.OnGameSceneSwitch ) );
@@ -65,7 +65,7 @@ namespace ScienceChecklist
 			}
 			UpdateExperiments( );
 			RefreshFilter( );
-			RefreshVesselExperiments();
+//			RefreshVesselExperiments();
 		}
 
 
@@ -96,14 +96,14 @@ namespace ScienceChecklist
 			}
 		}
 
-		private void RefreshVesselExperiments()
+/*		private void RefreshVesselExperiments()
 		{
 			if (_window.IsVisible && _vExperimentsRefreshPending)
 			{
 				_window.RefreshVesselExperiments();
 				_vExperimentsRefreshPending = false;
 			}
-		}
+		}*/
 
 
 
@@ -132,7 +132,7 @@ namespace ScienceChecklist
 				_window.ApplySettings( W );
 			}
 
-			_vExperimentsRefreshPending = true;
+//			_vExperimentsRefreshPending = true;
 		}
 
 
@@ -140,14 +140,14 @@ namespace ScienceChecklist
 		{
 			//			_logger.Trace( "Callback: VesselWasModified" );
 			_filterRefreshPending = true;
-			_vExperimentsRefreshPending = true;
+//			_vExperimentsRefreshPending = true;
 		}
 
 		private void VesselChange( Vessel V )
 		{
 			//			_logger.Trace( "Callback: VesselChange" );
 			_filterRefreshPending = true;
-			_vExperimentsRefreshPending = true;
+//			_vExperimentsRefreshPending = true;
 		}
 
 		private void EditorShipModified( ShipConstruct S )

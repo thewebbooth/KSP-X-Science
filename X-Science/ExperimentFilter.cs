@@ -327,7 +327,7 @@ On ScienceExperiment
 				IList<ScienceInstance> RemainingExperiments = new List<ScienceInstance>( );
 				RemainingExperiments = query.Where( x => !x.IsCollected ).ToList( );
 				CompleteCount = TotalCount - RemainingExperiments.Count( );
-				TotalScience = RemainingExperiments.Sum( x => x.TotalScience );
+				TotalScience = RemainingExperiments.Sum( x => x.TotalScience ) + RemainingExperiments.Sum( x => x.OnboardScience ); ;
 				CompletedScience = RemainingExperiments.Sum( x => x.CompletedScience );
 			}
 			else // Normal mode, must recover/transmit to KSC

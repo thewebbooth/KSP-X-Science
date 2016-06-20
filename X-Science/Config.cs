@@ -28,7 +28,7 @@ namespace ScienceChecklist {
 			public static bool CompleteWithoutRecovery		{ get; set; }
 			public static bool CheckDebris					{ get; set; }
 			public static bool AllFilter					{ get; set; }
-			public static bool HideExperimentResultsDialog	{ get; set; }
+//			public static bool HideExperimentResultsDialog	{ get; set; }
 
 
 
@@ -96,7 +96,7 @@ namespace ScienceChecklist {
 			settings.AddValue( "CompleteWithoutRecovery",		CompleteWithoutRecovery );
 			settings.AddValue( "CheckDebris",					CheckDebris );
 			settings.AddValue( "AllFilter",						AllFilter );
-			settings.AddValue( "HideExperimentResultsDialog",	HideExperimentResultsDialog);
+//			settings.AddValue( "HideExperimentResultsDialog",	HideExperimentResultsDialog);
 
 
 
@@ -112,6 +112,8 @@ namespace ScienceChecklist {
 					WindowNode.AddValue( "CompactLeft", W.Value.CompactLeft ); 
 					WindowNode.AddValue( "Visible", W.Value.Visible );
 					WindowNode.AddValue( "Compacted", W.Value.Compacted );
+					WindowNode.AddValue( "FilterText", W.Value.FilterText );
+					WindowNode.AddValue( "FilterMode", W.Value.FilterMode.ToString( ) );
 				}
 			}
 
@@ -130,7 +132,7 @@ namespace ScienceChecklist {
 			CompleteWithoutRecovery =		false;
 			CheckDebris =					false;
 			AllFilter =						true;
-			HideExperimentResultsDialog =	false;
+//			HideExperimentResultsDialog =	false;
 
 
 
@@ -168,10 +170,10 @@ namespace ScienceChecklist {
 					if( V != null )
 						AllFilter = bool.Parse( V );
 
-					V = settings.GetValue("HideExperimentResultsDialog");
+/*					V = settings.GetValue("HideExperimentResultsDialog");
 					if (V != null)
 						HideExperimentResultsDialog = bool.Parse(V);
-
+*/
 
 					var windowSettings = root.GetNode( "Windows" );
 					if( windowSettings == null ) return;
@@ -220,6 +222,15 @@ namespace ScienceChecklist {
 									V = WindowNode.GetValue( "Compacted" );
 									if( V != null )
 										NewWindowSetting.Compacted = bool.Parse( V );
+
+									V = WindowNode.GetValue( "FilterText" );
+									if( V != null )
+										NewWindowSetting.FilterText = V;
+
+									V = WindowNode.GetValue( "Filtermode" );
+									if( V != null )
+										NewWindowSetting.FilterMode = (DisplayMode)Enum.Parse( typeof( DisplayMode ), V, true );
+
 
 									_windowSettings[ Scene ][ NewWindowSetting.Name ] = NewWindowSetting;
 								}

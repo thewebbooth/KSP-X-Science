@@ -12,6 +12,8 @@ namespace ScienceChecklist
 	class WindowSettings
 	{
 		public string Name;
+		public string FilterText;
+		public DisplayMode FilterMode;
 		public int Top;
 		public int Left;
 		public int CompactTop;
@@ -22,6 +24,8 @@ namespace ScienceChecklist
 		public WindowSettings( )
 		{
 			Name = "";
+			FilterText = "";
+			FilterMode = DisplayMode.Unlocked;
 			Top = 40;
 			Left = 40;
 			CompactTop = 40;

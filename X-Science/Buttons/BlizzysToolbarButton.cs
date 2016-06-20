@@ -1,16 +1,37 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace ScienceChecklist.Buttons {
-	internal sealed class BlizzysToolbarButton : IToolbarButton {
+
+
+namespace ScienceChecklist
+{
+	internal sealed class BlizzysToolbarButton : IToolbarButton
+	{
+		private IButton					_button;
+		private bool					_open;
+		private string					_Namespace;
+		private string					_ButtonId;
+		private string					_ButtonToolTip;
+		private string					_ButtonText;
+		private string					_TexturePath;
+		private GameScenesVisibility	_Visibility;
+		private readonly Logger 		_logger;
+
+
 		/// <summary>
 		/// Creates a new instance of the BlizzysToolbarButton class.
 		/// </summary>
-		public BlizzysToolbarButton () {
+		public BlizzysToolbarButton( string Namespace, string ButtonId, string ButtonToolTip, string ButtonText, string TexturePath, GameScenesVisibility Visibility )
+		{
 			_logger = new Logger(this);
+			_Namespace = Namespace;
+			_ButtonId = ButtonId;
+			_ButtonToolTip = ButtonToolTip;
+			_ButtonText = ButtonText;
+			_TexturePath = TexturePath;
+			_Visibility = Visibility;
 		}
+
+
 
 		/// <summary>
 		/// Called when the button is toggled on.
@@ -41,21 +62,11 @@ namespace ScienceChecklist.Buttons {
 				return;
 			}
 
-			_button = ToolbarManager.Instance.add("ScienceChecklist", "button");
-			_button.ToolTip = "[x] Science!";
-			_button.Text = "[x] Science!";
-
-			const string texturePath = "ScienceChecklist/icons/icon-small.png";
-
-			if (!GameDatabase.Instance.ExistsTexture(texturePath)) {
-				var icon = TextureHelper.FromResource("ScienceChecklist.icons.icon-small.png", 24, 24);
-				var ti = new GameDatabase.TextureInfo( null, icon, false, true, true );
-				ti.name = texturePath;
-				GameDatabase.Instance.databaseTexture.Add(ti);
-			}
-
-			_button.TexturePath = texturePath;
-			_button.Visibility = new GameScenesVisibility(GameScenes.SPACECENTER, GameScenes.EDITOR, GameScenes.FLIGHT, GameScenes.TRACKSTATION);
+			_button = ToolbarManager.Instance.add( _Namespace, _ButtonId );
+			_button.ToolTip = _ButtonToolTip;
+			_button.Text = _ButtonText;
+			_button.TexturePath = _TexturePath;
+			_button.Visibility = _Visibility;
 			_button.OnClick += OnClick;
 			_button.Enabled = true;
 		}
@@ -101,8 +112,21 @@ namespace ScienceChecklist.Buttons {
 			_open = false;
 		}
 
+		public void SetEnabled( )
+		{
+//			this.Log( "Launcher Button Enabled" );
+			_button.Enabled = true;
+		}
 
-
+		public void SetDisabled( )
+		{
+//			this.Log( "Launcher Button Disabled" );
+			_button.Enabled = false;
+		}
+		public bool IsEnabled( )
+		{
+			return _button.Enabled;
+		}
 
 		/// <summary>
 		/// Raises the Open event.
@@ -123,10 +147,5 @@ namespace ScienceChecklist.Buttons {
 				Close(this, e);
 			}
 		}
-
-		private IButton _button;
-		private bool _open;
-
-		private readonly Logger _logger;
 	}
 }

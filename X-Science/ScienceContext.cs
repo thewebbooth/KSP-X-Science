@@ -233,14 +233,14 @@ namespace ScienceChecklist
 
 
 			// Do we have Kerbin
-				foreach( var body in _bodyList )
+			foreach( var body in _bodyList )
+			{
+				if( body.Value.Name == "Kerbin" )
 				{
-					if( body.Value.Name == "Kerbin" )
-					{
-						_kerbin = body.Key;
-						break;
-					}
+					_kerbin = body.Key;
+					break;
 				}
+			}
 
 
 

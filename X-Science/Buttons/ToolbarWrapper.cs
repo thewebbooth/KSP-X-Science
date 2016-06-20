@@ -29,7 +29,10 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-namespace ScienceChecklist.Buttons {
+
+
+namespace ScienceChecklist
+{
 	/**********************************************************\
 *          --- DO NOT EDIT BELOW THIS COMMENT ---          *
 *                                                          *

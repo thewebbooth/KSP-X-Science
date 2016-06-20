@@ -1,26 +1,32 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using UnityEngine;
 using KSP.UI.Screens;
 
 
 
-namespace ScienceChecklist.Buttons {
+namespace ScienceChecklist
+{
 	/// <summary>
 	/// A button that is rendered to the KSP toolbar.
 	/// </summary>
-	public sealed class AppLauncherButton : IToolbarButton {
+	public sealed class AppLauncherButton : IToolbarButton
+	{
+		public Texture2D						_Texture;
+		public ApplicationLauncher.AppScenes	_Visibility;
+
+
 		/// <summary>
 		/// Creates a new instance of the AppLauncherButton class.
 		/// </summary>
-		public AppLauncherButton () {
+		public AppLauncherButton( Texture2D Texture, ApplicationLauncher.AppScenes Visibility )
+		{
 			_logger = new Logger(this);
+			_Texture = Texture;
+			_Visibility = Visibility;
 		}
 
-		#region EVENTS
+
 
 		/// <summary>
 		/// Called when the button is toggled on.
@@ -31,26 +37,22 @@ namespace ScienceChecklist.Buttons {
 		/// </summary>
 		public event EventHandler Close;
 
-		#endregion
 
-		#region METHODS (PUBLIC)
+
+
 		
 		/// <summary>
 		/// Adds the button to the KSP toolbar.
 		/// </summary>
-		public void Add () {
+		public void Add( )
+		{
 //			_logger.Trace("Add");
 			if (_button != null) {
 				_logger.Debug("Button already added");
 				return;
 			}
 
-			var texture = new Texture2D(38, 38, TextureFormat.ARGB32, false);
-			
-			var iconStream = Assembly.GetExecutingAssembly ().GetManifestResourceStream ("ScienceChecklist.icons.icon.png").ReadToEnd ();
-			
-			texture.LoadImage(iconStream);
-			texture.Apply();
+
 
 //			_logger.Info("Adding button");
 			_button = ApplicationLauncher.Instance.AddModApplication(
@@ -60,13 +62,8 @@ namespace ScienceChecklist.Buttons {
 				null,
 				null,
 				null,
-				ApplicationLauncher.AppScenes.SPACECENTER |
-				ApplicationLauncher.AppScenes.FLIGHT |
-				ApplicationLauncher.AppScenes.MAPVIEW |
-				ApplicationLauncher.AppScenes.VAB |
-				ApplicationLauncher.AppScenes.SPH |
-				ApplicationLauncher.AppScenes.TRACKSTATION,
-				texture);
+				_Visibility,
+				_Texture);
 		}
 
 		/// <summary>
@@ -97,25 +94,43 @@ namespace ScienceChecklist.Buttons {
 //			_logger.Debug( "SetOff" );
 		}
 
-		#endregion
+		public void SetEnabled( )
+		{
+//			this.Log( "Launcher Button Enabled" );
+			_button.Enable( false );
+		}
 
-		#region METHODS (PRIVATE)
+		public void SetDisabled( )
+		{
+//			this.Log( "Launcher Button Disabled" );
+			_button.Disable( false );
+		}
+
+		public bool IsEnabled( )
+		{
+			return _button.IsEnabled;
+		}
+
 
 		/// <summary>
 		/// Called when the button is toggled on.
 		/// </summary>
-		private void OnToggleOn () {
+		private void OnToggleOn( )
+		{
 //			_logger.Trace("OnToggleOn");
-			OnOpen(EventArgs.Empty);
+			OnOpen( EventArgs.Empty );
 		}
 
 		/// <summary>
 		/// Called when the button is toggled off.
 		/// </summary>
-		private void OnToggleOff () {
+		private void OnToggleOff( )
+		{
 //			_logger.Trace("OnToggleOff");
-			OnClose(EventArgs.Empty);
+			OnClose( EventArgs.Empty );
 		}
+
+
 
 		/// <summary>
 		/// Raises the Open event.
@@ -139,13 +154,11 @@ namespace ScienceChecklist.Buttons {
 			}
 		}
 
-		#endregion
 
-		#region FIELDS
 
 		private ApplicationLauncherButton _button;
 		private readonly Logger _logger;
 
-		#endregion
+
 	}
 }
