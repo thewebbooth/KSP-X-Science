@@ -252,13 +252,16 @@ On ScienceExperiment
 					{
 						if( BodyList.Contains( Sci.BodyList[ Sci.Kerbin ] ) ) // If we haven't filtered it out
 						{
-//							_logger.Trace( "BabyBiomes " + experiment.experimentTitle + ": " + sitMask );
-							foreach( var kscBiome in Sci.KscBiomes ) // Ew.
-								exps.Add( new ScienceInstance( experiment, new Situation( Sci.BodyList[ Sci.Kerbin ], ExperimentSituations.SrfLanded, "Shores", kscBiome ), Sci ) );
+							if( SituationList.Contains( ExperimentSituations.SrfLanded ) )
+							{
+//								_logger.Trace( "BabyBiomes " + experiment.experimentTitle + ": " + sitMask );
+								foreach( var kscBiome in Sci.KscBiomes ) // Ew.
+									exps.Add( new ScienceInstance( experiment, new Situation( Sci.BodyList[ Sci.Kerbin ], ExperimentSituations.SrfLanded, "Shores", kscBiome ), Sci ) );
+							}
 						}
 					}
 				}
-				}
+			}
 
 
 				// Done replace the old list with the new one
@@ -327,7 +330,7 @@ On ScienceExperiment
 				IList<ScienceInstance> RemainingExperiments = new List<ScienceInstance>( );
 				RemainingExperiments = query.Where( x => !x.IsCollected ).ToList( );
 				CompleteCount = TotalCount - RemainingExperiments.Count( );
-				TotalScience = RemainingExperiments.Sum( x => x.TotalScience ) + RemainingExperiments.Sum( x => x.OnboardScience ); ;
+				TotalScience = RemainingExperiments.Sum( x => x.TotalScience ) - RemainingExperiments.Sum( x => x.OnboardScience ); ;
 				CompletedScience = RemainingExperiments.Sum( x => x.CompletedScience );
 			}
 			else // Normal mode, must recover/transmit to KSC

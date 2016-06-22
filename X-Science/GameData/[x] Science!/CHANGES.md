@@ -1,6 +1,25 @@
 [x] Science!
 ============
 
+4.20
+---
+22-June-2016 Built against KSP V1.1.3
+* Fix for science.cfg not applying to KSC baby biomes
+* Fix for remaining science tooltip.
+
+4.19
+---
+20-June-2016 Built against KSP V1.1.2
+* New button code to handle multiple buttons - ready for V5
+* New artwork for icons
+* New title bar icons
+* Compact mode use same icons as maximised mode
+* Separate settings window
+* New help window
+* New resizable window class - not on main window
+* Science totals tool tip contains onboard science
+* Filter text + state in settings
+
 4.18
 ---
 24-May-2016 Built against KSP V1.1.2

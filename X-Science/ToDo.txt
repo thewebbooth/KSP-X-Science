@@ -17,8 +17,8 @@
 [DONE] Science totals tool tip doesn't include partially collected science
 [DONE] Filter text + state
 [DONE] Finish icons
-
-
+[DONE] Is there any way to avoid the KSC baby biomes in science.cfg? I use AvoidSrfLanded but the KSC biomes still show up.
+[DONE] Remaining science tool tip - adding onboard science not removing it
 
 
 * Window class config

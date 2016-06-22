@@ -72,8 +72,8 @@ namespace ScienceChecklist
             scrollPosition = GUILayout.BeginScrollView(scrollPosition);
             GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
 
-            GUILayout.Label("[x] Science! by Z-Key Aerospace and Bodrick.", labelStyle, GUILayout.ExpandWidth(true));
-            GUILayout.Space(20);
+			GUILayout.Label( "[x] Science! by Z-Key Aerospace and Bodrick.", sectionStyle, GUILayout.ExpandWidth( true ) );
+            GUILayout.Space(30);
             GUILayout.Label("About", sectionStyle, GUILayout.ExpandWidth(true));
 			GUILayout.Label( "[x] Science! creates a list of all possible science.  Use the list to find what is possible, to see what is left to accomplish, to decide where your Kerbals are going next.", labelStyle, GUILayout.ExpandWidth( true ) );
 			GUILayout.Label( "The four filter buttons at the bottom of the window are", sectionStyle, GUILayout.ExpandWidth( true ) );
