@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 
 
@@ -11,7 +7,7 @@ namespace ScienceChecklist {
 	/// A location in which experiments may be conducted.
 	/// Many experiments may, perhaps, be conducted.  Those create "ScienceInstance"s
 	/// </summary>
-	internal sealed class Situation {
+	public sealed class Situation {
 		/// <summary>
 		/// Creates a new instance of the Situation class.
 		/// </summary>
@@ -100,7 +96,7 @@ namespace ScienceChecklist {
 			return Regex.Replace(biome ?? string.Empty, "((?<=[a-z])[A-Z]|[A-Z](?=[a-z]))", " $1").Replace("  ", " ").Trim();
 		}
 
-		private readonly Body        _body;
+		private readonly Body				  _body;
 		private readonly ExperimentSituations _situation;
 		private readonly string               _biome;
 		private readonly string               _subBiome;

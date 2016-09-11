@@ -53,43 +53,84 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Body.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BodySituationFilter.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Buttons\UnifiedButton.cs" />
-    <Compile Include="CelestialBodyFilters.cs" />
-    <Compile Include="BodySituationFilter.cs" />
-    <Compile Include="DMagic.cs" />
-    <Compile Include="HelpWindow.cs" />
+    <Compile Include="CelestialBodyFilters.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Config.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DisplayMode.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ExperimentFilter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="GameHelper.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HelpWindow.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Lib\Logging.cs" />
     <Compile Include="Lib\Utilities.cs" />
     <Compile Include="Lib\Window.cs" />
-    <Compile Include="SettingsWindow.cs" />
-    <Compile Include="VesselExperiments.cs" />
-    <Compile Include="WindowSettings.cs" />
-    <Compile Include="xScienceEventHandler.cs" />
-    <Compile Include="ScienceContext.cs" />
-    <Compile Include="Body.cs" />
     <Compile Include="Buttons\BlizzysToolbarButton.cs" />
     <Compile Include="Buttons\IToolbarButton.cs" />
-    <Compile Include="Config.cs" />
-    <Compile Include="DisplayMode.cs" />
-    <Compile Include="ScienceInstance.cs" />
-    <Compile Include="ExperimentFilter.cs" />
-    <Compile Include="GameHelper.cs" />
+    <Compile Include="NewSituationData.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Noise.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="ScienceChecklistAddon.cs" />
-    <Compile Include="ScienceWindow.cs" />
-    <Compile Include="Situation.cs" />
     <Compile Include="Lib\StreamEx.cs" />
     <Compile Include="Lib\TextureHelper.cs" />
     <Compile Include="Buttons\AppLauncherButton.cs" />
     <Compile Include="Lib\Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Buttons\ToolbarWrapper.cs" />
-    <Compile Include="UnlockedInstrumentList.cs" />
+    <Compile Include="ScienceContext.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ScienceInstance.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ScienceWindow.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SettingsWindow.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Situation.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="StatusWindow.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UnlockedInstrumentList.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="WindowSettings.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="xScienceEventHandler.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <None Include="GameData\[x] Science!\CHANGES.md" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="icons\resize.png" />
     <EmbeddedResource Include="icons\close.png" />
     <EmbeddedResource Include="icons\help.png" />
+    <EmbeddedResource Include="icons\icon-status-small.png" />
+    <EmbeddedResource Include="icons\icon-status.png" />
     <Content Include="ToDo.txt" />
     <EmbeddedResource Include="icons\scienceCompleteCompact.png" />
     <EmbeddedResource Include="icons\scienceProgressCompact.png" />

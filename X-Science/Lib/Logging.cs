@@ -1,5 +1,5 @@
 ﻿/**
- * Utilities.cs
+ * Logging.cs
  * 
  * Thunder Aerospace Corporation's library for the Kerbal Space Program, by Taranis Elsu
  * 
@@ -23,59 +23,59 @@
  * Note that Thunder Aerospace Corporation is a ficticious entity created for entertainment
  * purposes. It is in no way meant to represent a real entity. Any similarity to a real entity
  * is purely coincidental.
- *//*
+ */
+
 using UnityEngine;
 
 
 
 namespace ScienceChecklist
 {
-    public static class Logging
-    {
-        public static void Log(this UnityEngine.Object obj, string message)
-        {
-            Debug.Log("-INFO- " + obj.GetType().FullName + "[" + obj.GetInstanceID().ToString("X") + "][" + Time.time.ToString("0.00") + "]: " + message, obj);
-        }
+ public static class Logging
+ {
+	 public static void Log(this UnityEngine.Object obj, string message)
+	 {
+		 Debug.Log("-INFO- " + obj.GetType().FullName + "[" + obj.GetInstanceID().ToString("X") + "][" + Time.time.ToString("0.00") + "]: " + message, obj);
+	 }
 
-        public static void LogWarning(this UnityEngine.Object obj, string message)
-        {
-            Debug.LogWarning("-WARNING- " + obj.GetType().FullName + "[" + obj.GetInstanceID().ToString("X") + "][" + Time.time.ToString("0.00") + "]: " + message, obj);
-        }
+	 public static void LogWarning(this UnityEngine.Object obj, string message)
+	 {
+		 Debug.LogWarning("-WARNING- " + obj.GetType().FullName + "[" + obj.GetInstanceID().ToString("X") + "][" + Time.time.ToString("0.00") + "]: " + message, obj);
+	 }
 
-        public static void LogError(this UnityEngine.Object obj, string message)
-        {
-            Debug.LogError("-ERROR- " + obj.GetType().FullName + "[" + obj.GetInstanceID().ToString("X") + "][" + Time.time.ToString("0.00") + "]: " + message, obj);
-        }
+	 public static void LogError(this UnityEngine.Object obj, string message)
+	 {
+		 Debug.LogError("-ERROR- " + obj.GetType().FullName + "[" + obj.GetInstanceID().ToString("X") + "][" + Time.time.ToString("0.00") + "]: " + message, obj);
+	 }
 
-        public static void Log(this System.Object obj, string message)
-        {
-            Debug.Log("-INFO- " + obj.GetType().FullName + "[" + obj.GetHashCode().ToString("X") + "][" + Time.time.ToString("0.00") + "]: " + message);
-        }
+	 public static void Log(this System.Object obj, string message)
+	 {
+		 Debug.Log("-INFO- " + obj.GetType().FullName + "[" + obj.GetHashCode().ToString("X") + "][" + Time.time.ToString("0.00") + "]: " + message);
+	 }
 
-        public static void LogWarning(this System.Object obj, string message)
-        {
-            Debug.LogWarning("-WARNING- " + obj.GetType().FullName + "[" + obj.GetHashCode().ToString("X") + "][" + Time.time.ToString("0.00") + "]: " + message);
-        }
+	 public static void LogWarning(this System.Object obj, string message)
+	 {
+		 Debug.LogWarning("-WARNING- " + obj.GetType().FullName + "[" + obj.GetHashCode().ToString("X") + "][" + Time.time.ToString("0.00") + "]: " + message);
+	 }
 
-        public static void LogError(this System.Object obj, string message)
-        {
-            Debug.LogError("-ERROR- " + obj.GetType().FullName + "[" + obj.GetHashCode().ToString("X") + "][" + Time.time.ToString("0.00") + "]: " + message);
-        }
+	 public static void LogError(this System.Object obj, string message)
+	 {
+		 Debug.LogError("-ERROR- " + obj.GetType().FullName + "[" + obj.GetHashCode().ToString("X") + "][" + Time.time.ToString("0.00") + "]: " + message);
+	 }
 
-        public static void Log(string context, string message)
-        {
-            Debug.Log("-INFO- " + context + "[][" + Time.time.ToString("0.00") + "]: " + message);
-        }
+	 public static void Log(string context, string message)
+	 {
+		 Debug.Log("-INFO- " + context + "[][" + Time.time.ToString("0.00") + "]: " + message);
+	 }
 
-        public static void LogWarning(string context, string message)
-        {
-            Debug.LogWarning("-WARNING- " + context + "[][" + Time.time.ToString("0.00") + "]: " + message);
-        }
+	 public static void LogWarning(string context, string message)
+	 {
+		 Debug.LogWarning("-WARNING- " + context + "[][" + Time.time.ToString("0.00") + "]: " + message);
+	 }
 
-        public static void LogError(string context, string message)
-        {
-            Debug.LogError("-ERROR- " + context + "[][" + Time.time.ToString("0.00") + "]: " + message);
-        }
-    }
+	 public static void LogError(string context, string message)
+	 {
+		 Debug.LogError("-ERROR- " + context + "[][" + Time.time.ToString("0.00") + "]: " + message);
+	 }
+ }
 }
-*/

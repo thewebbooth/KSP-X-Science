@@ -1,5 +1,4 @@
-﻿
-[DONE] Event handler and no coroutines
+﻿[DONE] Event handler and no coroutines
 [DONE] Window positions
 [DONE] Fix long text
 [DONE] Summary tooltip
@@ -20,23 +19,69 @@
 [DONE] Is there any way to avoid the KSC baby biomes in science.cfg? I use AvoidSrfLanded but the KSC biomes still show up.
 [DONE] Remaining science tool tip - adding onboard science not removing it
 
+[DONE] Passing parent so add eventhandler to parent
+[DONE] Reorganise parent into more sensible sections.
+[DONE] Give Event handler hooks.
+[DONE] Event handler just re-throws events to who ever is listening.
+[DONE] Pass Event handler both windows.
+[DONE] Windows hook the events they need.
+
+[DONE] Move AllScienceInstances out of ExperimentFilter
+[DONE] Also the 2 refresh functions
+[DONE] Move config events to config object.
+[DONE] Regularly tell things the current situation
+
+[DONE] Event handler to recalculate science status as required.
+[DONE] Add one filter to each window
+[DONE] Move biome detection out of window
+[DONE] Clear blue water between science and GUI
+[DONE] Click to run experiment
+[DONE] Overide config settings in filter.
+[DONE] Hide when done/instrument is full/cant be run
+[DONE] Status window is always in Lablander mode
+[DONE] Stop time
+[DONE] Play noise
+[DONE] Grey buttons should be labels
+[DONE] Cache available experiments list in status window.
+
+Visibility is weird.
+Config settings for new window
+img/sprite class - Load all in one place
+Remove buttons from status window
+
+Green bar
+rename window
+Dont show results window.
+
+
+
+Need red icons
+Pop icon when necessary.
+Put each icon into class
+Give icon to own window
+
+
+
+
 
 * Window class config
 * Window width
 * Store pre-calculated content where possible.
-* img/sprite class - Load all in one place
 
 
 
-* Clear blue water between science and GUI
+
+
 * Difficult science filter
 
 
 
 
-
-
-
+Remove foreach and Linq
+---------------------------------------------------
+Nuke Linq - 9 files // 8 Files
+Nuke foreach - 23 instances // 8 instances
+---------------------------------------------------
 
 
 /*
@@ -170,3 +215,49 @@ recovery@KerbinFlew
 
 
 -------------------------------------------------------------------------------
+
+
+
+
+
+
+
+ accepted
+	
+
+Make a new EventArgs class such as:
+
+    public class ListEventArgs : EventArgs
+    {
+        public List<string> Data { get; set; }
+        public ListEventArgs(List<string> data)
+        {
+            Data = data;
+        }
+    }
+
+And make your event as this:
+
+    public event EventHandler<ListEventArgs> NewFileAdded;
+
+Add a firing method:
+
+protected void OnNewFileAdded(List<string> data)
+{
+    var localCopy = NewFileAdded;
+    if (localCopy != null)
+    {
+        localCopy(this, new ListEventArgs(data));
+    }
+}
+
+And when you want to handle this event:
+
+myObj.NewFileAdded += new EventHandler<ListEventArgs>(myObj_NewFileAdded);
+
+The handler method would appear like this:
+
+public void myObj_NewFileAdded(object sender, ListEventArgs e)
+{
+       // Do what you want with e.Data (It is a List of string)
+}

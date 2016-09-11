@@ -2,9 +2,9 @@
 
 
 
-namespace ScienceChecklist
+namespace ZKeyScience
 {
-	public sealed class Body
+	internal sealed class Body
 	{
 //		private readonly Logger	_logger;
 		private string[ ] _biomes;
@@ -140,10 +140,10 @@ namespace ScienceChecklist
 				Progress.Save( node );
 
 				ConfigNode[] P = node.GetNodes( "Progress" );
-				if( P.Length > 0 )
+				if( P.Count( ) > 0 )
 				{
 					ConfigNode[] B = P[ 0 ].GetNodes( _name );
-					if( B.Length > 0 )
+					if( B.Count( ) > 0 )
 					{
 						var V = B[ 0 ].GetValue( "reached" );
 						if( !string.IsNullOrEmpty( V ) )

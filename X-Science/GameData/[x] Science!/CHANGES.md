@@ -1,6 +1,12 @@
 [x] Science!
 ============
 
+5.0
+---
+11-Sept-2016 Built against KSP V1.1.3
+* New window a bit like Science Alert
+
+
 4.20
 ---
 22-June-2016 Built against KSP V1.1.3

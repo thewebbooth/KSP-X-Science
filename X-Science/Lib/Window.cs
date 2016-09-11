@@ -1,5 +1,5 @@
 ﻿/**
- * Utilities.cs
+ * Windows.cs
  * 
  * Thunder Aerospace Corporation's library for the Kerbal Space Program, by Taranis Elsu
  * 
@@ -153,7 +153,7 @@ namespace ScienceChecklist
             return windowConfig;
         }*/
 
-        public virtual void DrawWindow()
+        public virtual void DrawWindow( )
         {
             if (visible)
             {
@@ -310,7 +310,7 @@ namespace ScienceChecklist
         }
 		private void OnClose( EventArgs e )
 		{
-			_logger.Trace( "Window Closed" );
+//			_logger.Trace( "Window Closed" );
 			if( WindowClosed != null )
 				WindowClosed( this, e );
 		}

@@ -1,37 +1,55 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 
+// This class is a junction box for events concerning science related stuff.
+// Events tend to happen in flurries.  This deals with them and tries to prevent the system slowing down
+// because of event spamming.
+
+// There are 3 events.
+// *	Filter update is the most basic, caused by changes to the current ship
+// *	Experiment update is caused by experiments running, science being recovered or by science being lost in explosions.
+// *	Full Updates are caused by researcing new rocket parts, upgrading KSC or visiting new bodies.
 
 namespace ScienceChecklist
 {
-	class xScienceEventHandler
+	public class xScienceEventHandler
 	{
-		private DateTime				_nextSituationUpdate;
-		private DateTime?				_nextExperimentUpdate;
-		private bool					_mustDoFullRefresh;
-		private bool					_filterRefreshPending;
-//		private bool					_vExperimentsRefreshPending;
-		private	ScienceChecklistAddon	_parent;
-		private ScienceWindow			_window;
+		// Use UpdateExperiments() to set this
+			private DateTime?				_nextExperimentUpdate;
+			private bool					_mustDoFullRefresh;
 
+
+		// For smaller updates just set to true
+			private DateTime?				_nextFilterCheck;
+			private bool					_filterRefreshPending; // Set to true for a quick refresh of the science lists
+
+
+		// Anyone can hook these to get notified
+			public event EventHandler					FilterUpdateEvent;
+			public event EventHandler					ExperimentUpdateEvent;
+			public event EventHandler					FullUpdateEvent;
+			public event EventHandler<NewSituationData> SituationChanged;
+
+			private	ScienceChecklistAddon	_parent;
+			private Situation				_currentSituation;
+//			private Logger					_logger;
+			
 
 
 		// Constructor
-		public xScienceEventHandler( ScienceChecklistAddon Parent, ScienceWindow Window )
+		public xScienceEventHandler( ScienceChecklistAddon Parent )
 		{
+//			_logger = new Logger( this );
+//			_logger.Trace( "xScienceEventHandler" );
 			_parent = Parent;
-			_window = Window;
-			_nextSituationUpdate = DateTime.Now;
-			_nextExperimentUpdate = DateTime.Now;
-			_mustDoFullRefresh = true;
-			_filterRefreshPending = true;
-//			_vExperimentsRefreshPending = true;
+			
+			_nextExperimentUpdate =		DateTime.Now;
+			_nextFilterCheck =			DateTime.Now;
+			_mustDoFullRefresh =		true;
+			_filterRefreshPending =		true;
 
 
-			GameEvents.onGameSceneSwitchRequested.Add( new EventData<GameEvents.FromToAction<GameScenes, GameScenes>>.OnEvent( this.OnGameSceneSwitch ) );
 			GameEvents.onVesselWasModified.Add( new EventData<Vessel>.OnEvent( this.VesselWasModified ) );
 			GameEvents.onVesselChange.Add( new EventData<Vessel>.OnEvent( this.VesselChange ) );
 			GameEvents.onEditorShipModified.Add( new EventData<ShipConstruct>.OnEvent( this.EditorShipModified ) );
@@ -46,70 +64,125 @@ namespace ScienceChecklist
 
 			GameEvents.onDominantBodyChange.Add( new EventData<GameEvents.FromToAction<CelestialBody, CelestialBody>>.OnEvent( this.DominantBodyChange ) );
 			GameEvents.onVesselSOIChanged.Add( new EventData<GameEvents.HostedFromToAction<Vessel, CelestialBody>>.OnEvent( this.VesselSOIChanged ) );
+
+			_parent.Config.CheckDebrisChanged += ( s, e ) => CheckDebrisSettingChanged( );
 		}
 
 
 
+		// Called by the addon (_parent) on Update() - which happens every Unity frame.
 		public void Update( )
 		{
-			if( ResearchAndDevelopment.Instance == null )
-				return;
-
-			if( PartLoader.Instance == null )
-				return;
-
-			if( _nextSituationUpdate < DateTime.Now )
-			{
-				_nextSituationUpdate = DateTime.Now.AddSeconds(0.5);
-				_window.RecalculateSituation( );
-			}
+			UpdateSituation( );
 			UpdateExperiments( );
 			RefreshFilter( );
-//			RefreshVesselExperiments();
+		}
+
+
+
+		private int _lastDataCount;
+		private DateTime _nextSituationUpdate = DateTime.Now;
+		public void UpdateSituation( )
+		{
+			if( _nextSituationUpdate < DateTime.Now )
+			{
+				_nextSituationUpdate = DateTime.Now.AddSeconds( 0.5 );
+				RecalculateSituation( );
+			}
+		}
+
+
+
+		// Recalculates the current situation of the active vessel.
+		private void RecalculateSituation( )
+		{
+//_logger.Trace( "RecalculateSituation Start" );
+
+			var vessel = FlightGlobals.ActiveVessel;
+			if( vessel == null )
+			{
+				if( _currentSituation != null )
+					_currentSituation = null;
+				return;
+			}
+
+			var body = vessel.mainBody;
+			var situation = ScienceUtil.GetExperimentSituation( vessel );
+
+			var biome = ScienceUtil.GetExperimentBiome( body, vessel.latitude, vessel.longitude );
+			var subBiome = string.IsNullOrEmpty( vessel.landedAt )
+				? null
+				: Vessel.GetLandedAtString( vessel.landedAt ).Replace( " ", "" );
+
+			var dataCount = vessel.FindPartModulesImplementing<IScienceDataContainer>( ).Sum( x => x.GetData( ).Length );
+
+			if( _lastDataCount != dataCount )
+			{
+//				_logger.Trace( "Collected new science!" );
+				_lastDataCount = dataCount;
+				ScheduleExperimentUpdate( );
+			}
+
+			if(
+				_currentSituation != null &&
+				_currentSituation.Biome == biome &&
+				_currentSituation.ExperimentSituation == situation &&
+				_currentSituation.Body.CelestialBody == body &&
+				_currentSituation.SubBiome == subBiome
+			)
+			{
+				return;
+			}
+			var Body = new Body( body );
+			_currentSituation = new Situation( Body, situation, biome, subBiome );
+
+			if( SituationChanged != null )
+				SituationChanged( this, new NewSituationData( Body, situation, biome, subBiome ) );
+//_logger.Trace( "RecalculateSituation Done" );
 		}
 
 
 
 		private void UpdateExperiments( )
 		{
-			if( _window.IsVisible && _nextExperimentUpdate != null && _nextExperimentUpdate.Value < DateTime.Now )
+			if( _nextExperimentUpdate != null && _nextExperimentUpdate.Value < DateTime.Now )
 			{
 				if( _mustDoFullRefresh )
-					_window.RefreshExperimentCache( );
+				{
+					_parent.Science.Reset( );
+					if( FullUpdateEvent != null )
+						FullUpdateEvent( this, EventArgs.Empty );
+				}
 				else
-					_window.UpdateExperiments( );
+				{
+					_parent.Science.UpdateAllScienceInstances( );
+					if( ExperimentUpdateEvent != null )
+						ExperimentUpdateEvent( this, EventArgs.Empty );
+				}
 				_nextExperimentUpdate = null;
 				_mustDoFullRefresh = false;
+				_filterRefreshPending = true; // Must do a filter change if we updated some science
 			}
 		}
-
+		
 
 
 		private void RefreshFilter( )
 		{
-			var nextCheck = DateTime.Now;
-			if( _window.IsVisible && _filterRefreshPending && DateTime.Now > nextCheck )
+			if( _filterRefreshPending && DateTime.Now > _nextFilterCheck )
 			{
-				nextCheck = DateTime.Now.AddSeconds( 0.5 );
-				_window.RefreshFilter( );
+				_nextFilterCheck = DateTime.Now.AddSeconds( 0.5 );
+				if( FilterUpdateEvent != null )
+					FilterUpdateEvent( this, EventArgs.Empty );
 				_filterRefreshPending = false;
 			}
 		}
 
-/*		private void RefreshVesselExperiments()
-		{
-			if (_window.IsVisible && _vExperimentsRefreshPending)
-			{
-				_window.RefreshVesselExperiments();
-				_vExperimentsRefreshPending = false;
-			}
-		}*/
 
 
-
-		/// <summary>
-		/// Schedules a full experiment update in 1 second.
-		/// </summary>
+		// Schedules a full experiment update in 1 second.
+		// In addition to the events we hook, this is also called bu the parent when
+		// the system has been sleeping and wakes up.  Eg when the window is made visible.
 		public void ScheduleExperimentUpdate( bool FullRefresh = false, int AddTime = 1 )
 		{
 			_nextExperimentUpdate = DateTime.Now.AddSeconds( AddTime );
@@ -118,103 +191,106 @@ namespace ScienceChecklist
 		}
 
 
-		private void OnGameSceneSwitch( GameEvents.FromToAction<GameScenes, GameScenes> Data )
-		{
-			if( GameHelper.AllowWindow( Data.from ) )
+
+
+		// Something happened to the current vessel so we should do a check of the applied filters
+			private void VesselWasModified( Vessel V )
 			{
-				WindowSettings W =_window.BuildSettings( );
-				Config.SetWindowConfig( W, Data.from );
+//				_logger.Trace( "Callback: VesselWasModified" );
+				_filterRefreshPending = true;
 			}
 
-			if( GameHelper.AllowWindow( Data.to ) )
+			private void VesselChange( Vessel V )
 			{
-				WindowSettings W = Config.GetWindowConfig( "ScienceCheckList", Data.to );
-				_window.ApplySettings( W );
+//				_logger.Trace( "Callback: VesselChange" );
+				_filterRefreshPending = true;
 			}
 
-//			_vExperimentsRefreshPending = true;
-		}
-
-
-		private void VesselWasModified( Vessel V )
-		{
-			//			_logger.Trace( "Callback: VesselWasModified" );
-			_filterRefreshPending = true;
-//			_vExperimentsRefreshPending = true;
-		}
-
-		private void VesselChange( Vessel V )
-		{
-			//			_logger.Trace( "Callback: VesselChange" );
-			_filterRefreshPending = true;
-//			_vExperimentsRefreshPending = true;
-		}
-
-		private void EditorShipModified( ShipConstruct S )
-		{
-			//			_logger.Trace( "Callback: EditorShipModified" );
-			_filterRefreshPending = true;
-		}
-
-		private void GameStateSave( ConfigNode C )
-		{
-			//			_logger.Trace( "Callback: GameStateSave" );
-			ScheduleExperimentUpdate( );
-		}
-
-		private void PartPurchased( AvailablePart P )
-		{
-			//			_logger.Trace( "Callback: PartPurchased" );
-			ScheduleExperimentUpdate( true );
-		}
-
-		private void TechnologyResearched( GameEvents.HostTargetAction<RDTech, RDTech.OperationResult> Data )
-		{
-			if( Data.target == RDTech.OperationResult.Successful )
+			private void EditorShipModified( ShipConstruct S )
 			{
-				//				_logger.Trace( "Callback: TechnologyResearched" );
+//				_logger.Trace( "Callback: EditorShipModified" );
+				_filterRefreshPending = true;
+			}
+
+
+
+		// Something happened to the ammount of science on vessels so we need to walk through the parts containg science
+		// and count it all again
+			private void GameStateSave( ConfigNode C )
+			{
+//				_logger.Trace( "Callback: GameStateSave" );
+				ScheduleExperimentUpdate( );
+			}
+
+			private void ScienceChanged( float V, TransactionReasons R )
+			{
+//				_logger.Trace( "Callback: ScienceChanged" );
+				ScheduleExperimentUpdate( );
+			}
+
+			private void ScienceRecieved( float V, ScienceSubject S, ProtoVessel P, bool F )
+			{
+//				_logger.Trace( "Callback: ScienceRecieved" );
+				ScheduleExperimentUpdate( );
+			}
+
+			private void VesselRename( GameEvents.HostedFromToAction<Vessel, string> Data )
+			{
+//				_logger.Trace( "Callback: VesselRename" );
+				ScheduleExperimentUpdate( );
+			}
+
+
+
+
+		// Something happened to the underling model of science.
+		// We visited a new body or bought some ship parts or unlocked a new building.
+		// We chuck everything away and start again
+		//
+		// Calling ScheduleExperimentUpdate with true
+			private void PartPurchased( AvailablePart P )
+			{
+//				_logger.Trace( "Callback: PartPurchased" );
 				ScheduleExperimentUpdate( true );
-            }
-			//			else
-			//				_logger.Trace( "Callback: Technology Research Failed" );
-		}
+			}
+
+			private void TechnologyResearched( GameEvents.HostTargetAction<RDTech, RDTech.OperationResult> Data )
+			{
+				if( Data.target == RDTech.OperationResult.Successful )
+				{
+//					_logger.Trace( "Callback: TechnologyResearched" );
+					ScheduleExperimentUpdate( true );
+				}
+//				else
+//					_logger.Trace( "Callback: Technology Research Failed" );
+			}
+
+			private void FacilityUpgrade( Upgradeables.UpgradeableFacility Data, int V )
+			{
+//				_logger.Trace( "Callback: KSP Facility Upgraded" );
+				ScheduleExperimentUpdate( true, 5 ); // 5 seconds.  Trying to avoid an exception.  The colliders list gets updated while we are looking at it.
+			}
+
+			private void DominantBodyChange( GameEvents.FromToAction<CelestialBody, CelestialBody> Data )
+			{
+//				_logger.Trace( "Callback: DominantBodyChange" );
+				ScheduleExperimentUpdate( true );
+			}
+
+			private void VesselSOIChanged( GameEvents.HostedFromToAction<Vessel, CelestialBody> Data )
+			{
+//				_logger.Trace( "Callback: VesselSOIChanged" );
+				ScheduleExperimentUpdate( true );
+			}
 
 
 
-		private void ScienceChanged( float V, TransactionReasons R )
-		{
-			//			_logger.Trace( "Callback: ScienceChanged" );
-			ScheduleExperimentUpdate( );
-        }
+			private void CheckDebrisSettingChanged( )
+			{
+//				_logger.Trace( "Callback: CheckDebrisSettingChanged" );
+				ScheduleExperimentUpdate( false );
+			}
 
-		private void ScienceRecieved( float V, ScienceSubject S, ProtoVessel P, bool F )
-		{
-			//			_logger.Trace( "Callback: ScienceRecieved" );
-			ScheduleExperimentUpdate( );
-		}
 
-		private void VesselRename( GameEvents.HostedFromToAction<Vessel, string> Data )
-		{
-			//			_logger.Trace( "Callback: VesselRename" );
-			ScheduleExperimentUpdate( );
-		}
-
-		private void FacilityUpgrade( Upgradeables.UpgradeableFacility Data, int V )
-		{
-			//			_logger.Trace( "Callback: KSP Facility Upgraded" );
-			ScheduleExperimentUpdate( true, 5 );
-		}
-
-		private void DominantBodyChange( GameEvents.FromToAction<CelestialBody, CelestialBody> Data )
-		{
-			//			_logger.Trace( "Callback: DominantBodyChange" );
-			ScheduleExperimentUpdate( true );
-		}
-
-		private void VesselSOIChanged( GameEvents.HostedFromToAction<Vessel, CelestialBody> Data )
-		{
-			//			_logger.Trace( "Callback: VesselSOIChanged" );
-			ScheduleExperimentUpdate( true );
-		}
 	} // End of class
 }

@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-
+﻿
 
 namespace ScienceChecklist {
 	/// <summary>
 	/// Enum to control which experiments should be displayed in the ScienceWindow.
 	/// </summary>
-	internal enum DisplayMode {
+	public enum DisplayMode {
 		/// <summary>
 		/// Only show experiments that can be performed in the current situation.
 		/// </summary>

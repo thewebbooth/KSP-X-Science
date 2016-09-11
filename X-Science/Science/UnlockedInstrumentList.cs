@@ -3,11 +3,13 @@ using System.Linq;
 
 
 
+
+
  // Cache those experiments that are available so we don't keep
  // walking through expensive lists of rocket parts.
-namespace ScienceChecklist
+namespace ZKeyScience
 {
-	public sealed class UnlockedInstrumentList
+	internal sealed class UnlockedInstrumentList
 	{
 		private Dictionary<string, bool> _unlockedInstruments;
 

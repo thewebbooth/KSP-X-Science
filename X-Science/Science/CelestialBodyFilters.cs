@@ -1,28 +1,23 @@
 ﻿using System;
 using System.IO;
+using ZKeyLib;
 
 
 
 
-/* 
- * THIS IS A STATIC CLASS
- */
-
-
-
-namespace ScienceChecklist
+namespace ZKeyScience
 {
-	internal static class CelestialBodyFilters
+	internal sealed class CelestialBodyFilters
 	{
-		public static ConfigNode Filters { get; set; }
-		static CelestialBodyFilters( )
+		public ConfigNode Filters { get; set; }
+		public CelestialBodyFilters( )
 		{
 			Load( );
 		}
 
 
 
-		public static void Load( )
+		public void Load( )
 		{
 			try
 			{
@@ -44,6 +39,6 @@ namespace ScienceChecklist
 			}
 		}
 
-		private static readonly Logger _logger = new Logger( "CelestialBodyFilters" );
+		private readonly Logger _logger = new Logger( "CelestialBodyFilters" );
 	}
 }

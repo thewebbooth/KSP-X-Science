@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Reflection;
 using UnityEngine;
 using KSP.UI.Screens;
+
 
 
 
@@ -21,7 +21,7 @@ namespace ScienceChecklist
 		/// </summary>
 		public AppLauncherButton( Texture2D Texture, ApplicationLauncher.AppScenes Visibility )
 		{
-			_logger = new Logger(this);
+			_logger = new Logger( this );
 			_Texture = Texture;
 			_Visibility = Visibility;
 		}

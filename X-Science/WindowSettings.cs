@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using UnityEngine;
-using KSP.UI.Dialogs;
-
+﻿using UnityEngine;
 
 
 // Holds settings for one window on one game scene.
 namespace ScienceChecklist
 {
-	class WindowSettings
+	public sealed class WindowSettings
 	{
 		public string Name;
 		public string FilterText;

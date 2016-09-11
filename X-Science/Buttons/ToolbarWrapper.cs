@@ -25,15 +25,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
+using System.Linq;
 using UnityEngine;
 
 
 
 namespace ScienceChecklist
 {
-	/**********************************************************\
+/**********************************************************\
 *          --- DO NOT EDIT BELOW THIS COMMENT ---          *
 *                                                          *
 * This file contains classes and interfaces to use the     *

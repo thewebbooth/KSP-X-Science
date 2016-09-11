@@ -1,17 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-
-
-
-
+﻿
 namespace ScienceChecklist {
 	/// <summary>
 	/// An object that represents a ScienceExperiement in a given Situation.
 	/// </summary>
-	internal sealed class ScienceInstance {
+	public sealed class ScienceInstance {
+		#region FIELDS
+		private readonly ScienceExperiment _experiment;
+		private readonly Situation _situation;
+		#endregion
+
+
 		/// <summary>
 		/// Creates a new instance of the Experiment class.
 		/// </summary>
@@ -90,6 +88,8 @@ namespace ScienceChecklist {
 			}
 		}
 
+		public string ShortDescription { get { return ScienceExperiment.experimentTitle; } }
+
 		#endregion
 
 		#region METHODS (PUBLIC)
@@ -105,7 +105,7 @@ namespace ScienceChecklist {
 			else ScienceSubject = new ScienceSubject(ScienceExperiment, Situation.ExperimentSituation, Situation.Body.CelestialBody, Situation.SubBiome ?? Situation.Biome ?? string.Empty);
 
 
-			IsUnlocked = UnlockedInstrumentList.IsUnlocked( ScienceExperiment.id ) && ( Situation.Body.Reached != null );
+			IsUnlocked = Sci.UnlockedInstruments.IsUnlocked( ScienceExperiment.id ) && ( Situation.Body.Reached != null );
 
 			CompletedScience = ScienceSubject.science * HighLogic.CurrentGame.Parameters.Career.ScienceGainMultiplier;
 			TotalScience = ScienceSubject.scienceCap * HighLogic.CurrentGame.Parameters.Career.ScienceGainMultiplier;
@@ -121,7 +121,8 @@ namespace ScienceChecklist {
 				var data = Sci.OnboardScienceList[ ScienceSubject.id ];
 //				var _logger = new Logger( "Experiment" );
 //				_logger.Trace( ScienceSubject.id + " found " + data.Count( ) + " items" );
-				foreach (var i in data)
+
+				for( int x = 0; x < data.Count; x++ )
 				{
 					var next = (TotalScience - (CompletedScience + OnboardScience)) * multiplier;
 					OnboardScience += next;
@@ -130,14 +131,6 @@ namespace ScienceChecklist {
 			var AllCollectedScience = CompletedScience + OnboardScience;
 			IsCollected = AllCollectedScience > TotalScience || TotalScience - AllCollectedScience < 0.1;
 		}
-		#endregion
-
-		#region FIELDS
-
-		private readonly ScienceExperiment _experiment;
-		private readonly Situation _situation;
-//UNUSED		private readonly bool _usesSubBiomes;
-
 		#endregion
 	}
 }

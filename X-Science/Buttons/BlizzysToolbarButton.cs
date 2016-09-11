@@ -1,4 +1,5 @@
 ﻿using System;
+using ScienceChecklist;
 
 
 
@@ -14,7 +15,7 @@ namespace ScienceChecklist
 		private string					_ButtonText;
 		private string					_TexturePath;
 		private GameScenesVisibility	_Visibility;
-		private readonly Logger 		_logger;
+		private readonly Logger _logger;
 
 
 		/// <summary>
@@ -22,7 +23,7 @@ namespace ScienceChecklist
 		/// </summary>
 		public BlizzysToolbarButton( string Namespace, string ButtonId, string ButtonToolTip, string ButtonText, string TexturePath, GameScenesVisibility Visibility )
 		{
-			_logger = new Logger(this);
+			_logger = new Logger( this );
 			_Namespace = Namespace;
 			_ButtonId = ButtonId;
 			_ButtonToolTip = ButtonToolTip;

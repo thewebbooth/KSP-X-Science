@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ZKeyLib;
 
 
 
-namespace ScienceChecklist
+namespace ZKeyScience
 {
 	internal sealed class BodySituationFilter
 	{
@@ -22,10 +23,10 @@ namespace ScienceChecklist
 		public void Filter( List<Body> BodyList, List<ExperimentSituations> SituationList, String FilterString )
 		{
 			List<string> Filters = FilterString.Split( ',' ).Select( s => s.Trim( ) ).ToList<string>( );
-			for( var x = 0; x < Filters.Count; x++ )
+			foreach( string F in Filters )
 			{
-//				_logger.Trace( Filters[ x ] );
-				ApplyOneFilter( BodyList, SituationList, Filters[ x ] );
+//				_logger.Trace( F );
+				ApplyOneFilter( BodyList, SituationList, F );
 			}
 		}
 

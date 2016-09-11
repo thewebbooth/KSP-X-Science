@@ -1,38 +1,96 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-
-
-
-/* 
- * THIS IS A STATIC CLASS
- */
 
 
 
 namespace ScienceChecklist {
-	internal static class Config {
+	public sealed class Config
+	{
 		// Locals
-			private static readonly Logger _logger = new Logger( "Config" );
-			private static readonly string _assemblyPath = Path.GetDirectoryName( typeof( ScienceChecklistAddon ).Assembly.Location );
-			private static readonly string _file = KSP.IO.IOUtils.GetFilePathFor( typeof( ScienceChecklistAddon ), "settings.cfg" );
-			private static Dictionary<GameScenes, Dictionary<string, WindowSettings>> _windowSettings = new Dictionary<GameScenes, Dictionary<string, WindowSettings>>( );
+			private readonly Logger _logger;
+			private readonly string _assemblyPath = Path.GetDirectoryName( typeof( ScienceChecklistAddon ).Assembly.Location );
+			private readonly string _file = KSP.IO.IOUtils.GetFilePathFor( typeof( ScienceChecklistAddon ), "settings.cfg" );
+			private Dictionary<GameScenes, Dictionary<string, WindowSettings>> _windowSettings = new Dictionary<GameScenes, Dictionary<string, WindowSettings>>( );
+
+			private bool _hideCompleteExperiments;
+			private bool _useBlizzysToolbar;
+			private bool _completeWithoutRecovery;
+			private bool _checkDebris;
+			private bool _allFilter;
 
 
 
 		// Members
-			public static bool HideCompleteExperiments		{ get; set; }
-			public static bool UseBlizzysToolbar			{ get; set; }
-			public static bool CompleteWithoutRecovery		{ get; set; }
-			public static bool CheckDebris					{ get; set; }
-			public static bool AllFilter					{ get; set; }
-//			public static bool HideExperimentResultsDialog	{ get; set; }
+			public bool HideCompleteExperiments			{ get { return _hideCompleteExperiments; }		set { if( _hideCompleteExperiments != value ) { _hideCompleteExperiments = value; OnHideCompleteEventsChanged( ); } } }
+			public bool UseBlizzysToolbar				{ get { return _useBlizzysToolbar; }			set { if( _useBlizzysToolbar != value ) { _useBlizzysToolbar = value; OnUseBlizzysToolbarChanged( ); } } }
+			public bool CompleteWithoutRecovery			{ get { return _completeWithoutRecovery; }		set { if( _completeWithoutRecovery != value ) { _completeWithoutRecovery = value; OnCompleteWithoutRecoveryChanged( ); } } }
+			public bool CheckDebris						{ get { return _checkDebris; }					set { if( _checkDebris != value ) { _checkDebris = value; OnCheckDebrisChanged( ); } } }
+			public bool AllFilter						{ get { return _allFilter; }					set { if( _allFilter != value ) { _allFilter = value; OnAllFilterChanged( ); } } }
+//			public bool HideExperimentResultsDialog	{ get; set; }
 
 
 
-		public static WindowSettings GetWindowConfig( string Name, GameScenes Scene )
+					// Get notified when settings change
+					public event EventHandler UseBlizzysToolbarChanged;
+					public event EventHandler HideCompleteEventsChanged;
+					public event EventHandler CompleteWithoutRecoveryChanged;
+					public event EventHandler CheckDebrisChanged;
+					public event EventHandler AllFilterChanged;
+
+
+			
+					// For triggering events
+					private void OnUseBlizzysToolbarChanged( )
+					{
+						if( UseBlizzysToolbarChanged != null )
+						{
+							UseBlizzysToolbarChanged( this, EventArgs.Empty );
+						}
+					}
+
+					private void OnHideCompleteEventsChanged( )
+					{
+						if( HideCompleteEventsChanged != null )
+						{
+							HideCompleteEventsChanged( this, EventArgs.Empty );
+						}
+					}
+
+					private void OnCompleteWithoutRecoveryChanged( )
+					{
+						if( CompleteWithoutRecoveryChanged != null )
+						{
+							CompleteWithoutRecoveryChanged( this, EventArgs.Empty );
+						}
+					}
+
+					private void OnCheckDebrisChanged( )
+					{
+						if( CheckDebrisChanged != null )
+						{
+							CheckDebrisChanged( this, EventArgs.Empty );
+						}
+					}
+
+					private void OnAllFilterChanged( )
+					{
+						if( AllFilterChanged != null )
+						{
+							AllFilterChanged( this, EventArgs.Empty );
+						}
+					}
+
+
+
+		public Config( )
+		{
+			_logger = new Logger( this );
+		}
+
+
+
+		public WindowSettings GetWindowConfig( string Name, GameScenes Scene )
 		{
 			WindowSettings W = null;
 
@@ -58,7 +116,7 @@ namespace ScienceChecklist {
 
 
 
-		public static void SetWindowConfig( WindowSettings W, GameScenes Scene )
+		public void SetWindowConfig( WindowSettings W, GameScenes Scene )
 		{
 			W.TestPosition( );
 
@@ -81,7 +139,7 @@ namespace ScienceChecklist {
 
 
 
-		public static void Save( )
+		public void Save( )
 		{
 //			_logger.Trace("Save");
 			var node = new ConfigNode( );
@@ -91,11 +149,11 @@ namespace ScienceChecklist {
 
 
 			
-			settings.AddValue( "HideCompleteExperiments",		HideCompleteExperiments );
-			settings.AddValue( "UseBlizzysToolbar",				UseBlizzysToolbar );
-			settings.AddValue( "CompleteWithoutRecovery",		CompleteWithoutRecovery );
-			settings.AddValue( "CheckDebris",					CheckDebris );
-			settings.AddValue( "AllFilter",						AllFilter );
+			settings.AddValue( "HideCompleteExperiments",		_hideCompleteExperiments );
+			settings.AddValue( "UseBlizzysToolbar",				_useBlizzysToolbar );
+			settings.AddValue( "CompleteWithoutRecovery",		_completeWithoutRecovery );
+			settings.AddValue( "CheckDebris",					_checkDebris );
+			settings.AddValue( "AllFilter",						_allFilter );
 //			settings.AddValue( "HideExperimentResultsDialog",	HideExperimentResultsDialog);
 
 
@@ -125,13 +183,13 @@ namespace ScienceChecklist {
 
 
 
-		public static void Load( )
+		public void Load( )
 		{
-			HideCompleteExperiments =		false;
-			UseBlizzysToolbar =				false;
-			CompleteWithoutRecovery =		false;
-			CheckDebris =					false;
-			AllFilter =						true;
+			_hideCompleteExperiments =		false;
+			_useBlizzysToolbar =			false;
+			_completeWithoutRecovery =		false;
+			_checkDebris =					false;
+			_allFilter =					true;
 //			HideExperimentResultsDialog =	false;
 
 
@@ -152,23 +210,23 @@ namespace ScienceChecklist {
 
 					var V = settings.GetValue( "HideCompleteExperiments" );
 					if( V != null )
-						HideCompleteExperiments = bool.Parse( V );
+						_hideCompleteExperiments = bool.Parse( V );
 
 					V = settings.GetValue( "UseBlizzysToolbar" );
 					if( V != null )
-						UseBlizzysToolbar = bool.Parse( V );
+						_useBlizzysToolbar = bool.Parse( V );
 
 					V = settings.GetValue( "CompleteWithoutRecovery" );
 					if( V != null )
-						CompleteWithoutRecovery = bool.Parse( V );
+						_completeWithoutRecovery = bool.Parse( V );
 
 					V = settings.GetValue( "CheckDebris" );
 					if( V != null )
-						CheckDebris = bool.Parse( V );
+						_checkDebris = bool.Parse( V );
 
 					V = settings.GetValue( "AllFilter" );
 					if( V != null )
-						AllFilter = bool.Parse( V );
+						_allFilter = bool.Parse( V );
 
 /*					V = settings.GetValue("HideExperimentResultsDialog");
 					if (V != null)

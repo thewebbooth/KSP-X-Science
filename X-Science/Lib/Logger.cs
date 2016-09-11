@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
 
-namespace ScienceChecklist {
+
+
+
+namespace ScienceChecklist
+{
 	/// <summary>
 	/// Class for helping with log messages.
 	/// </summary>

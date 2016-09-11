@@ -9,11 +9,12 @@ namespace ScienceChecklist
 	class UnifiedButton
 	{
 		// Members
-			public bool								UseBlizzyIfPossible;
 			private IToolbarButton					_button;
 
 			public event EventHandler				ButtonOn;
 			public event EventHandler				ButtonOff;
+
+			public bool								UseBlizzyIfPossible;
 
 			public Texture2D						LauncherTexture;
 			public ApplicationLauncher.AppScenes	LauncherVisibility;
@@ -26,6 +27,7 @@ namespace ScienceChecklist
 			public string							BlizzyToolTip;
 			public string							BlizzyText;
 			private readonly Logger 				_logger;
+
 
 
 		// Constructor
