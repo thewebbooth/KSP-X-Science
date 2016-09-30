@@ -16,7 +16,7 @@ namespace ScienceChecklist
 		private Dictionary<string, ScienceSubject> _scienceSubjects;
 		private Dictionary<ScienceExperiment,ModuleScienceExperiment> _experiments;
 		private IList<string> _kscBiomes;
-		private CelestialBody _kerbin;
+		private CelestialBody _homeBody;
 		private UnlockedInstrumentList _unlockedInstruments;
 		private List<ScienceInstance> _allScienceInstances;
 
@@ -29,7 +29,7 @@ namespace ScienceChecklist
 		public Dictionary<string, ScienceSubject> ScienceSubjects { get { return _scienceSubjects; } }
 		public Dictionary<ScienceExperiment, ModuleScienceExperiment> Experiments { get { return _experiments; } }
 		public IList<string> KscBiomes { get { return _kscBiomes; } }
-		public CelestialBody Kerbin { get { return _kerbin; } }
+		public CelestialBody HomeBody { get { return _homeBody; } }
 		public UnlockedInstrumentList UnlockedInstruments { get { return _unlockedInstruments; } }
 
 
@@ -223,26 +223,12 @@ namespace ScienceChecklist
 
 		private void UpdateKscBiomes( )
 		{
-			_kerbin = null;
+			_homeBody = FlightGlobals.GetHomeBody();
 			_kscBiomes = new List<string>( );
-
-
-
-			// Do we have Kerbin
-			foreach( var body in _bodyList )
-			{
-				if( body.Value.Name == "Kerbin" )
-				{
-					_kerbin = body.Key;
-					break;
-				}
-			}
-
-
 
 			// Find the KSC baby biomes
 			// This is throwing exceptions.  I think the callback is being thrown before the world is finished updating.
-				if( _kerbin != null )
+				if( _homeBody != null )
 				{
 					_kscBiomes = UnityEngine.Object.FindObjectsOfType<Collider>( )
 						.Where( x => x.gameObject.layer == 15 )
@@ -376,15 +362,15 @@ namespace ScienceChecklist
 				// Can't really avoid magic constants here - Kerbin and Shores
 				if( ( ( sitMask & (uint)ExperimentSituations.SrfLanded ) != 0 ) && ( ( biomeMask & (uint)ExperimentSituations.SrfLanded ) != 0 ) )
 				{
-					if( _kerbin != null && _kscBiomes.Count > 0 )
+					if( _homeBody != null && _kscBiomes.Count > 0 )
 					{
-						if( bodies.Contains( _bodyList[ _kerbin ] ) ) // If we haven't filtered it out
+						if( bodies.Contains( _bodyList[ _homeBody ] ) ) // If we haven't filtered it out
 						{
 							if( SituationList.Contains( ExperimentSituations.SrfLanded ) )
 							{
 								//								_logger.Trace( "BabyBiomes " + experiment.experimentTitle + ": " + sitMask );
 								for( int x = 0; x < _kscBiomes.Count; x++ ) // Ew.
-									_allScienceInstances.Add( new ScienceInstance( experiment, new Situation( _bodyList[ _kerbin ], ExperimentSituations.SrfLanded, "Shores", _kscBiomes[ x ] ), this ) );
+									_allScienceInstances.Add( new ScienceInstance( experiment, new Situation( _bodyList[ _homeBody ], ExperimentSituations.SrfLanded, "Shores", _kscBiomes[ x ] ), this ) );
 							}
 						}
 					}
