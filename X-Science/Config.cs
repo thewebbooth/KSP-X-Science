@@ -18,6 +18,9 @@ namespace ScienceChecklist {
 			private bool _completeWithoutRecovery;
 			private bool _checkDebris;
 			private bool _allFilter;
+			private bool _stopTimeWarp;
+			private bool _playNoise;
+			private bool _showResultsWindow;
 
 
 
@@ -27,59 +30,88 @@ namespace ScienceChecklist {
 			public bool CompleteWithoutRecovery			{ get { return _completeWithoutRecovery; }		set { if( _completeWithoutRecovery != value ) { _completeWithoutRecovery = value; OnCompleteWithoutRecoveryChanged( ); } } }
 			public bool CheckDebris						{ get { return _checkDebris; }					set { if( _checkDebris != value ) { _checkDebris = value; OnCheckDebrisChanged( ); } } }
 			public bool AllFilter						{ get { return _allFilter; }					set { if( _allFilter != value ) { _allFilter = value; OnAllFilterChanged( ); } } }
-//			public bool HideExperimentResultsDialog	{ get; set; }
+			public bool StopTimeWarp					{ get { return _stopTimeWarp; }					set { if( _stopTimeWarp != value ) { _stopTimeWarp = value; OnStopTimeWarpChanged( ); } } }
+			public bool PlayNoise						{ get { return _playNoise; }					set { if( _playNoise != value ) { _allFilter = value; OnPlayNoiseChanged( ); } } }
+			public bool ShowResultsWindow				{ get { return _showResultsWindow; }			set { if( _showResultsWindow != value ) { _showResultsWindow = value; OnShowResultsWindowChanged( ); } } }
 
 
 
-					// Get notified when settings change
-					public event EventHandler UseBlizzysToolbarChanged;
-					public event EventHandler HideCompleteEventsChanged;
-					public event EventHandler CompleteWithoutRecoveryChanged;
-					public event EventHandler CheckDebrisChanged;
-					public event EventHandler AllFilterChanged;
-
+		// Get notified when settings change
+			public event EventHandler UseBlizzysToolbarChanged;
+			public event EventHandler HideCompleteEventsChanged;
+			public event EventHandler CompleteWithoutRecoveryChanged;
+			public event EventHandler CheckDebrisChanged;
+			public event EventHandler AllFilterChanged;
+			public event EventHandler StopTimeWarpChanged;
+			public event EventHandler PlayNoiseChanged;
+			public event EventHandler ShowResultsWindowChanged;
 
 			
-					// For triggering events
-					private void OnUseBlizzysToolbarChanged( )
-					{
-						if( UseBlizzysToolbarChanged != null )
-						{
-							UseBlizzysToolbarChanged( this, EventArgs.Empty );
-						}
-					}
 
-					private void OnHideCompleteEventsChanged( )
-					{
-						if( HideCompleteEventsChanged != null )
-						{
-							HideCompleteEventsChanged( this, EventArgs.Empty );
-						}
-					}
+		// For triggering events
+			private void OnUseBlizzysToolbarChanged( )
+			{
+				if( UseBlizzysToolbarChanged != null )
+				{
+					UseBlizzysToolbarChanged( this, EventArgs.Empty );
+				}
+			}
 
-					private void OnCompleteWithoutRecoveryChanged( )
-					{
-						if( CompleteWithoutRecoveryChanged != null )
-						{
-							CompleteWithoutRecoveryChanged( this, EventArgs.Empty );
-						}
-					}
+			private void OnHideCompleteEventsChanged( )
+			{
+				if( HideCompleteEventsChanged != null )
+				{
+					HideCompleteEventsChanged( this, EventArgs.Empty );
+				}
+			}
 
-					private void OnCheckDebrisChanged( )
-					{
-						if( CheckDebrisChanged != null )
-						{
-							CheckDebrisChanged( this, EventArgs.Empty );
-						}
-					}
+			private void OnCompleteWithoutRecoveryChanged( )
+			{
+				if( CompleteWithoutRecoveryChanged != null )
+				{
+					CompleteWithoutRecoveryChanged( this, EventArgs.Empty );
+				}
+			}
 
-					private void OnAllFilterChanged( )
-					{
-						if( AllFilterChanged != null )
-						{
-							AllFilterChanged( this, EventArgs.Empty );
-						}
-					}
+			private void OnCheckDebrisChanged( )
+			{
+				if( CheckDebrisChanged != null )
+				{
+					CheckDebrisChanged( this, EventArgs.Empty );
+				}
+			}
+
+			private void OnAllFilterChanged( )
+			{
+				if( AllFilterChanged != null )
+				{
+					AllFilterChanged( this, EventArgs.Empty );
+				}
+			}
+
+			private void OnStopTimeWarpChanged( )
+			{
+				if( StopTimeWarpChanged != null )
+				{
+					StopTimeWarpChanged( this, EventArgs.Empty );
+				}
+			}
+
+			private void OnPlayNoiseChanged( )
+			{
+				if( PlayNoiseChanged != null )
+				{
+					PlayNoiseChanged( this, EventArgs.Empty );
+				}
+			}
+
+			private void OnShowResultsWindowChanged( )
+			{
+				if( ShowResultsWindowChanged != null )
+				{
+					ShowResultsWindowChanged( this, EventArgs.Empty );
+				}
+			}
 
 
 
@@ -154,7 +186,9 @@ namespace ScienceChecklist {
 			settings.AddValue( "CompleteWithoutRecovery",		_completeWithoutRecovery );
 			settings.AddValue( "CheckDebris",					_checkDebris );
 			settings.AddValue( "AllFilter",						_allFilter );
-//			settings.AddValue( "HideExperimentResultsDialog",	HideExperimentResultsDialog);
+			settings.AddValue( "StopTimeWarp",					_stopTimeWarp );
+			settings.AddValue( "PlayNoise",						_playNoise );
+			settings.AddValue( "ShowResultsWindow",				_showResultsWindow );
 
 
 
@@ -190,8 +224,9 @@ namespace ScienceChecklist {
 			_completeWithoutRecovery =		false;
 			_checkDebris =					false;
 			_allFilter =					true;
-//			HideExperimentResultsDialog =	false;
-
+			_stopTimeWarp =					true;
+			_playNoise =					true;
+			_showResultsWindow =			true;
 
 
 
@@ -228,10 +263,19 @@ namespace ScienceChecklist {
 					if( V != null )
 						_allFilter = bool.Parse( V );
 
-/*					V = settings.GetValue("HideExperimentResultsDialog");
-					if (V != null)
-						HideExperimentResultsDialog = bool.Parse(V);
-*/
+					V = settings.GetValue( "StopTimeWarp" );
+					if( V != null )
+						_stopTimeWarp = bool.Parse( V );
+
+					V = settings.GetValue( "PlayNoise" );
+					if( V != null )
+						_playNoise = bool.Parse( V );
+
+					V = settings.GetValue( "ShowResultsWindow" );
+					if( V != null )
+						_showResultsWindow = bool.Parse( V );
+
+
 
 					var windowSettings = root.GetNode( "Windows" );
 					if( windowSettings == null ) return;

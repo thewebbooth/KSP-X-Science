@@ -16,6 +16,7 @@ namespace ScienceChecklist
 		private readonly ExperimentFilter		_filter;
 		private readonly ScienceChecklistAddon	_parent;
 		private readonly Logger					_logger;
+		private int								_previousNumExperiments;
 		private GUIStyle						_experimentButtonStyle;
 		private GUIStyle						_experimentLabelStyle;
 		private	IList<ModuleScienceExperiment>	_moduleScienceExperiments;
@@ -114,7 +115,11 @@ namespace ScienceChecklist
 
 		public override void DrawWindow( )
 		{
-			windowPos.height = 50;
+			// The window needs to get smaller when the number of experiments drops.
+			// This allows that while preventing flickering.
+			if( _previousNumExperiments > _filter.DisplayScienceInstances.Count )
+				windowPos.height = 25 + ( ( _filter.DisplayScienceInstances.Count + 1 ) * 20 );
+			_previousNumExperiments = _filter.DisplayScienceInstances.Count;
 			base.DrawWindow( );
 		}
 
@@ -144,7 +149,6 @@ namespace ScienceChecklist
 				_experimentButtonStyle.normal.textColor = exp.IsComplete ? Color.green : Color.yellow;
 				if( GUILayout.Button( exp.ShortDescription, _experimentButtonStyle ) )
 				{
-					_logger.Trace( "Pop" );
 					RunExperiment( exp );
 				}
 			}
@@ -238,8 +242,13 @@ namespace ScienceChecklist
 			{
 				if( _filter.TotalCount - _filter.CompleteCount > 0 )
 				{
-					GameHelper.StopTimeWarp( );
-					PlayNoise( );
+					if( IsVisible( ) )
+					{
+						if( _parent.Config.StopTimeWarp )
+							GameHelper.StopTimeWarp( );
+						if( _parent.Config.PlayNoise )
+							PlayNoise( );
+					}
 				}
 			}
 		}
@@ -271,9 +280,7 @@ namespace ScienceChecklist
 
 		public ModuleScienceExperiment FindExperiment( ScienceInstance s, bool runSingleUse = true )
 		{
-
 			ModuleScienceExperiment m = null;
-
 			if( _moduleScienceExperiments != null && _moduleScienceExperiments.Count > 0 )
 			{
 				IEnumerable<ModuleScienceExperiment> lm = _moduleScienceExperiments.Where(x => (
@@ -295,7 +302,7 @@ namespace ScienceChecklist
 			ModuleScienceExperiment m = FindExperiment( s, runSingleUse );
 			if( m != null )
 			{
-				_logger.Trace( "Running Experiment " + m.experimentID + " on part " + m.part.partInfo.name );
+//				_logger.Trace( "Running Experiment " + m.experimentID + " on part " + m.part.partInfo.name );
 				RunStandardModuleScienceExperiment( m );
 				return;
 			}
@@ -307,7 +314,9 @@ namespace ScienceChecklist
 		{
 			if( exp.Inoperable ) return;
 
-/*			if (Config.HideExperimentResultsDialog)
+			if( _parent.Config.ShowResultsWindow )
+				exp.DeployExperiment( );
+			else
 			{
 				if (!exp.useStaging)
 				{
@@ -318,8 +327,6 @@ namespace ScienceChecklist
 				else
 					exp.OnActive();
 			}
-			else*/
-				exp.DeployExperiment( );
 		}
 	}
 }

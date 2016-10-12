@@ -38,24 +38,24 @@ namespace ScienceChecklist
 		{
 			_parent = Parent;
 			_logger = new Logger( this );
-//			_logger.Trace( "Making ScienceContext" );
+//_logger.Trace( "Making ScienceContext" );
 			_bodyList = new Dictionary<CelestialBody, Body>( );
-//			_logger.Trace( "Made _bodyList" );
+//_logger.Trace( "Made _bodyList" );
 			_onboardScience = new Dictionary<string, List<ScienceData>>( );
-//			_logger.Trace( "Made _onboardScience" );
+//_logger.Trace( "Made _onboardScience" );
 			_scienceSubjects = new Dictionary<string, ScienceSubject>( );
-//			_logger.Trace( "Made _scienceSubjects" );
+//_logger.Trace( "Made _scienceSubjects" );
 			_experiments = new Dictionary<ScienceExperiment, ModuleScienceExperiment>( );
-//			_logger.Trace( "Made _experiments" );
+//_logger.Trace( "Made _experiments" );
 			_kscBiomes = new List<string>( );
-//			_logger.Trace( "Made _kscBiomes" );
+//_logger.Trace( "Made _kscBiomes" );
 			_unlockedInstruments = new UnlockedInstrumentList( );
-//			_logger.Trace( "Made _unlockedInstruments" );
+//_logger.Trace( "Made _unlockedInstruments" );
 			_allScienceInstances = new List<ScienceInstance>( );
-//			_logger.Trace( "Made _allScienceInstances" );
+//_logger.Trace( "Made _allScienceInstances" );
 
 			Reset( );
-//			_logger.Trace( "Made ScienceContext" );
+//_logger.Trace( "Made ScienceContext" );
 		}
 
 
@@ -85,8 +85,8 @@ namespace ScienceChecklist
 			// Handle added and updated bodies
 				for( int x = 0; x < bodies.Count; x++ )
 				{
-//					String s = String.Format( "Body {0} - {1}.", CelBody.flightGlobalsIndex, CelBody.name );
-//					_logger.Trace( s );
+//String s = String.Format( "Body {0} - {1}.", bodies[ x ].flightGlobalsIndex, bodies[ x ].name );
+//_logger.Trace( s );
 					if( !_bodyList.ContainsKey( bodies[ x ] ) )
 					{
 						var B = new Body( bodies[ x ] );
@@ -114,8 +114,8 @@ namespace ScienceChecklist
 		private void UpdateOnboardScience( )
 		{
 			// Init
-				var Start = DateTime.Now;
-				TimeSpan Elapsed;
+//				var Start = DateTime.Now;
+//				TimeSpan Elapsed;
 				var onboardScience = new List<ScienceData>( );
 				var vesselIds = new List<string>( );
 
@@ -177,8 +177,8 @@ namespace ScienceChecklist
 				}
 
 			// Update the dictionary
-				Elapsed = DateTime.Now - Start;
-			//	_logger.Trace( "GetOnboardScience took " + Elapsed.ToString( ) + "ms and found " + onboardScience.Count( ) + " ScienceData" );
+//				Elapsed = DateTime.Now - Start;
+//_logger.Trace( "GetOnboardScience took " + Elapsed.ToString( ) + "ms and found " + onboardScience.Count( ) + " ScienceData" );
 			_onboardScience = onboardScienceDict;
 		}
 
@@ -186,7 +186,7 @@ namespace ScienceChecklist
 
 		private void UpdateScienceSubjects( )
 		{
-			//			var StartTime = DateTime.Now;
+//var StartTime = DateTime.Now;
 
 
 
@@ -195,10 +195,10 @@ namespace ScienceChecklist
 
 
 
-			//			_logger.Trace( "Science Subjects contains " + SciSubjects.Count.ToString( ) + " items" );
-			//			_logger.Trace( "Science Subjects contains " + SciDict.Count.ToString( ) + " items" );
-			//			var Elapsed = DateTime.Now - StartTime;
-			//			_logger.Trace( "GetScienceSubjects Done - " + Elapsed.ToString( ) + "ms" );
+//_logger.Trace( "Science Subjects contains " + SciSubjects.Count.ToString( ) + " items" );
+//_logger.Trace( "Science Subjects contains " + SciDict.Count.ToString( ) + " items" );
+//var Elapsed = DateTime.Now - StartTime;
+//_logger.Trace( "UpdateScienceSubjects Done - " + Elapsed.ToString( ) + "ms" );
 			_scienceSubjects = SciDict;
 		}
 
@@ -206,8 +206,19 @@ namespace ScienceChecklist
 
 		private void UpdateExperiments( )
 		{
+/*var StartTime = DateTime.Now;
+_logger.Trace( "PartLoader contains " + PartLoader.LoadedPartsList.Count.ToString( ) + " items" );
+			for( var x = 0; x < PartLoader.Instance.parts.Count; x++ )
+			{
+				_logger.Trace( "Part name: " + PartLoader.Instance.parts[ x ].name );
+			}
+
+			var Thing = PartLoader.LoadedPartsList
+			.SelectMany( x => x.partPrefab.FindModulesImplementing<ModuleScienceExperiment>( ) );
+_logger.Trace( "Thing contains " + Thing.Count().ToString( ) + " items" );
+*/
 			// Find all experiments - These should be in an object
-			_experiments = PartLoader.Instance.parts
+			_experiments = PartLoader.LoadedPartsList
 			.SelectMany( x => x.partPrefab.FindModulesImplementing<ModuleScienceExperiment>( ) )
 			.Select( x => new
 			{
@@ -217,12 +228,17 @@ namespace ScienceChecklist
 			.Where( x => x.Experiment != null )
 			.GroupBy( x => x.Experiment )
 			.ToDictionary( x => x.Key, x => x.First( ).Module );
+
+/*_logger.Trace( "_experiments contains " + _experiments.Count.ToString( ) + " items" );
+var Elapsed = DateTime.Now - StartTime;
+_logger.Trace( "UpdateExperiments Done - " + Elapsed.ToString( ) + "ms" );*/
 		}
 
 
 
 		private void UpdateKscBiomes( )
 		{
+//var StartTime = DateTime.Now;
 			_kerbin = null;
 			_kscBiomes = new List<string>( );
 
@@ -256,6 +272,9 @@ namespace ScienceChecklist
 						.Distinct( )
 						.ToList( );
 				}
+/*_logger.Trace( "_kscBiomes contains " + _kscBiomes.Count.ToString( ) + " items" );
+var Elapsed = DateTime.Now - StartTime;
+_logger.Trace( "UpdateKscBiomes Done - " + Elapsed.ToString( ) + "ms" );*/
 		}
 
 
@@ -270,7 +289,7 @@ namespace ScienceChecklist
 			BodySituationFilter BodyFilter = new BodySituationFilter( );
 			_unlockedInstruments.Clear( );
 			_allScienceInstances.Clear( );
-			//				_logger.Info( "RefreshExperimentCache" );
+//_logger.Info( "RefreshExperimentCache" );
 
 
 			// Quick check for things we depend on
@@ -308,7 +327,7 @@ namespace ScienceChecklist
 					if( sitMaskField != null )
 					{
 						sitMask = (uint)(int)sitMaskField.GetValue( _experiments[ experiment ] );
-						//								_logger.Trace( "Setting sitMask to " + sitMask + " for " + experiment.experimentTitle );
+//_logger.Trace( "Setting sitMask to " + sitMask + " for " + experiment.experimentTitle );
 					}
 
 					if( biomeMask == 0 )
@@ -317,7 +336,7 @@ namespace ScienceChecklist
 						if( biomeMaskField != null )
 						{
 							biomeMask = (uint)(int)biomeMaskField.GetValue( _experiments[ experiment ] );
-							//								_logger.Trace( "Setting biomeMask to " + biomeMask + " for " + experiment.experimentTitle );
+//_logger.Trace( "Setting biomeMask to " + biomeMask + " for " + experiment.experimentTitle );
 						}
 					}
 				}
@@ -332,7 +351,7 @@ namespace ScienceChecklist
 				// Check for CelestialBodyFilter
 				if( _experiments[ experiment ] != null )
 				{
-					//							_logger.Trace( Sci.Experiments[ experiment ].experimentID );
+//_logger.Trace( Experiments[ experiment ].experimentID );
 					if( CelestialBodyFilters.Filters.HasValue( _experiments[ experiment ].experimentID ) )
 					{
 						string FilterText = CelestialBodyFilters.Filters.GetValue( _experiments[ experiment ].experimentID );
@@ -382,7 +401,7 @@ namespace ScienceChecklist
 						{
 							if( SituationList.Contains( ExperimentSituations.SrfLanded ) )
 							{
-								//								_logger.Trace( "BabyBiomes " + experiment.experimentTitle + ": " + sitMask );
+//_logger.Trace( "BabyBiomes " + experiment.experimentTitle + ": " + sitMask );
 								for( int x = 0; x < _kscBiomes.Count; x++ ) // Ew.
 									_allScienceInstances.Add( new ScienceInstance( experiment, new Situation( _bodyList[ _kerbin ], ExperimentSituations.SrfLanded, "Shores", _kscBiomes[ x ] ), this ) );
 							}
@@ -393,8 +412,8 @@ namespace ScienceChecklist
 
 
 
-			var Elapsed = DateTime.Now - StartTime;
-			_logger.Trace( "RefreshExperimentCache Done - " + Elapsed.ToString( ) + "ms" );
+//			var Elapsed = DateTime.Now - StartTime;
+//			_logger.Trace( "RefreshExperimentCache Done - " + Elapsed.ToString( ) + "ms" );
 		}
 
 
@@ -404,15 +423,15 @@ namespace ScienceChecklist
 		/// </summary>
 		public void UpdateAllScienceInstances( )
 		{
-			var StartTime = DateTime.Now;
+//			var StartTime = DateTime.Now;
 			UpdateScienceSubjects( );
 			UpdateOnboardScience( );
 			for( int x = 0; x < _allScienceInstances.Count; x++ )
 			{
 				_allScienceInstances[ x ].Update( this );
 			}
-			var Elapsed = DateTime.Now - StartTime;
-			_logger.Trace( "UpdateExperiments Done - " + Elapsed.ToString( ) + "ms" );
+//			var Elapsed = DateTime.Now - StartTime;
+//			_logger.Trace( "UpdateExperiments Done - " + Elapsed.ToString( ) + "ms" );
 		}
 	}
 }

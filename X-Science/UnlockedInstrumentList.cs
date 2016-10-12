@@ -63,7 +63,7 @@ float AstroLevel = ScenarioUpgradeableFacilities.GetFacilityLevel( SpaceCenterFa
 
 
 
-			bool IsUnlocked = PartLoader.Instance.parts.Any
+			bool IsUnlocked = PartLoader.LoadedPartsList.Any
 			(
 				x => ResearchAndDevelopment.PartModelPurchased( x ) &&
 				x.partPrefab.Modules != null &&

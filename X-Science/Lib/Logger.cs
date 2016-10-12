@@ -92,15 +92,15 @@ namespace ScienceChecklist
 			switch (logLevel) {
 				case LogLevel.Fatal:
 				case LogLevel.Error:
-					UnityEngine.Debug.LogError(msg);
+					UnityEngine.Debug.LogError( msg );
 					break;
 				case LogLevel.Warning:
 				case LogLevel.Info:
-					UnityEngine.Debug.LogWarning(msg);
+					UnityEngine.Debug.LogWarning( msg );
 					break;
 				case LogLevel.Debug:
 				case LogLevel.Trace:
-					UnityEngine.Debug.Log(msg);
+					UnityEngine.Debug.Log( msg );
 					break;
 			}
 		}
