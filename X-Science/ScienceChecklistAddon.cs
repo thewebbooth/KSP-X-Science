@@ -209,6 +209,7 @@ namespace ScienceChecklist {
 			if( !GameHelper.AllowWindow( ) )
 			{
 				_logger.Trace( "Ui is hidden in this scene" );
+				RemoveButtons( );
 				return;
 			}
 			

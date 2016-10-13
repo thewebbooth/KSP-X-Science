@@ -1,11 +1,17 @@
 [x] Science!
 ============
 
+5.1
+---
+13-Oct-2016 Built against KSP V1.2.0
+* Rebuilt for KSP 1.2
+* Bug fixes
+* New settings, without Gui
+
 5.0
 ---
 11-Sept-2016 Built against KSP V1.1.3
 * New window a bit like Science Alert
-
 
 4.20
 ---
