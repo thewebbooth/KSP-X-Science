@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2013-2014, Maik Schreiber
+Copyright (c) 2013-2016, Maik Schreiber
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -26,24 +26,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Linq;
 using UnityEngine;
 
 
+// TODO: Change to your plugin's namespace here.
+namespace ScienceChecklist {
 
-namespace ScienceChecklist
-{
-/**********************************************************\
-*          --- DO NOT EDIT BELOW THIS COMMENT ---          *
-*                                                          *
-* This file contains classes and interfaces to use the     *
-* Toolbar Plugin without creating a hard dependency on it. *
-*                                                          *
-* There is nothing in this file that needs to be edited    *
-* by hand.                                                 *
-*                                                          *
-*          --- DO NOT EDIT BELOW THIS COMMENT ---          *
-\**********************************************************/
+
+
+	/**********************************************************\
+	*          --- DO NOT EDIT BELOW THIS COMMENT ---          *
+	*                                                          *
+	* This file contains classes and interfaces to use the     *
+	* Toolbar Plugin without creating a hard dependency on it. *
+	*                                                          *
+	* There is nothing in this file that needs to be edited    *
+	* by hand.                                                 *
+	*                                                          *
+	*          --- DO NOT EDIT BELOW THIS COMMENT ---          *
+	\**********************************************************/
+
+
+
 	/// <summary>
 	/// The global tool bar manager.
 	/// </summary>
@@ -93,7 +97,7 @@ namespace ScienceChecklist
 		/// <param name="ns">The new button's namespace. This is usually the plugin's name. Must not include special characters like '.'</param>
 		/// <param name="id">The new button's ID. This ID must be unique across all buttons in the namespace. Must not include special characters like '.'</param>
 		/// <returns>The button created.</returns>
-		IButton add (string ns, string id);
+		IButton add(string ns, string id);
 	}
 
 	/// <summary>
@@ -285,7 +289,7 @@ namespace ScienceChecklist
 		/// Permanently destroys this button so that it is no longer displayed.
 		/// Should be used when a plugin is stopped to remove leftover buttons.
 		/// </summary>
-		void Destroy ();
+		void Destroy();
 	}
 
 	/// <summary>
@@ -296,7 +300,7 @@ namespace ScienceChecklist
 		/// <summary>
 		/// Update any information. This is called once per frame.
 		/// </summary>
-		void Update ();
+		void Update();
 
 		/// <summary>
 		/// Draws GUI widgets for this drawable. This is the equivalent to the OnGUI() message in
@@ -308,7 +312,7 @@ namespace ScienceChecklist
 		/// </remarks>
 		/// <param name="position">The left/top position of where to draw this drawable.</param>
 		/// <returns>The current width/height of this drawable.</returns>
-		Vector2 Draw (Vector2 position);
+		Vector2 Draw(Vector2 position);
 	}
 
 	#endregion
@@ -337,7 +341,7 @@ namespace ScienceChecklist
 	/// An event handler that is invoked whenever a button has been clicked.
 	/// </summary>
 	/// <param name="e">An event describing the button click.</param>
-	public delegate void ClickHandler (ClickEvent e);
+	public delegate void ClickHandler(ClickEvent e);
 
 	/// <summary>
 	/// Event describing the mouse pointer moving about a button.
@@ -365,13 +369,13 @@ namespace ScienceChecklist
 	/// An event handler that is invoked whenever the mouse pointer enters a button's area.
 	/// </summary>
 	/// <param name="e">An event describing the mouse pointer entering.</param>
-	public delegate void MouseEnterHandler (MouseEnterEvent e);
+	public delegate void MouseEnterHandler(MouseEnterEvent e);
 
 	/// <summary>
 	/// An event handler that is invoked whenever the mouse pointer leaves a button's area.
 	/// </summary>
 	/// <param name="e">An event describing the mouse pointer leaving.</param>
-	public delegate void MouseLeaveHandler (MouseLeaveEvent e);
+	public delegate void MouseLeaveHandler(MouseLeaveEvent e);
 
 	#endregion
 
@@ -397,7 +401,7 @@ namespace ScienceChecklist
 	/// <example>
 	/// <code>
 	/// IButton button = ...
-	/// button.Visibility = new GameScenesVisibility(GameScenes.EDITOR, GameScenes.SPH);
+	/// button.Visibility = new GameScenesVisibility(GameScenes.EDITOR, GameScenes.FLIGHT);
 	/// </code>
 	/// </example>
 	/// <seealso cref="IButton.Visibility"/>
@@ -411,7 +415,7 @@ namespace ScienceChecklist
 		private object realGameScenesVisibility;
 		private PropertyInfo visibleProperty;
 
-		public GameScenesVisibility (params GameScenes[] gameScenes) {
+		public GameScenesVisibility(params GameScenes[] gameScenes) {
 			Type gameScenesVisibilityType = ToolbarTypes.getType("Toolbar.GameScenesVisibility");
 			realGameScenesVisibility = Activator.CreateInstance(gameScenesVisibilityType, new object[] { gameScenes });
 			visibleProperty = ToolbarTypes.getProperty(gameScenesVisibilityType, "Visible");
@@ -446,7 +450,7 @@ namespace ScienceChecklist
 		private MethodInfo destroyMethod;
 		private EventInfo onAnyOptionClickedEvent;
 
-		public PopupMenuDrawable () {
+		public PopupMenuDrawable() {
 			Type popupMenuDrawableType = ToolbarTypes.getType("Toolbar.PopupMenuDrawable");
 			realPopupMenuDrawable = Activator.CreateInstance(popupMenuDrawableType, null);
 			updateMethod = ToolbarTypes.getMethod(popupMenuDrawableType, "Update");
@@ -457,11 +461,11 @@ namespace ScienceChecklist
 			onAnyOptionClickedEvent = ToolbarTypes.getEvent(popupMenuDrawableType, "OnAnyOptionClicked");
 		}
 
-		public void Update () {
+		public void Update() {
 			updateMethod.Invoke(realPopupMenuDrawable, null);
 		}
 
-		public Vector2 Draw (Vector2 position) {
+		public Vector2 Draw(Vector2 position) {
 			return (Vector2) drawMethod.Invoke(realPopupMenuDrawable, new object[] { position });
 		}
 
@@ -470,7 +474,7 @@ namespace ScienceChecklist
 		/// </summary>
 		/// <param name="text">The text of the option.</param>
 		/// <returns>A button that can be used to register clicks on the menu option.</returns>
-		public IButton AddOption (string text) {
+		public IButton AddOption(string text) {
 			object realButton = addOptionMethod.Invoke(realPopupMenuDrawable, new object[] { text });
 			return new Button(realButton, new ToolbarTypes());
 		}
@@ -478,14 +482,14 @@ namespace ScienceChecklist
 		/// <summary>
 		/// Adds a separator to the popup menu.
 		/// </summary>
-		public void AddSeparator () {
+		public void AddSeparator() {
 			addSeparatorMethod.Invoke(realPopupMenuDrawable, null);
 		}
 
 		/// <summary>
 		/// Destroys this drawable. This must always be called before disposing of this drawable.
 		/// </summary>
-		public void Destroy () {
+		public void Destroy() {
 			destroyMethod.Invoke(realPopupMenuDrawable, null);
 		}
 	}
@@ -503,13 +507,13 @@ namespace ScienceChecklist
 		private Dictionary<object, IButton> buttons = new Dictionary<object, IButton>();
 		private ToolbarTypes types = new ToolbarTypes();
 
-		private ToolbarManager (object realToolbarManager) {
+		private ToolbarManager(object realToolbarManager) {
 			this.realToolbarManager = realToolbarManager;
 
 			addMethod = ToolbarTypes.getMethod(types.iToolbarManagerType, "add");
 		}
 
-		public IButton add (string ns, string id) {
+		public IButton add(string ns, string id) {
 			object realButton = addMethod.Invoke(realToolbarManager, new object[] { ns, id });
 			IButton button = new Button(realButton, types);
 			buttons.Add(realButton, button);
@@ -524,7 +528,7 @@ namespace ScienceChecklist
 		private Delegate realMouseEnterHandler;
 		private Delegate realMouseLeaveHandler;
 
-		internal Button (object realButton, ToolbarTypes types) {
+		internal Button(object realButton, ToolbarTypes types) {
 			this.realButton = realButton;
 			this.types = types;
 
@@ -533,7 +537,7 @@ namespace ScienceChecklist
 			realMouseLeaveHandler = attachEventHandler(types.button.onMouseLeaveEvent, "mouseLeft", realButton);
 		}
 
-		private Delegate attachEventHandler (EventInfo @event, string methodName, object realButton) {
+		private Delegate attachEventHandler(EventInfo @event, string methodName, object realButton) {
 			MethodInfo method = GetType().GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
 			Delegate d = Delegate.CreateDelegate(@event.EventHandlerType, this, method);
 			@event.AddEventHandler(realButton, d);
@@ -644,7 +648,7 @@ namespace ScienceChecklist
 
 		public event ClickHandler OnClick;
 
-		private void clicked (object realEvent) {
+		private void clicked(object realEvent) {
 			if (OnClick != null) {
 				OnClick(new ClickEvent(realEvent, this));
 			}
@@ -652,7 +656,7 @@ namespace ScienceChecklist
 
 		public event MouseEnterHandler OnMouseEnter;
 
-		private void mouseEntered (object realEvent) {
+		private void mouseEntered(object realEvent) {
 			if (OnMouseEnter != null) {
 				OnMouseEnter(new MouseEnterEvent(this));
 			}
@@ -660,13 +664,13 @@ namespace ScienceChecklist
 
 		public event MouseLeaveHandler OnMouseLeave;
 
-		private void mouseLeft (object realEvent) {
+		private void mouseLeft(object realEvent) {
 			if (OnMouseLeave != null) {
 				OnMouseLeave(new MouseLeaveEvent(this));
 			}
 		}
 
-		public void Destroy () {
+		public void Destroy() {
 			detachEventHandler(types.button.onClickEvent, realClickHandler, realButton);
 			detachEventHandler(types.button.onMouseEnterEvent, realMouseEnterHandler, realButton);
 			detachEventHandler(types.button.onMouseLeaveEvent, realMouseLeaveHandler, realButton);
@@ -674,13 +678,13 @@ namespace ScienceChecklist
 			types.button.destroyMethod.Invoke(realButton, null);
 		}
 
-		private void detachEventHandler (EventInfo @event, Delegate d, object realButton) {
+		private void detachEventHandler(EventInfo @event, Delegate d, object realButton) {
 			@event.RemoveEventHandler(realButton, d);
 		}
 	}
 
 	public partial class ClickEvent : EventArgs {
-		internal ClickEvent (object realEvent, IButton button) {
+		internal ClickEvent(object realEvent, IButton button) {
 			Type type = realEvent.GetType();
 			Button = button;
 			MouseButton = (int) type.GetField("MouseButton", BindingFlags.Public | BindingFlags.Instance).GetValue(realEvent);
@@ -688,19 +692,19 @@ namespace ScienceChecklist
 	}
 
 	public abstract partial class MouseMoveEvent : EventArgs {
-		internal MouseMoveEvent (IButton button) {
+		internal MouseMoveEvent(IButton button) {
 			this.button = button;
 		}
 	}
 
 	public partial class MouseEnterEvent : MouseMoveEvent {
-		internal MouseEnterEvent (IButton button)
+		internal MouseEnterEvent(IButton button)
 			: base(button) {
 		}
 	}
 
 	public partial class MouseLeaveEvent : MouseMoveEvent {
-		internal MouseLeaveEvent (IButton button)
+		internal MouseLeaveEvent(IButton button)
 			: base(button) {
 		}
 	}
@@ -711,7 +715,7 @@ namespace ScienceChecklist
 		internal readonly Type functionDrawableType;
 		internal readonly ButtonTypes button;
 
-		internal ToolbarTypes () {
+		internal ToolbarTypes() {
 			iToolbarManagerType = getType("Toolbar.IToolbarManager");
 			functionVisibilityType = getType("Toolbar.FunctionVisibility");
 			functionDrawableType = getType("Toolbar.FunctionDrawable");
@@ -720,25 +724,29 @@ namespace ScienceChecklist
 			button = new ButtonTypes(iButtonType);
 		}
 
-		internal static Type getType (string name) {
-			return AssemblyLoader.loadedAssemblies
-				.SelectMany(a => a.assembly.GetExportedTypes())
-				.SingleOrDefault(t => t.FullName == name);
+		internal static Type getType(string name) {
+			Type type = null;
+			AssemblyLoader.loadedAssemblies.TypeOperation(t => {
+				if (t.FullName == name) {
+					type = t;
+				}
+			});
+			return type;
 		}
 
-		internal static PropertyInfo getProperty (Type type, string name) {
+		internal static PropertyInfo getProperty(Type type, string name) {
 			return type.GetProperty(name, BindingFlags.Public | BindingFlags.Instance);
 		}
 
-		internal static PropertyInfo getStaticProperty (Type type, string name) {
+		internal static PropertyInfo getStaticProperty(Type type, string name) {
 			return type.GetProperty(name, BindingFlags.Public | BindingFlags.Static);
 		}
 
-		internal static EventInfo getEvent (Type type, string name) {
+		internal static EventInfo getEvent(Type type, string name) {
 			return type.GetEvent(name, BindingFlags.Public | BindingFlags.Instance);
 		}
 
-		internal static MethodInfo getMethod (Type type, string name) {
+		internal static MethodInfo getMethod(Type type, string name) {
 			return type.GetMethod(name, BindingFlags.Public | BindingFlags.Instance);
 		}
 	}
@@ -760,7 +768,7 @@ namespace ScienceChecklist
 		internal readonly EventInfo onMouseLeaveEvent;
 		internal readonly MethodInfo destroyMethod;
 
-		internal ButtonTypes (Type iButtonType) {
+		internal ButtonTypes(Type iButtonType) {
 			this.iButtonType = iButtonType;
 
 			textProperty = ToolbarTypes.getProperty(iButtonType, "Text");

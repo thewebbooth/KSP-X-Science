@@ -13,7 +13,7 @@ namespace ScienceChecklist {
 
 	
 		// All the Scenes, which ones are kosher?
-		public static bool AllowWindow( GameScenes? Scene = null )
+		public static bool AllowChecklistWindow( GameScenes? Scene = null )
 		{
 			if( Scene == null )
 				Scene = HighLogic.LoadedScene;
@@ -35,6 +35,18 @@ namespace ScienceChecklist {
 				default:
 					return false;
 			}
+		}
+
+
+
+		// All the Scenes, which ones are kosher?
+		public static bool AllowStatusWindow( GameScenes? Scene = null )
+		{
+			if( Scene == null )
+				Scene = HighLogic.LoadedScene;
+			if( Scene == GameScenes.FLIGHT )
+				return true;
+			return false;
 		}
 
 

@@ -16,7 +16,8 @@ namespace ScienceChecklist
 		private Dictionary<string, ScienceSubject> _scienceSubjects;
 		private Dictionary<ScienceExperiment,ModuleScienceExperiment> _experiments;
 		private IList<string> _kscBiomes;
-		private CelestialBody _kerbin;
+		private CelestialBody _homeWorld;
+		private string _kscBiome;
 		private UnlockedInstrumentList _unlockedInstruments;
 		private List<ScienceInstance> _allScienceInstances;
 
@@ -29,7 +30,8 @@ namespace ScienceChecklist
 		public Dictionary<string, ScienceSubject> ScienceSubjects { get { return _scienceSubjects; } }
 		public Dictionary<ScienceExperiment, ModuleScienceExperiment> Experiments { get { return _experiments; } }
 		public IList<string> KscBiomes { get { return _kscBiomes; } }
-		public CelestialBody Kerbin { get { return _kerbin; } }
+		public CelestialBody HomeWorld { get { return _homeWorld; } }
+		public string KscBiome { get { return _kscBiome; } }
 		public UnlockedInstrumentList UnlockedInstruments { get { return _unlockedInstruments; } }
 
 
@@ -206,32 +208,37 @@ namespace ScienceChecklist
 
 		private void UpdateExperiments( )
 		{
-/*var StartTime = DateTime.Now;
-_logger.Trace( "PartLoader contains " + PartLoader.LoadedPartsList.Count.ToString( ) + " items" );
-			for( var x = 0; x < PartLoader.Instance.parts.Count; x++ )
+//			var StartTime = DateTime.Now;
+
+
+			_experiments.Clear( );
+			for( int x = 0; x < PartLoader.LoadedPartsList.Count; x++ )
 			{
-				_logger.Trace( "Part name: " + PartLoader.Instance.parts[ x ].name );
+				AvailablePart P = PartLoader.LoadedPartsList[ x ];
+				List<ModuleScienceExperiment> Modules = P.partPrefab.FindModulesImplementing<ModuleScienceExperiment>( );
+				for( int y = 0; y < Modules.Count; y++ )
+				{
+					ModuleScienceExperiment Module = Modules[ y ];
+					if( Module != null )
+					{
+						if( Module.experimentID != null )
+						{
+							ScienceExperiment Experiment = ResearchAndDevelopment.GetExperiment( Module.experimentID );
+							if( Experiment != null )
+							{
+								if( !_experiments.ContainsKey( Experiment ) )
+									_experiments.Add( Experiment, Module );
+							}
+						}
+					}
+				}
 			}
 
-			var Thing = PartLoader.LoadedPartsList
-			.SelectMany( x => x.partPrefab.FindModulesImplementing<ModuleScienceExperiment>( ) );
-_logger.Trace( "Thing contains " + Thing.Count().ToString( ) + " items" );
-*/
-			// Find all experiments - These should be in an object
-			_experiments = PartLoader.LoadedPartsList
-			.SelectMany( x => x.partPrefab.FindModulesImplementing<ModuleScienceExperiment>( ) )
-			.Select( x => new
-			{
-				Module = x,
-				Experiment = ResearchAndDevelopment.GetExperiment( x.experimentID ),
-			} )
-			.Where( x => x.Experiment != null )
-			.GroupBy( x => x.Experiment )
-			.ToDictionary( x => x.Key, x => x.First( ).Module );
 
-/*_logger.Trace( "_experiments contains " + _experiments.Count.ToString( ) + " items" );
-var Elapsed = DateTime.Now - StartTime;
-_logger.Trace( "UpdateExperiments Done - " + Elapsed.ToString( ) + "ms" );*/
+
+//_logger.Trace( "_experiments contains " + _experiments.Count.ToString( ) + " items" );
+//var Elapsed = DateTime.Now - StartTime;
+//_logger.Trace( "UpdateExperiments Done - " + Elapsed.ToString( ) + "ms" );
 		}
 
 
@@ -239,26 +246,25 @@ _logger.Trace( "UpdateExperiments Done - " + Elapsed.ToString( ) + "ms" );*/
 		private void UpdateKscBiomes( )
 		{
 //var StartTime = DateTime.Now;
-			_kerbin = null;
+			_homeWorld = FlightGlobals.GetHomeBody( );
 			_kscBiomes = new List<string>( );
+			_kscBiome = null;
 
 
 
-			// Do we have Kerbin
-			foreach( var body in _bodyList )
+			if( SpaceCenter.Instance != null )
 			{
-				if( body.Value.Name == "Kerbin" )
-				{
-					_kerbin = body.Key;
-					break;
-				}
+				var lat = SpaceCenter.Instance.Latitude;
+				var lng = SpaceCenter.Instance.Longitude;
+				_kscBiome = ScienceUtil.GetExperimentBiome( _homeWorld, lat, lng );
+//_logger.Trace( "KSC is in the " + biome + " biome" );
 			}
 
 
 
 			// Find the KSC baby biomes
 			// This is throwing exceptions.  I think the callback is being thrown before the world is finished updating.
-				if( _kerbin != null )
+				if( _homeWorld != null )
 				{
 					_kscBiomes = UnityEngine.Object.FindObjectsOfType<Collider>( )
 						.Where( x => x.gameObject.layer == 15 )
@@ -293,7 +299,7 @@ _logger.Trace( "UpdateKscBiomes Done - " + Elapsed.ToString( ) + "ms" );*/
 
 
 			// Quick check for things we depend on
-			if( ResearchAndDevelopment.Instance == null || PartLoader.Instance == null )
+			if( ResearchAndDevelopment.Instance == null || PartLoader.Instance == null  )
 			{
 				_logger.Debug( "ResearchAndDevelopment and PartLoader must be instantiated." );
 				return;
@@ -395,15 +401,15 @@ _logger.Trace( "UpdateKscBiomes Done - " + Elapsed.ToString( ) + "ms" );*/
 				// Can't really avoid magic constants here - Kerbin and Shores
 				if( ( ( sitMask & (uint)ExperimentSituations.SrfLanded ) != 0 ) && ( ( biomeMask & (uint)ExperimentSituations.SrfLanded ) != 0 ) )
 				{
-					if( _kerbin != null && _kscBiomes.Count > 0 )
+					if( _homeWorld != null && _kscBiomes.Count > 0 )
 					{
-						if( bodies.Contains( _bodyList[ _kerbin ] ) ) // If we haven't filtered it out
+						if( bodies.Contains( _bodyList[ _homeWorld ] ) ) // If we haven't filtered it out
 						{
 							if( SituationList.Contains( ExperimentSituations.SrfLanded ) )
 							{
 //_logger.Trace( "BabyBiomes " + experiment.experimentTitle + ": " + sitMask );
 								for( int x = 0; x < _kscBiomes.Count; x++ ) // Ew.
-									_allScienceInstances.Add( new ScienceInstance( experiment, new Situation( _bodyList[ _kerbin ], ExperimentSituations.SrfLanded, "Shores", _kscBiomes[ x ] ), this ) );
+									_allScienceInstances.Add( new ScienceInstance( experiment, new Situation( _bodyList[ _homeWorld ], ExperimentSituations.SrfLanded, _kscBiome, _kscBiomes[ x ] ), this ) );
 							}
 						}
 					}

@@ -1,6 +1,14 @@
 [x] Science!
 ============
 
+
+5.2
+---
+24-Oct-2016 Built against KSP V1.2.0
+* Fix for Contract Configurator
+* Don't rely on KSC being in Kerbin+Shores
+* Works with LTech
+
 5.1
 ---
 13-Oct-2016 Built against KSP V1.2.0

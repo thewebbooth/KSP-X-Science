@@ -9,6 +9,11 @@ namespace ScienceChecklist {
 	public class ScienceChecklistAddon : MonoBehaviour
 	{
 		#region FIELDS
+		public const string WINDOW_NAME_CHECKLIST =		"ScienceChecklist";
+		public const string WINDOW_NAME_STATUS =		"StatusWindow";
+
+
+
 		public xScienceEventHandler		ScienceEventHandler;
 		public ScienceContext Science	{ get; private set; }
 		public Config Config			{ get; private set; }
@@ -94,7 +99,6 @@ namespace ScienceChecklist {
 
 
 			
-			
 			// Checklist window
 			_checklistWindow = new ScienceWindow( this, _settingsWindow, _helpWindow );
 			_checklistWindow.OnCloseEvent += OnChecklistWindowClosed;
@@ -121,7 +125,6 @@ namespace ScienceChecklist {
 			_logger.Trace( "Done Start" );
 		}
 
-		
 
 		
 		// Called by Unity when the application is destroyed.
@@ -186,17 +189,33 @@ namespace ScienceChecklist {
 		// Save and load checklist window config when the game scene is changed
 		private void OnGameSceneSwitch( GameEvents.FromToAction<GameScenes, GameScenes> Data )
 		{
-			if( GameHelper.AllowWindow( Data.from ) )
+			if( GameHelper.AllowChecklistWindow( Data.from ) )
 			{
 				WindowSettings W =_checklistWindow.BuildSettings( );
 				Config.SetWindowConfig( W, Data.from );
 			}
 
-			if( GameHelper.AllowWindow( Data.to ) )
+			if( GameHelper.AllowChecklistWindow( Data.to ) )
 			{
-				WindowSettings W = Config.GetWindowConfig( "ScienceCheckList", Data.to );
+				WindowSettings W = Config.GetWindowConfig( WINDOW_NAME_CHECKLIST, Data.to );
 				_checklistWindow.ApplySettings( W );
 			}
+
+
+
+/*			if( GameHelper.AllowStatusWindow( Data.from ) )
+			{
+//				WindowSettings W =_statusWindow.BuildSettings( );
+//				Config.SetWindowConfig( W, Data.from );
+			}
+
+			if( GameHelper.AllowStatusWindow( Data.to ) )
+			{
+//				WindowSettings W = Config.GetWindowConfig( WINDOW_NAME_CHECKLIST, Data.to );
+//				_statusWindow.ApplySettings( W );
+			}
+*/
+
 		}
 
 
@@ -206,7 +225,7 @@ namespace ScienceChecklist {
 		private void Load( )
 		{
 			_logger.Trace( "Load" );
-			if( !GameHelper.AllowWindow( ) )
+			if( !GameHelper.AllowChecklistWindow( ) )
 			{
 				_logger.Trace( "Ui is hidden in this scene" );
 				RemoveButtons( );
@@ -466,7 +485,7 @@ namespace ScienceChecklist {
 //				_logger.Info( "Load : Blizzy texture" );
 
 
-				_checklistButton.BlizzyNamespace = "ScienceChecklist";
+				_checklistButton.BlizzyNamespace = WINDOW_NAME_CHECKLIST;
 				_checklistButton.BlizzyButtonId = "checklist_button";
 				_checklistButton.BlizzyToolTip = "[x] Science! Checklist";
 				_checklistButton.BlizzyText = "Science Report and Checklist";
@@ -522,7 +541,7 @@ namespace ScienceChecklist {
 //				_logger.Info( "Load : Blizzy texture" );
 
 
-				_statusButton.BlizzyNamespace = "ScienceChecklist";
+				_statusButton.BlizzyNamespace = WINDOW_NAME_CHECKLIST;
 				_statusButton.BlizzyButtonId = "status_button";
 				_statusButton.BlizzyToolTip = "[x] Science! Here & Now";
 				_statusButton.BlizzyText = "Science Status Window";

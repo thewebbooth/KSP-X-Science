@@ -141,7 +141,7 @@ namespace ScienceChecklist {
 		public WindowSettings BuildSettings( )
 		{
 			WindowSettings W = new WindowSettings( );
-			W.Name = "ScienceCheckList";
+			W.Name = ScienceChecklistAddon.WINDOW_NAME_CHECKLIST;
 			W.Top = (int)_rect.yMin;
 			W.Left = (int)_rect.xMin;
 			W.CompactTop = (int)_rect3.yMin;
@@ -190,7 +190,7 @@ namespace ScienceChecklist {
 			{
 				return;
 			}
-			if( !GameHelper.AllowWindow( ) )
+			if( !GameHelper.AllowChecklistWindow( ) )
 			{
 				IsVisible = false;
 				OnCloseEvent( this, EventArgs.Empty );

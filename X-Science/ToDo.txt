@@ -44,6 +44,11 @@
 [DONE] Grey buttons should be labels
 [DONE] Cache available experiments list in status window.
 
+[DONE] Don't rely on Kerbin+Shores
+[DONE] AutoLoader
+Ltech
+
+
 Visibility is weird.
 Config settings for new window
 img/sprite class - Load all in one place
@@ -59,8 +64,6 @@ Need red icons
 Pop icon when necessary.
 Put each icon into class
 Give icon to own window
-
-
 
 
 
