@@ -54,19 +54,7 @@ namespace ScienceChecklist {
 		public static void StopTimeWarp( )
 		{
 			if( TimeWarp.CurrentRateIndex > 0 )
-			{
-				// Simply setting warp index to zero causes some kind of
-				// accuracy problem that can seriously affect the
-				// orbit of the vessel.
-				//
-				// to avoid this, we'll take a snapshot of the orbit
-				// pre-warp and then apply it again after we've changed
-				// the warp rate
-				//				OrbitSnapshot snap = new OrbitSnapshot( FlightGlobals.ActiveVessel.GetOrbitDriver( ).orbit );
 				TimeWarp.SetRate( 0, true );
-				//				FlightGlobals.ActiveVessel.GetOrbitDriver( ).orbit = snap.Load( );
-				//				FlightGlobals.ActiveVessel.GetOrbitDriver( ).orbit.UpdateFromUT( Planetarium.GetUniversalTime( ) );
-			}
 		}
 	}
 }

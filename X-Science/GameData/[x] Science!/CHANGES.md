@@ -1,6 +1,13 @@
 [x] Science!
 ============
 
+5.3
+---
+xx-Nov-2016 Built against KSP V1.2.0
+* Bug fix - Icons invisible after going to MAIN MENU
+* Display situation on Here&Now Window + MouseOver - number of experiments stored
+* Progress bars for experiments on Here&Now window.
+
 
 5.2
 ---

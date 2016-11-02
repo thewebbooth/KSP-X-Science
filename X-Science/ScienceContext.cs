@@ -13,6 +13,7 @@ namespace ScienceChecklist
 		private readonly ScienceChecklistAddon _parent;
 		private Dictionary<CelestialBody, Body> _bodyList;
 		private Dictionary<string, List<ScienceData>> _onboardScience;
+		private List <ScienceData> _currentVesselScience;
 		private Dictionary<string, ScienceSubject> _scienceSubjects;
 		private Dictionary<ScienceExperiment,ModuleScienceExperiment> _experiments;
 		private IList<string> _kscBiomes;
@@ -27,6 +28,7 @@ namespace ScienceChecklist
 
 		public Dictionary<CelestialBody, Body> BodyList { get { return _bodyList; } }
 		public Dictionary<string, List<ScienceData>> OnboardScienceList { get { return _onboardScience; } }
+		public List <ScienceData> CurrentVesselScience { get { return _currentVesselScience; } }
 		public Dictionary<string, ScienceSubject> ScienceSubjects { get { return _scienceSubjects; } }
 		public Dictionary<ScienceExperiment, ModuleScienceExperiment> Experiments { get { return _experiments; } }
 		public IList<string> KscBiomes { get { return _kscBiomes; } }
@@ -121,18 +123,29 @@ namespace ScienceChecklist
 				var onboardScience = new List<ScienceData>( );
 				var vesselIds = new List<string>( );
 
+				_currentVesselScience = new List <ScienceData>( );
 
 
 			// Handle loaded craft, remember the Ids so we can filter the unloaded ones
 				var LoadedVessels = FlightGlobals.Vessels.Where( x => x.loaded );
+				List <ScienceData> D = new List <ScienceData>( );
 				foreach( var v in LoadedVessels )
 				{
 					if( _parent.Config.CheckDebris || v.vesselType != VesselType.Debris )
 					{
-						onboardScience.AddRange( v
-							.FindPartModulesImplementing<IScienceDataContainer>( )
-							.SelectMany( y => y.GetData( ) ?? new ScienceData[ 0 ] ) );
+						 D = v.FindPartModulesImplementing<IScienceDataContainer>( )
+							.SelectMany( y => y.GetData( ) ?? new ScienceData[ 0 ] ).ToList( );
 						vesselIds.Add( v.id.ToString( ).ToLower( ).Replace( "-", "" ) );
+						
+						onboardScience.AddRange( D );
+					}
+
+					if( FlightGlobals.ActiveVessel )
+					{
+						if( FlightGlobals.ActiveVessel == v )
+						{
+							_currentVesselScience = D;
+						}
 					}
 				}
 

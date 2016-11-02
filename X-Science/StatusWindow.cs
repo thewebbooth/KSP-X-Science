@@ -10,17 +10,22 @@ namespace ScienceChecklist
 	class StatusWindow : Window<ScienceChecklistAddon>
 	{
 		public event EventHandler				NoiseEvent;
-
-//		private GUIStyle						_labelStyle;
-//		private GUIStyle						sectionStyle;
+		private readonly Texture2D				_emptyTexture;
+		private readonly Texture2D				_progressTexture;
+		private readonly Texture2D				_completeTexture;
 		private readonly ExperimentFilter		_filter;
 		private readonly ScienceChecklistAddon	_parent;
 		private readonly Logger					_logger;
 		private int								_previousNumExperiments;
 		private GUIStyle						_experimentButtonStyle;
 		private GUIStyle						_experimentLabelStyle;
+		private GUIStyle						_situationStyle;
+		private GUIStyle						_horizontalScrollbarOnboardStyle;
+		private GUIStyle						_progressLabelStyle;
 		private	IList<ModuleScienceExperiment>	_moduleScienceExperiments;
 		private Dictionary<string, bool>		_availableScienceExperiments;
+
+
 
 		public StatusWindow( ScienceChecklistAddon Parent )
 			: base( "[x] Science! Here and Now", 250, 30 )
@@ -30,6 +35,12 @@ namespace ScienceChecklist
 			_filter = new ExperimentFilter( _parent );
 			_filter.DisplayMode = DisplayMode.CurrentSituation;
 			_filter.EnforceLabLanderMode = true;
+
+			_emptyTexture = new Texture2D(1, 1, TextureFormat.ARGB32, false);
+			_emptyTexture.SetPixels(new[] { Color.clear });
+			_emptyTexture.Apply();
+			_progressTexture =						TextureHelper.FromResource( "ScienceChecklist.icons.scienceProgress.png", 13, 13 );
+			_completeTexture =						TextureHelper.FromResource( "ScienceChecklist.icons.scienceComplete.png", 13, 13 );
 
 			_availableScienceExperiments = new Dictionary<string, bool>( );
 
@@ -48,29 +59,40 @@ namespace ScienceChecklist
 		{
 			base.ConfigureStyles( );
 
-/*			if( labelStyle == null )
+			_progressLabelStyle = new GUIStyle( _skin.label )
 			{
-				labelStyle = new GUIStyle( _skin.label );
-				labelStyle.wordWrap = true;
-				labelStyle.fontStyle = FontStyle.Normal;
-				labelStyle.normal.textColor = Color.white;
-				labelStyle.stretchWidth = true;
-				labelStyle.stretchHeight = false;
-				labelStyle.margin.bottom -= 2;
-				labelStyle.padding.bottom -= 2;
-			}
-			if( sectionStyle == null )
+				fontStyle = FontStyle.BoldAndItalic,
+				alignment = TextAnchor.MiddleCenter,
+				fontSize = 11,
+				normal = {
+					textColor = new Color(0.322f, 0.298f, 0.004f)
+				}
+			};
+
+			_horizontalScrollbarOnboardStyle = new GUIStyle( _skin.horizontalScrollbar )
 			{
-				sectionStyle = new GUIStyle( labelStyle );
-				sectionStyle.fontStyle = FontStyle.Bold;
-			}*/
+				normal = { background = _emptyTexture }
+			};
+
+			_situationStyle = new GUIStyle( _skin.label )
+			{
+				fontSize = 13,
+				alignment = TextAnchor.MiddleCenter,
+				fontStyle = FontStyle.Normal,
+				fixedHeight = 25,
+				contentOffset = new Vector2(0, 6),
+				wordWrap = true,
+				normal = {
+					textColor = new Color(0.7f, 0.8f, 0.8f)
+				}
+			};
 			_experimentButtonStyle = new GUIStyle( _skin.button )
 			{
-				fontSize = 18
+				fontSize = 14
 			};
 			_experimentLabelStyle = new GUIStyle( _experimentButtonStyle )
 			{
-				fontSize = 18,
+				fontSize = 14,
 				normal = { textColor = Color.black }
 			};
 		}
@@ -79,22 +101,40 @@ namespace ScienceChecklist
 
 		protected override void DrawWindowContents( int windowID )
 		{
-			GUILayout.Space( 25 );
 			GUILayout.BeginVertical( );
+
+			if( _filter.CurrentSituation != null )
+			{
+				var desc = _filter.CurrentSituation.Description;
+				GUILayout.Box
+				(
+					new GUIContent
+					(
+						char.ToUpper( desc[ 0 ] ) + desc.Substring( 1 ),
+						"Current Vessel: " + _parent.Science.CurrentVesselScience.Count( ) + " stored experiments"
+					),
+					_situationStyle,
+					GUILayout.Width( 250 )
+				);
+			}
+			int Top = 65;
 			if( _filter.DisplayScienceInstances != null )
 			{
 				for( var i = 0; i < _filter.DisplayScienceInstances.Count; i++ )
 				{
-
-					var rect = new Rect( 5, 20 * i, 0, 20 );
+					var rect = new Rect( 5, Top, 250, 30 );
 					var experiment = _filter.DisplayScienceInstances[ i ];
 					DrawExperiment( experiment, rect );
+					Top += 35;
 				}
 			}
 			else
 				_logger.Trace( "DisplayExperiments is null" );
 
+
 			GUILayout.EndVertical( );
+
+
 
 /*			GUILayout.BeginHorizontal( GUILayout.ExpandWidth( true ) );
 			if( GUILayout.Button( new GUIContent( "Kill Warp", "Kill Warp" ), GUILayout.Width( 100 ), GUILayout.Height( 23 ) ) )
@@ -117,8 +157,8 @@ namespace ScienceChecklist
 		{
 			// The window needs to get smaller when the number of experiments drops.
 			// This allows that while preventing flickering.
-			if( _previousNumExperiments > _filter.DisplayScienceInstances.Count )
-				windowPos.height = 25 + ( ( _filter.DisplayScienceInstances.Count + 1 ) * 20 );
+			if( _previousNumExperiments != _filter.DisplayScienceInstances.Count )
+				windowPos.height = 30 + ( ( _filter.DisplayScienceInstances.Count + 1 ) * 35 );
 			_previousNumExperiments = _filter.DisplayScienceInstances.Count;
 			base.DrawWindow( );
 		}
@@ -138,44 +178,38 @@ namespace ScienceChecklist
 		private void DrawExperiment( ScienceInstance exp, Rect rect )
 		{
 			bool ExperimentRunnable = CanRunExperiment( exp, true );
-			Rect progressRect = new Rect(rect) {
-				xMin = rect.xMax - ( 105),
-				xMax = rect.xMax - (40),
-				y = rect.y + ( 3)
-			};
+			Rect buttonRect = new Rect(rect) { xMax = 200 };
 			
 			if( ExperimentRunnable )
 			{
 				_experimentButtonStyle.normal.textColor = exp.IsComplete ? Color.green : Color.yellow;
-				if( GUILayout.Button( exp.ShortDescription, _experimentButtonStyle ) )
+				if( GUI.Button( buttonRect, exp.ShortDescription, _experimentButtonStyle ) )
 				{
 					RunExperiment( exp );
 				}
 			}
 			else
 			{
-				GUILayout.Label( exp.ShortDescription, _experimentLabelStyle );
+				GUI.Label( buttonRect, exp.ShortDescription, _experimentLabelStyle );
 			}
-
-
-
-
-//			ProgressBar(progressRect, exp.CompletedScience, exp.TotalScience, exp.CompletedScience + exp.OnboardScience);
+			int Dif = (int)( ( ( rect.yMax - rect.yMin ) - 13 ) / 2 );
+			Rect progressRect = new Rect( 205, rect.yMin + Dif, 50, 13 );
+			ProgressBar( progressRect, exp.CompletedScience, exp.TotalScience, exp.CompletedScience + exp.OnboardScience );
 		}
 
 
 
 		private void ProgressBar( Rect rect, float curr, float total, float curr2 )
 		{
-/*			var completeTexture = compact ? _completeTextureCompact : _completeTexture;
-			var progressTexture = compact ? _progressTextureCompact : _progressTexture;
+			var completeTexture = _completeTexture;
+			var progressTexture = _progressTexture;
 			var complete = curr > total || (total - curr < 0.1);
-			if (complete) {
+			if( complete )
 				curr = total;
-			}
-			var progressRect = new Rect(rect) {
-				y = rect.y + (compact ? 3 : 1),
-			};
+			var progressRect = new Rect( rect.xMin, rect.yMin, rect.width, 13 );
+
+			GUI.skin.horizontalScrollbar.fixedHeight = 13;
+			GUI.skin.horizontalScrollbarThumb.fixedHeight = 13;
 
 			if (curr2 != 0 && !complete) {
 				var complete2 = false;
@@ -198,12 +232,14 @@ namespace ScienceChecklist
 
 			GUI.HorizontalScrollbar(progressRect, 0, curr / total, 0, 1);
 
-			if (showValues) {
-				var labelRect = new Rect(rect) {
-					y = rect.y - 1,
+			var showValues = true;
+			if( showValues )
+			{
+				var labelRect = new Rect( progressRect ) {
+					y = progressRect.y + 1,
 				};
 				GUI.Label(labelRect, string.Format("{0:0.#}  /  {1:0.#}", curr, total), _progressLabelStyle);
-			}*/
+			}
 		}
 
 
@@ -248,6 +284,8 @@ namespace ScienceChecklist
 							GameHelper.StopTimeWarp( );
 						if( _parent.Config.PlayNoise )
 							PlayNoise( );
+						if( _parent.Config.StopTimeWarp || _parent.Config.PlayNoise )
+						ScreenMessages.PostScreenMessage( "New Situation: " + _filter.CurrentSituation.Description );
 					}
 				}
 			}

@@ -45,18 +45,22 @@
 [DONE] Cache available experiments list in status window.
 
 [DONE] Don't rely on Kerbin+Shores
-[DONE] AutoLoader
-Ltech
-
-
-Visibility is weird.
+[DONE] Ltech
+[DONE] Message on screen when changing biome.
+[DONE] Science in vehicle
+[DONE] Green bar
 Config settings for new window
-img/sprite class - Load all in one place
-Remove buttons from status window
 
-Green bar
+
+
 rename window
 Dont show results window.
+img/sprite class - Load all in one place
+
+Visibility is weird.
+Funding
+
+
 
 
 
@@ -82,8 +86,8 @@ Give icon to own window
 
 Remove foreach and Linq
 ---------------------------------------------------
-Nuke Linq - 9 files // 8 Files
-Nuke foreach - 23 instances // 8 instances
+Nuke Linq -		9 files //		8 Files //		7 Files
+Nuke foreach - 23 instances //	8 instances //	7 instances
 ---------------------------------------------------
 
 
