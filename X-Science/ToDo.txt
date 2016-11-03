@@ -49,21 +49,18 @@
 [DONE] Message on screen when changing biome.
 [DONE] Science in vehicle
 [DONE] Green bar
+
+
 Config settings for new window
+Dont show results window.
+Here&Now Settings
 
 
 
 rename window
-Dont show results window.
 img/sprite class - Load all in one place
-
 Visibility is weird.
 Funding
-
-
-
-
-
 Need red icons
 Pop icon when necessary.
 Put each icon into class
@@ -74,15 +71,7 @@ Give icon to own window
 * Window class config
 * Window width
 * Store pre-calculated content where possible.
-
-
-
-
-
 * Difficult science filter
-
-
-
 
 Remove foreach and Linq
 ---------------------------------------------------
