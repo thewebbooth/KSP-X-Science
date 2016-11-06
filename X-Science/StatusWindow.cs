@@ -280,7 +280,7 @@ namespace ScienceChecklist
 				{
 					if( IsVisible( ) )
 					{
-						if( _parent.Config.StopTimeWarp )
+						if( _parent.Config.StopTimeWarp && ( !_parent.Config.StopTimeWarpOnlyOnNewScience || _filter.NewScienceCount > 0 ))
 							GameHelper.StopTimeWarp( );
 						if( _parent.Config.PlayNoise )
 							PlayNoise( );

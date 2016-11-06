@@ -19,6 +19,7 @@ namespace ScienceChecklist {
 			private bool _checkDebris;
 			private bool _allFilter;
 			private bool _stopTimeWarp;
+			private bool _stopTimeWarpOnlyOnNewScience;
 			private bool _playNoise;
 			private bool _showResultsWindow;
 
@@ -31,6 +32,7 @@ namespace ScienceChecklist {
 			public bool CheckDebris						{ get { return _checkDebris; }					set { if( _checkDebris != value ) { _checkDebris = value; OnCheckDebrisChanged( ); } } }
 			public bool AllFilter						{ get { return _allFilter; }					set { if( _allFilter != value ) { _allFilter = value; OnAllFilterChanged( ); } } }
 			public bool StopTimeWarp					{ get { return _stopTimeWarp; }					set { if( _stopTimeWarp != value ) { _stopTimeWarp = value; OnStopTimeWarpChanged( ); } } }
+			public bool StopTimeWarpOnlyOnNewScience	{ get { return _stopTimeWarpOnlyOnNewScience; }	set { if( _stopTimeWarpOnlyOnNewScience != value ) { _stopTimeWarpOnlyOnNewScience = value; OnStopTimeWarpOnlyOnNewScienceChanged( ); } } }
 			public bool PlayNoise						{ get { return _playNoise; }					set { if( _playNoise != value ) { _allFilter = value; OnPlayNoiseChanged( ); } } }
 			public bool ShowResultsWindow				{ get { return _showResultsWindow; }			set { if( _showResultsWindow != value ) { _showResultsWindow = value; OnShowResultsWindowChanged( ); } } }
 
@@ -43,6 +45,7 @@ namespace ScienceChecklist {
 			public event EventHandler CheckDebrisChanged;
 			public event EventHandler AllFilterChanged;
 			public event EventHandler StopTimeWarpChanged;
+			public event EventHandler StopTimeWarpOnlyOnNewScienceChanged;
 			public event EventHandler PlayNoiseChanged;
 			public event EventHandler ShowResultsWindowChanged;
 
@@ -97,7 +100,15 @@ namespace ScienceChecklist {
 				}
 			}
 
-			private void OnPlayNoiseChanged( )
+			private void OnStopTimeWarpOnlyOnNewScienceChanged()
+			{
+				if (StopTimeWarpOnlyOnNewScienceChanged != null)
+				{
+					StopTimeWarpOnlyOnNewScienceChanged(this, EventArgs.Empty);
+				}
+			}
+
+		private void OnPlayNoiseChanged( )
 			{
 				if( PlayNoiseChanged != null )
 				{
@@ -187,6 +198,7 @@ namespace ScienceChecklist {
 			settings.AddValue( "CheckDebris",					_checkDebris );
 			settings.AddValue( "AllFilter",						_allFilter );
 			settings.AddValue( "StopTimeWarp",					_stopTimeWarp );
+			settings.AddValue( "StopTimeWarpOnlyOnNewScience",	_stopTimeWarpOnlyOnNewScience );
 			settings.AddValue( "PlayNoise",						_playNoise );
 			settings.AddValue( "ShowResultsWindow",				_showResultsWindow );
 
@@ -225,6 +237,7 @@ namespace ScienceChecklist {
 			_checkDebris =					false;
 			_allFilter =					true;
 			_stopTimeWarp =					true;
+			_stopTimeWarpOnlyOnNewScience = false;
 			_playNoise =					true;
 			_showResultsWindow =			true;
 
@@ -266,6 +279,10 @@ namespace ScienceChecklist {
 					V = settings.GetValue( "StopTimeWarp" );
 					if( V != null )
 						_stopTimeWarp = bool.Parse( V );
+
+					V = settings.GetValue( "StopTimeWarpOnlyOnNewScience" );
+					if ( V != null )
+						_stopTimeWarpOnlyOnNewScience = bool.Parse( V );
 
 					V = settings.GetValue( "PlayNoise" );
 					if( V != null )
