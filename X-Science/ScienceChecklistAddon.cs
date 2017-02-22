@@ -87,7 +87,7 @@ namespace ScienceChecklist {
 
 			
 			// Help window
-			_helpWindow = new HelpWindow( );
+			_helpWindow = new HelpWindow( this );
 
 			
 			
