@@ -40,35 +40,42 @@ namespace ScienceChecklist
 		private readonly int _tooltipWindowId = UnityEngine.Random.Range( 0, int.MaxValue );
         private string configNodeName;
         protected Rect windowPos;
+		protected Vector2 defaultWindowSize;
         private bool mouseDown;
         private bool visible;
 		private readonly Logger _logger;
 		protected string _lastTooltip;
+		protected readonly ScienceChecklistAddon _parent;
 
-		protected GUISkin _skin;
+      protected GUISkin _skin;
         protected GUIStyle closeButtonStyle;
 		protected GUIContent closeContent;
         private GUIStyle resizeStyle;
         private GUIContent resizeContent;
 		private GUIStyle _tooltipStyle;
 		private GUIStyle _tooltipBoxStyle;
+		private GUIStyle windowStyle;
 
-        public bool Resizable { get; set; }
+      public bool Resizable { get; set; }
         public bool HideCloseButton { get; set; }
         public bool HideWhenPaused { get; set; }
 		public event EventHandler WindowClosed;
 
 
 
-        protected Window(string windowTitle, float defaultWidth, float defaultHeight)
+        protected Window(string windowTitle, float defaultWidth, float defaultHeight, ScienceChecklistAddon Parent)
         {
+			_parent = Parent;
 			_logger = new Logger( this );
+
+			defaultWindowSize = new Vector2(defaultWidth, defaultHeight);
+
             this.windowTitle = windowTitle;
             this.windowId = windowTitle.GetHashCode() + new System.Random().Next(65536);
 
             configNodeName = windowTitle.Replace(" ", "");
 
-            windowPos = new Rect((Screen.width - defaultWidth) / 2, (Screen.height - defaultHeight) / 2, defaultWidth, defaultHeight);
+            windowPos = new Rect((Screen.width - wScale(defaultWindowSize.x)) / 2, (Screen.height - wScale(defaultWindowSize.y)) / 2, wScale(defaultWindowSize.x), wScale(defaultWindowSize.y));
             mouseDown = false;
             visible = false;
 
@@ -82,6 +89,8 @@ namespace ScienceChecklist
             Resizable = true;
             HideCloseButton = false;
             HideWhenPaused = true;
+
+			_parent.Config.UiScaleChanged += OnUiScaleChange;
         }
 
         public bool IsVisible()
@@ -178,13 +187,14 @@ namespace ScienceChecklist
 
                     windowPos = Utilities.EnsureVisible(windowPos);
                     windowPos = GUILayout.Window( windowId, windowPos, PreDrawWindowContents, windowTitle, GUILayout.ExpandWidth(true),
-                        GUILayout.ExpandHeight(true), GUILayout.MinWidth(64), GUILayout.MinHeight(64));
+                        GUILayout.ExpandHeight(true), GUILayout.MinWidth(wScale(64)), GUILayout.MinHeight(wScale(64)));
 
 
 					if( !string.IsNullOrEmpty( _lastTooltip ) )
 					{
-						_tooltipStyle = _tooltipStyle ?? new GUIStyle( GUI.skin.window )
+						_tooltipStyle = _tooltipStyle ?? new GUIStyle(GUI.skin.window)
 						{
+							fontSize = wScale(11),
 							normal =
 							{
 								background = GUI.skin.window.normal.background
@@ -195,14 +205,15 @@ namespace ScienceChecklist
 							_tooltipBoxStyle = _tooltipBoxStyle ?? new GUIStyle( GUI.skin.box )
 						{
 							// int left, int right, int top, int bottom
-							padding = new RectOffset( 4, 4, 4, 4 ),
+							fontSize = wScale(11),
+							padding = wScale(new RectOffset(4, 4, 4, 4)),
 							wordWrap = true
 						};
 
-						float boxHeight = _tooltipBoxStyle.CalcHeight( new GUIContent( _lastTooltip ), 190 );
-						GUI.Window( _tooltipWindowId, new Rect( Mouse.screenPos.x + 15, Mouse.screenPos.y + 15, 200, boxHeight + 10 ), x =>
+						float boxHeight = _tooltipBoxStyle.CalcHeight( new GUIContent( _lastTooltip ), wScale(190));
+						GUI.Window( _tooltipWindowId, new Rect( Mouse.screenPos.x + wScale(15), Mouse.screenPos.y + wScale(15), wScale(200), boxHeight + wScale(10)), x =>
 						{
-							GUI.Box( new Rect( 5, 5, 190, boxHeight ), _lastTooltip, _tooltipBoxStyle );
+							GUI.Box( new Rect( wScale(5), wScale(5), wScale(190), boxHeight ), _lastTooltip, _tooltipBoxStyle );
 						}, string.Empty, _tooltipStyle );
 					}
 
@@ -220,11 +231,22 @@ namespace ScienceChecklist
 				// Initialize our skin and styles.
 				_skin = GameObject.Instantiate(HighLogic.Skin) as GUISkin;
 
-				if( closeButtonStyle == null )
+				if (windowStyle == null)
+				{
+					windowStyle = new GUIStyle(_skin.window);
+					windowStyle.fontSize = (int)(_skin.window.fontSize * _parent.Config.UiScale);
+					windowStyle.padding = wScale(_skin.window.padding);
+					windowStyle.margin = wScale(_skin.window.margin);
+					windowStyle.border = wScale(_skin.window.border);
+					windowStyle.contentOffset = wScale(_skin.window.contentOffset);
+				}
+				_skin.window = windowStyle;
+
+				if ( closeButtonStyle == null )
 				{
 					closeButtonStyle = new GUIStyle(_skin.button);
-					closeButtonStyle.padding = new RectOffset(2, 2, 2, 2);
-					closeButtonStyle.margin = new RectOffset(1, 1, 1, 1);
+					closeButtonStyle.padding = wScale(new RectOffset(2, 2, 2, 2));
+					closeButtonStyle.margin = wScale(new RectOffset(1, 1, 1, 1));
 					closeButtonStyle.stretchWidth = false;
 					closeButtonStyle.stretchHeight = false;
 					closeButtonStyle.alignment = TextAnchor.MiddleCenter;
@@ -233,7 +255,7 @@ namespace ScienceChecklist
 				{
 					resizeStyle = new GUIStyle(_skin.label);
 					resizeStyle.alignment = TextAnchor.MiddleCenter;
-					resizeStyle.padding = new RectOffset(1, 1, 1, 1);
+					resizeStyle.padding = wScale(new RectOffset(1, 1, 1, 1));
 				}	
 			}
         }
@@ -246,7 +268,7 @@ namespace ScienceChecklist
 
             if (!HideCloseButton)
             {
-                if( GUI.Button( new Rect( 4, 4, 20, 20 ), closeContent, closeButtonStyle ) )
+                if( GUI.Button( wScale(new Rect(4, 4, 20, 20)), closeContent, closeButtonStyle ) )
                 {
                     SetVisible(false);
 					OnClose( EventArgs.Empty );
@@ -255,7 +277,7 @@ namespace ScienceChecklist
 
             if (Resizable)
             {
-                var resizeRect = new Rect(windowPos.width - 16, windowPos.height - 16, 16, 16);
+                var resizeRect = new Rect(windowPos.width - wScale(16), windowPos.height - wScale(16), wScale(16), wScale(16));
                 GUI.Label(resizeRect, resizeContent, resizeStyle);
 
                 HandleWindowEvents(resizeRect);
@@ -298,8 +320,8 @@ namespace ScienceChecklist
                         // Flip the mouse Y so that 0 is at the top
                         float mouseY = Screen.height - Input.mousePosition.y;
 
-                        windowPos.width = Mathf.Clamp(Input.mousePosition.x - windowPos.x + (resizeRect.width / 2), 50, Screen.width - windowPos.x);
-                        windowPos.height = Mathf.Clamp(mouseY - windowPos.y + (resizeRect.height / 2), 50, Screen.height - windowPos.y);
+                        windowPos.width = Mathf.Clamp(Input.mousePosition.x - windowPos.x + (resizeRect.width / 2), wScale(50), Screen.width - windowPos.x);
+                        windowPos.height = Mathf.Clamp(mouseY - windowPos.y + (resizeRect.height / 2), wScale(50), Screen.height - windowPos.y);
                     }
                     else
                     {
@@ -314,5 +336,34 @@ namespace ScienceChecklist
 			if( WindowClosed != null )
 				WindowClosed( this, e );
 		}
-    }
+
+		protected virtual void OnUiScaleChange( object sender, EventArgs e )
+		{
+			_skin = null;
+			closeButtonStyle = null;
+			resizeStyle = null;
+			_tooltipStyle = null;
+			_tooltipBoxStyle = null;
+			windowStyle = null;
+
+			ConfigureStyles();
+		}
+
+		protected int wScale(int v) { return Convert.ToInt32(Math.Round(v * _parent.Config.UiScale)); }
+		protected float wScale(float v) { return v * _parent.Config.UiScale; }
+		protected Rect wScale(Rect v)
+		{
+			return new Rect(wScale(v.x), wScale(v.y), wScale(v.width), wScale(v.height));
+		}
+		protected RectOffset wScale(RectOffset v)
+		{
+			return new RectOffset(wScale(v.left), wScale(v.right), wScale(v.top), wScale(v.bottom));
+		}
+		protected Vector2 wScale(Vector2 v)
+		{
+			return new Vector2(wScale(v.x), wScale(v.y));
+		}
+
+	}
+
 }

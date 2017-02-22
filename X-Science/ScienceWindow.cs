@@ -26,6 +26,7 @@ namespace ScienceChecklist {
 		private GUIStyle _labelStyle;
 		private GUIStyle _horizontalScrollbarOnboardStyle;
 		private GUIStyle _progressLabelStyle;
+		private GUIStyle _textFieldStyle;
 		private GUIStyle _situationStyle;
 		private GUIStyle _experimentProgressLabelStyle;
 		private GUIStyle _tooltipStyle;
@@ -35,7 +36,10 @@ namespace ScienceChecklist {
 		private GUIStyle _compactSituationStyle;
 		private GUIStyle _compactButtonStyle;
 		private GUIStyle _closeButtonStyle;
+		private GUIStyle _windowStyle;
 		private GUISkin _skin;
+		private Vector2 _defaultSize;
+		private Vector2 _defaultSize3;
 
 		private string _lastTooltip;
 		private bool _compactMode;
@@ -74,8 +78,10 @@ namespace ScienceChecklist {
 			_helpWindow = helpWindow;
 
 			_logger = new Logger(this);
-			_rect = new Rect(40, 40, 500, 400);
-			_rect3 = new Rect(40, 40, 400, 200);
+			_defaultSize = new Vector2(500, 400);
+			_rect = wScale(new Rect(40, 40, _defaultSize.x, _defaultSize.y));
+			_defaultSize3 = new Vector2(400, 200);
+			_rect3 = wScale(new Rect(40, 40, _defaultSize3.x, _defaultSize3.y));
 			_scrollPos = new Vector2();
 			_filter = new ExperimentFilter( _parent );
 
@@ -105,6 +111,7 @@ namespace ScienceChecklist {
 			_parent.ScienceEventHandler.FilterUpdateEvent += ( s, e ) => RefreshFilter( s, e );
 			_parent.ScienceEventHandler.SituationChanged += ( s, e ) => UpdateSituation( s, e );
 
+			_parent.Config.UiScaleChanged += OnUiScaleChange;
 		}
 		#endregion
 
@@ -160,13 +167,13 @@ namespace ScienceChecklist {
 		{
 			_rect.yMin = W.Top;
 			_rect.xMin = W.Left;
-			_rect.yMax = W.Top + 400;
-			_rect.xMax = W.Left + 500;
+			_rect.yMax = W.Top + wScale(400);
+			_rect.xMax = W.Left + wScale(500);
 
 			_rect3.yMin = W.CompactTop;
 			_rect3.xMin = W.CompactLeft;
-			_rect3.yMax = W.CompactTop + 200;
-			_rect3.xMax = W.CompactLeft + 400;
+			_rect3.yMax = W.CompactTop + wScale(200);
+			_rect3.xMax = W.CompactLeft + wScale(400);
 
 			_compactMode = W.Compacted;
 			_filter.DisplayMode = W.FilterMode;
@@ -201,29 +208,29 @@ namespace ScienceChecklist {
 				// Initialize our skin and styles.
 				_skin = GameObject.Instantiate(HighLogic.Skin) as GUISkin;
 
-				_skin.horizontalScrollbarThumb.fixedHeight = 13;
-				_skin.horizontalScrollbar.fixedHeight = 13;
+				_skin.horizontalScrollbarThumb.fixedHeight = wScale(13);
+				_skin.horizontalScrollbar.fixedHeight = wScale(13);
 
 				_labelStyle = new GUIStyle(_skin.label) {
-					fontSize = 11,
+					fontSize = wScale(11),
 					fontStyle = FontStyle.Italic,
 				};
 
 				_progressLabelStyle = new GUIStyle(_skin.label) {
 					fontStyle = FontStyle.BoldAndItalic,
 					alignment = TextAnchor.MiddleCenter,
-					fontSize = 11,
+					fontSize = wScale(11),
 					normal = {
 						textColor = new Color(0.322f, 0.298f, 0.004f),
 					},
 				};
 
 				_situationStyle = new GUIStyle(_progressLabelStyle) {
-					fontSize = 13,
+					fontSize = wScale(13),
 					alignment = TextAnchor.MiddleCenter,
 					fontStyle = FontStyle.Normal,
-					fixedHeight = 25,
-					contentOffset = new Vector2(0, 6),
+					fixedHeight = wScale(25),
+					contentOffset = wScale(new Vector2(0, 6)),
 					wordWrap = true,
 					normal = {
 						textColor = new Color(0.7f, 0.8f, 0.8f),
@@ -231,7 +238,15 @@ namespace ScienceChecklist {
 				};
 
 				_experimentProgressLabelStyle = new GUIStyle(_skin.label) {
-					padding = new RectOffset(0, 0, 4, 0),
+					fontSize = wScale(16),
+					alignment = TextAnchor.MiddleLeft,
+					padding = wScale(new RectOffset(0, 0, 4, 0)),
+				};
+
+				_textFieldStyle = new GUIStyle(_skin.textField)
+				{
+					fontSize = wScale(16),
+					alignment = TextAnchor.MiddleLeft,
 				};
 
 				_horizontalScrollbarOnboardStyle = new GUIStyle(_skin.horizontalScrollbar) {
@@ -241,31 +256,41 @@ namespace ScienceChecklist {
 				};
 
 				_compactWindowStyle = new GUIStyle(_skin.window) {
-					padding = new RectOffset(0, 4, 4, 4),
+					padding = wScale(new RectOffset(0, 4, 4, 4)),
 				};
 
 				_compactLabelStyle = new GUIStyle(_labelStyle) {
-					fontSize = 9,
+					fontSize = wScale(9),
 				};
 
 				_compactSituationStyle = new GUIStyle(_situationStyle) {
-					fontSize = 11,
-					contentOffset = new Vector2( 0, 3 ),
+					fontSize = wScale(11),
+					contentOffset = wScale(new Vector2(0, 3)),
 				};
 
 				_compactButtonStyle = new GUIStyle(_skin.button) {
 					padding = new RectOffset(),
-					fixedHeight = 16
+					fixedHeight = wScale(16)
 				};
 				_closeButtonStyle = new GUIStyle( _skin.button )
 				{
 					// int left, int right, int top, int bottom
-					padding = new RectOffset(2, 2, 2, 2),
-					margin = new RectOffset(1, 1, 1, 1),
+					padding = wScale(new RectOffset(2, 2, 2, 2)),
+					margin = wScale(new RectOffset(1, 1, 1, 1)),
 					stretchWidth = false,
 					stretchHeight = false,
 					alignment = TextAnchor.MiddleCenter,
 				};
+
+				_windowStyle = new GUIStyle(_skin.window) {
+					fontSize = (int)(_skin.window.fontSize * _parent.Config.UiScale),
+					padding = wScale(_skin.window.padding),
+					margin =wScale(_skin.window.margin),
+					border = wScale(_skin.window.border),
+					contentOffset = wScale(_skin.window.contentOffset),
+				};
+
+				_skin.window = _windowStyle;
 			}
 
 			var oldSkin = GUI.skin;
@@ -293,14 +318,15 @@ namespace ScienceChecklist {
 				_tooltipBoxStyle = _tooltipBoxStyle ?? new GUIStyle( _skin.box )
 				{
 					// int left, int right, int top, int bottom
-					padding = new RectOffset( 4, 4, 4, 4 ),
+					fontSize = wScale(11),
+					padding = wScale(new RectOffset(4, 4, 4, 4)),
 					wordWrap = true
 				};
 
-				float boxHeight = _tooltipBoxStyle.CalcHeight( new GUIContent( _lastTooltip ), 190 );
-				GUI.Window( _window2Id, new Rect( Mouse.screenPos.x + 15, Mouse.screenPos.y + 15, 200, boxHeight + 10 ), x =>
+				float boxHeight = _tooltipBoxStyle.CalcHeight( new GUIContent( _lastTooltip ), wScale(190));
+				GUI.Window( _window2Id, new Rect( Mouse.screenPos.x + wScale(15), Mouse.screenPos.y + wScale(15), wScale(200), boxHeight + wScale(10)), x =>
 				{
-					GUI.Box( new Rect( 5, 5, 190, boxHeight ), _lastTooltip, _tooltipBoxStyle );
+					GUI.Box( new Rect( wScale(5), wScale(5), wScale(190), boxHeight ), _lastTooltip, _tooltipBoxStyle );
 				}, string.Empty, _tooltipStyle );
 			}
 
@@ -327,17 +353,17 @@ namespace ScienceChecklist {
 
 			GUILayout.BeginHorizontal( );
 
-			GUILayout.BeginVertical(GUILayout.Width(480), GUILayout.ExpandHeight(true));
+			GUILayout.BeginVertical(GUILayout.Width(wScale(480)), GUILayout.ExpandHeight(true));
 
 			ProgressBar(
-				new Rect (10, 27, 480, 13),
+				wScale(new Rect(10, 27, 480, 13)),
 				_filter.TotalCount == 0 ? 1 : _filter.CompleteCount,
 				_filter.TotalCount == 0 ? 1 : _filter.TotalCount,
 				0,
 				false,
 				false);
 
-			GUILayout.Space(20);
+			GUILayout.Space(wScale(20));
 
 			GUILayout.BeginHorizontal( );
 			GUILayout.Label
@@ -347,13 +373,13 @@ namespace ScienceChecklist {
 					string.Format( "{0} remaining\n{1:0.#} mits", _filter.TotalCount - _filter.CompleteCount, _filter.TotalScience - _filter.CompletedScience )
 				),
 				_experimentProgressLabelStyle,
-				GUILayout.Width( 150 )
+				GUILayout.Width( wScale(150) )
 			);
 			GUILayout.FlexibleSpace();
-			GUILayout.Label(new GUIContent(_searchTexture));
-			_filter.Text = GUILayout.TextField(_filter.Text, GUILayout.Width(150));
+			GUILayout.Label(new GUIContent(_searchTexture), _experimentProgressLabelStyle);
+			_filter.Text = GUILayout.TextField(_filter.Text, _textFieldStyle, GUILayout.Height(wScale(25)), GUILayout.Width(wScale(150)));
 
-			if (GUILayout.Button(new GUIContent(_clearSearchTexture, "Clear search"), GUILayout.Width(25), GUILayout.Height(23))) {
+			if (GUILayout.Button(new GUIContent(_clearSearchTexture, "Clear search"), GUILayout.Width(wScale(25)), GUILayout.Height(wScale(25)))) {
 				_filter.Text = string.Empty;
 			}
 
@@ -367,8 +393,8 @@ namespace ScienceChecklist {
 			{
 				for( ; i < _filter.DisplayScienceInstances.Count; i++ )
 				{
-					var rect = new Rect( 5, 20 * i, _filter.DisplayScienceInstances.Count > 13 ? 490 : 500, 20 );
-				if (rect.yMax < _scrollPos.y || rect.yMin > _scrollPos.y + 400) {
+					var rect = new Rect( wScale(5), wScale(20) * i, _filter.DisplayScienceInstances.Count > 13 ? wScale(490) : wScale(500), wScale(20));
+				if (rect.yMax < _scrollPos.y || rect.yMin > _scrollPos.y + wScale(400)) {
 					continue;
 				}
 
@@ -377,13 +403,13 @@ namespace ScienceChecklist {
 			}
 			}
 
-			GUILayout.Space(20 * i);
+			GUILayout.Space(wScale(20) * i);
 			GUILayout.EndScrollView();
 			
 			GUILayout.BeginHorizontal();
 
 
-			var TextWidth = 290;
+			var TextWidth = wScale(290);
 			var NumButtons = 3;
 			GUIContent[ ] FilterButtons = {
 					new GUIContent(_currentSituationTexture, "Show experiments available right now"),
@@ -394,7 +420,7 @@ namespace ScienceChecklist {
 			{
 				Array.Resize( ref FilterButtons, 4 );
 				FilterButtons[ 3 ] = new GUIContent(_allTexture, "Show all experiments");
-				TextWidth = 260;
+				TextWidth = wScale(260);
 				NumButtons = 4;
 			}
 			else
@@ -406,7 +432,7 @@ namespace ScienceChecklist {
 				}
 			}
 
-			_filter.DisplayMode = (DisplayMode)GUILayout.SelectionGrid( (int)_filter.DisplayMode, FilterButtons, NumButtons );
+			_filter.DisplayMode = (DisplayMode)GUILayout.SelectionGrid( (int)_filter.DisplayMode, FilterButtons, NumButtons, _closeButtonStyle, GUILayout.Width(wScale(20 * NumButtons)), GUILayout.Height(wScale(20)));
 
 			GUILayout.FlexibleSpace();
 
@@ -442,7 +468,7 @@ namespace ScienceChecklist {
 		private void DrawCompactControls( int windowId )
 		{
 			GUILayout.BeginHorizontal( );
-			GUILayout.Label( "", GUILayout.Height( 20 ) );
+			GUILayout.Label( "", GUILayout.Height( wScale(20) ) );
 			GUILayout.EndHorizontal( );
 
 			GUILayout.BeginVertical();
@@ -453,8 +479,8 @@ namespace ScienceChecklist {
 				for( ; i < _filter.DisplayScienceInstances.Count; i++ )
 				{
 
-					var rect = new Rect( 5, 15 * i, _filter.DisplayScienceInstances.Count > 11 ? 405 : 420, 20 );
-					if (rect.yMax < _compactScrollPos.y || rect.yMin > _compactScrollPos.y + 400) {
+					var rect = wScale(new Rect( 5, 15 * i, _filter.DisplayScienceInstances.Count > 11 ? 405 : 420, 20 ));
+					if (rect.yMax < _compactScrollPos.y || rect.yMin > _compactScrollPos.y + wScale(400)) {
 						continue;
 					}
 
@@ -464,7 +490,7 @@ namespace ScienceChecklist {
 			}
 			else
 				_logger.Trace( "DisplayExperiments is null" );
-			GUILayout.Space(15 * i);
+			GUILayout.Space(wScale(15) * i);
 			GUILayout.EndScrollView();
 			GUILayout.EndVertical();
 
@@ -473,7 +499,7 @@ namespace ScienceChecklist {
 			if( _filter.CurrentSituation != null )
 			{
 				var desc = _filter.CurrentSituation.Description;
-				GUI.Box( new Rect( 28, 0, _rect3.width - 100, 16 ), char.ToUpper( desc[ 0 ] ) + desc.Substring( 1 ), _compactSituationStyle );
+				GUI.Box( new Rect( wScale(28), wScale(0), _rect3.width - wScale(100), wScale(16)), char.ToUpper( desc[ 0 ] ) + desc.Substring( 1 ), _compactSituationStyle );
 			}
 			DrawTitleBarButtons( _rect3, true );
 
@@ -497,20 +523,20 @@ namespace ScienceChecklist {
 		private void DrawTitleBarButtons( Rect rect, bool NeedMaxIcon = false )
 		{
 			var closeContent = ( _closeTexture != null ) ? new GUIContent( _closeTexture, "Close window" ) : new GUIContent( "X", "Close window" );
-			if( GUI.Button( new Rect( 4, 4, 20, 20 ), closeContent, _closeButtonStyle ) )
+			if( GUI.Button( wScale(new Rect(4, 4, 20, 20)), closeContent, _closeButtonStyle ) )
 			{
 				IsVisible = false;
 				OnCloseEvent( this, EventArgs.Empty );
 			}
 
 			var helpContent = ( _helpTexture != null ) ? new GUIContent( _helpTexture, "Open help window" ) : new GUIContent( "?", "Open help window" );
-			if( GUI.Button( new Rect( rect.width - 72, 4, 20, 20 ), helpContent, _closeButtonStyle ) )
+			if( GUI.Button( new Rect( rect.width - wScale(72), wScale(4), wScale(20), wScale(20)), helpContent, _closeButtonStyle ) )
 			{
 				_helpWindow.ToggleVisible( );
 			}
 
 			var setingsContent = ( _settingsTexture != null ) ? new GUIContent( _settingsTexture, "Open settings window" ) : new GUIContent( "S", "Open settings window" );
-			if( GUI.Button( new Rect( rect.width - 48, 4, 20, 20 ), setingsContent, _closeButtonStyle ) )
+			if( GUI.Button( new Rect( rect.width - wScale(48), wScale(4), wScale(20), wScale(20)), setingsContent, _closeButtonStyle ) )
 			{
 				_settingsWindow.ToggleVisible( );
 			}
@@ -520,7 +546,7 @@ namespace ScienceChecklist {
 				compactContent = ( _maximizeTexture != null ) ? new GUIContent( _maximizeTexture, "Maximise window" ) : new GUIContent( "S", "Maximise window" );
 			else
 				compactContent = ( _minimizeTexture != null ) ? new GUIContent( _minimizeTexture, "Compact window" ) : new GUIContent( "S", "Compact window" );
-			if( GUI.Button( new Rect( rect.width - 24, 4, 20, 20 ), compactContent, _closeButtonStyle ) )
+			if( GUI.Button( new Rect( rect.width - wScale(24), wScale(4), wScale(20), wScale(20)), compactContent, _closeButtonStyle ) )
 			{
 				_compactMode = !_compactMode;
 			}
@@ -538,16 +564,16 @@ namespace ScienceChecklist {
 		private void DrawExperiment (ScienceInstance exp, Rect rect, bool compact, GUIStyle labelStyle) {
 			labelStyle.normal.textColor = exp.IsComplete ? Color.green : Color.yellow;
 			var labelRect = new Rect(rect) {
-				y = rect.y + (compact ? 1 : 3),
+				y = rect.y + (compact ? wScale(1) : wScale(3)),
 			};
 			var progressRect = new Rect(rect) {
-				xMin = rect.xMax - (compact ? 75 : 105),
-				xMax = rect.xMax - (compact ? 40 : 40),
-				y = rect.y + (compact ? 1 : 3),
+				xMin = rect.xMax - (compact ? wScale(75) : wScale(105)),
+				xMax = rect.xMax - (compact ? wScale(40) : wScale(40)),
+				y = rect.y + (compact ? wScale(1) : wScale(3)),
 			};
 			GUI.Label(labelRect, exp.Description, labelStyle);
-			GUI.skin.horizontalScrollbar.fixedHeight = compact ? 8 : 13;
-			GUI.skin.horizontalScrollbarThumb.fixedHeight = compact ? 8 : 13;
+			GUI.skin.horizontalScrollbar.fixedHeight = compact ? wScale(8) : wScale(13);
+			GUI.skin.horizontalScrollbarThumb.fixedHeight = compact ? wScale(8) : wScale(13);
 			ProgressBar(progressRect, exp.CompletedScience, exp.TotalScience, exp.CompletedScience + exp.OnboardScience, !compact, compact);
 		}
 
@@ -568,7 +594,7 @@ namespace ScienceChecklist {
 				curr = total;
 			}
 			var progressRect = new Rect(rect) {
-				y = rect.y + (compact ? 3 : 1),
+				y = rect.y + (compact ? wScale(3) : wScale(1)),
 			};
 
 			if (curr2 != 0 && !complete) {
@@ -594,13 +620,38 @@ namespace ScienceChecklist {
 
 			if (showValues) {
 				var labelRect = new Rect(rect) {
-					y = rect.y - 1,
+					y = rect.y - wScale(1),
 				};
 				GUI.Label(labelRect, string.Format("{0:0.#}  /  {1:0.#}", curr, total), _progressLabelStyle);
 			}
 		}
 
+		private void OnUiScaleChange(object sender, EventArgs e)
+		{
+			_skin = null;
+			_tooltipStyle = null;
+			_tooltipBoxStyle = null;
 
+			_rect.width = wScale(_defaultSize.x);
+			_rect.height = wScale(_defaultSize.y);
+			_rect3.width = wScale(_defaultSize3.x);
+			_rect3.height = wScale(_defaultSize3.y);
+		}
+
+		private int wScale(int v) { return Convert.ToInt32(Math.Round(v * _parent.Config.UiScale)); }
+		private float wScale(float v) { return v * _parent.Config.UiScale; }
+		private Rect wScale(Rect v)
+		{
+			return new Rect(wScale(v.x), wScale(v.y), wScale(v.width), wScale(v.height));
+		}
+		private RectOffset wScale(RectOffset v)
+		{
+			return new RectOffset(wScale(v.left), wScale(v.right), wScale(v.top), wScale(v.bottom));
+		}
+		private Vector2 wScale(Vector2 v)
+		{
+			return new Vector2(wScale(v.x), wScale(v.y));
+		}
 
 		#endregion
 	}

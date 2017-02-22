@@ -21,6 +21,7 @@ namespace ScienceChecklist {
 			private bool _stopTimeWarp;
 			private bool _playNoise;
 			private bool _showResultsWindow;
+			private float _uiScale;
 
 
 
@@ -33,11 +34,11 @@ namespace ScienceChecklist {
 			public bool StopTimeWarp					{ get { return _stopTimeWarp; }					set { if( _stopTimeWarp != value ) { _stopTimeWarp = value; OnStopTimeWarpChanged( ); } } }
 			public bool PlayNoise						{ get { return _playNoise; }					set { if( _playNoise != value ) { _allFilter = value; OnPlayNoiseChanged( ); } } }
 			public bool ShowResultsWindow				{ get { return _showResultsWindow; }			set { if( _showResultsWindow != value ) { _showResultsWindow = value; OnShowResultsWindowChanged( ); } } }
+			public float UiScale                   { get { return _uiScale; } set { if (_uiScale != value) { _uiScale = value; OnUiScaleChanged(); } } }
 
 
-
-		// Get notified when settings change
-			public event EventHandler UseBlizzysToolbarChanged;
+      // Get notified when settings change
+      public event EventHandler UseBlizzysToolbarChanged;
 			public event EventHandler HideCompleteEventsChanged;
 			public event EventHandler CompleteWithoutRecoveryChanged;
 			public event EventHandler CheckDebrisChanged;
@@ -45,11 +46,12 @@ namespace ScienceChecklist {
 			public event EventHandler StopTimeWarpChanged;
 			public event EventHandler PlayNoiseChanged;
 			public event EventHandler ShowResultsWindowChanged;
+			public event EventHandler UiScaleChanged;
 
-			
 
-		// For triggering events
-			private void OnUseBlizzysToolbarChanged( )
+
+      // For triggering events
+      private void OnUseBlizzysToolbarChanged( )
 			{
 				if( UseBlizzysToolbarChanged != null )
 				{
@@ -113,9 +115,17 @@ namespace ScienceChecklist {
 				}
 			}
 
+			private void OnUiScaleChanged()
+			{
+				if (UiScaleChanged != null)
+				{
+					UiScaleChanged(this, EventArgs.Empty);
+				}
+			}
 
 
-		public Config( )
+
+      public Config( )
 		{
 			_logger = new Logger( this );
 		}
@@ -189,6 +199,7 @@ namespace ScienceChecklist {
 			settings.AddValue( "StopTimeWarp",					_stopTimeWarp );
 			settings.AddValue( "PlayNoise",						_playNoise );
 			settings.AddValue( "ShowResultsWindow",				_showResultsWindow );
+			settings.AddValue("UiScale", _uiScale);
 
 
 
@@ -198,7 +209,7 @@ namespace ScienceChecklist {
 				foreach( var W in V.Value )
 				{
 					var WindowNode = SceneNode.AddNode( W.Key );
-					WindowNode.AddValue( "Top",	W.Value.Top );
+               WindowNode.AddValue( "Top",	W.Value.Top );
 					WindowNode.AddValue( "Left", W.Value.Left );
 					WindowNode.AddValue( "CompactTop", W.Value.CompactTop );
 					WindowNode.AddValue( "CompactLeft", W.Value.CompactLeft ); 
@@ -227,6 +238,7 @@ namespace ScienceChecklist {
 			_stopTimeWarp =					true;
 			_playNoise =					true;
 			_showResultsWindow =			true;
+			_uiScale = 1f;
 
 
 
@@ -275,9 +287,13 @@ namespace ScienceChecklist {
 					if( V != null )
 						_showResultsWindow = bool.Parse( V );
 
+					V = settings.GetValue("UiScale");
+					if (V != null)
+						_uiScale = float.Parse(V);
 
 
-					var windowSettings = root.GetNode( "Windows" );
+
+               var windowSettings = root.GetNode( "Windows" );
 					if( windowSettings == null ) return;
 					foreach( var N in windowSettings.nodes )
 					{
@@ -301,7 +317,7 @@ namespace ScienceChecklist {
 
 									WindowSettings NewWindowSetting = new WindowSettings( WindowName );
 
-									V = WindowNode.GetValue( "Top" );
+                           V = WindowNode.GetValue( "Top" );
 									if( V != null )
 										NewWindowSetting.Top = int.Parse( V );
 
@@ -334,7 +350,7 @@ namespace ScienceChecklist {
 										NewWindowSetting.FilterMode = (DisplayMode)Enum.Parse( typeof( DisplayMode ), V, true );
 
 
-									_windowSettings[ Scene ][ NewWindowSetting.Name ] = NewWindowSetting;
+                           _windowSettings[ Scene ][ NewWindowSetting.Name ] = NewWindowSetting;
 								}
 							}
 						}
