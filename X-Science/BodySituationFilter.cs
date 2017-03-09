@@ -8,13 +8,13 @@ namespace ScienceChecklist
 {
 	internal sealed class BodySituationFilter
 	{
-		private readonly Logger	_logger;
+//		private readonly Logger	_logger;
 
 
 		public BodySituationFilter( )
 		{
 			// Init
-				_logger = new Logger( this );
+//				_logger = new Logger( this );
 		}
 
 
@@ -27,6 +27,62 @@ namespace ScienceChecklist
 //				_logger.Trace( Filters[ x ] );
 				ApplyOneFilter( BodyList, SituationList, Filters[ x ] );
 			}
+		}
+
+
+
+		public bool TextFilter( ScienceInstance S )
+		{
+			string[] Filters = CelestialBodyFilters.TextFilters.GetValues( "TEXT_FILTER" );
+			string Description = S.Description.ToLowerInvariant( );
+			
+
+
+			for( int FilterIndex = 0; FilterIndex < Filters.Length; FilterIndex++ )
+			{
+				string FilterText = Filters[ FilterIndex ];
+
+				string[] Words = FilterText.Split( ' ' );
+				bool WordResult = true;
+				for( int WordIndex = 0; WordIndex < Words.Length; WordIndex++ )
+				{
+					string[] Options = Words[ WordIndex ].Split( '|' );
+					bool OptionResult = false;
+					for( int OptionIndex = 0; OptionIndex < Options.Length; OptionIndex++ )
+					{
+						string ThisOption = Options[ OptionIndex ].ToLowerInvariant( );
+						var negate = false;
+						if( ThisOption.StartsWith( "-", StringComparison.InvariantCultureIgnoreCase ) )
+						{
+							negate = true;
+							ThisOption = ThisOption.Substring( 1 );
+						}
+
+						bool Result = ( Description.Contains( ThisOption ) == !negate );
+						if( Result )
+						{
+//							_logger.Log( "Option: " + Description + " WITH " + ThisOption );
+							OptionResult = true; // Matched one of the options
+							break;
+						}
+					}
+					if( !OptionResult ) // None of the options matched, so this word is not in the description
+					{
+//						_logger.Log( "Word: " + Description + " Doesn't contain " + Words[ WordIndex ] );
+						WordResult = false;
+						break;
+					}
+				}
+				if( WordResult ) // Matched all words in a filter
+				{
+//					_logger.Log( "TEXT_FILTER: " + Description + " WITH " + FilterText );
+					return false;
+				}
+
+			}
+
+			
+			return true;
 		}
 
 
@@ -168,6 +224,49 @@ namespace ScienceChecklist
 					SituationList.RemoveAll( x => x == ExperimentSituations.InSpaceHigh );
 					break;
 			}
+		}
+
+
+
+		public bool DifficultScienceFilter( ScienceInstance S )
+		{
+			// For stars don't show any flying situations.  Block EVA in space near 'cos the Kerbals just explode
+			if( S.Situation.Body.IsStar )
+			{
+				if( S.Situation.ExperimentSituation == ExperimentSituations.FlyingHigh || S.Situation.ExperimentSituation == ExperimentSituations.FlyingLow )
+					return false;
+				if( S.Situation.ExperimentSituation == ExperimentSituations.InSpaceLow && S.ScienceExperiment.id == "evaReport" ) 
+					return false;
+			}
+
+			// For gas-giants don't show any flying low.
+			if( S.Situation.Body.IsGasGiant )
+			{
+				if( S.Situation.ExperimentSituation == ExperimentSituations.FlyingLow )
+					return false;
+			}
+
+			// If the AstronautComplex isn't upgraded then block all non-homeworld EVA.
+			// Also EVA on homeworld that isn't splashed or landed or flying-low.
+			float AstroLevel = ScenarioUpgradeableFacilities.GetFacilityLevel( SpaceCenterFacility.AstronautComplex );
+			if( AstroLevel == 0f )
+			{
+				if( S.ScienceExperiment.id == "evaReport" )
+				{
+					if( S.Situation.Body.IsHome )
+					{
+						if( S.Situation.ExperimentSituation == ExperimentSituations.InSpaceHigh ||
+							S.Situation.ExperimentSituation == ExperimentSituations.InSpaceLow ||
+							S.Situation.ExperimentSituation == ExperimentSituations.FlyingHigh
+						)
+							return false;
+					}
+					else
+						return false;
+				}
+			}
+
+			return true;
 		}
 	}
 }

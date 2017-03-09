@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine; // For Collider
 
 
+
 // The current state of science in KSP
 namespace ScienceChecklist
 {
@@ -339,6 +340,8 @@ _logger.Trace( "UpdateKscBiomes Done - " + Elapsed.ToString( ) + "ms" );*/
 				On ScienceExperiment
 				*/
 
+
+
 				// OrbitalScience support - where the experiment is possible
 				if( sitMask == 0 && _experiments[ experiment ] != null )
 				{
@@ -402,16 +405,26 @@ _logger.Trace( "UpdateKscBiomes Done - " + Elapsed.ToString( ) + "ms" );*/
 						if( bodies[ body_index ].Biomes.Any( ) && ( biomeMask & (uint)SituationList[ situation_index ] ) != 0 )
 						{
 							for( int biome_index = 0; biome_index < bodies[ body_index ].Biomes.Count( ); biome_index++ )
-								_allScienceInstances.Add( new ScienceInstance( experiment, new Situation( bodies[ body_index ], SituationList[ situation_index ], bodies[ body_index ].Biomes[ biome_index ] ), this ) );
+							{
+								ScienceInstance S = new ScienceInstance( experiment, new Situation( bodies[ body_index ], SituationList[ situation_index ], bodies[ body_index ].Biomes[ biome_index ] ), this );
+								if( BodyFilter.TextFilter( S ) )
+									if( !_parent.Config.FilterDifficultScience || BodyFilter.DifficultScienceFilter( S ) )
+										_allScienceInstances.Add( S );
+							}
 						}
 						else
-							_allScienceInstances.Add( new ScienceInstance( experiment, new Situation( bodies[ body_index ], SituationList[ situation_index ] ), this ) );
+						{
+							ScienceInstance S = new ScienceInstance( experiment, new Situation( bodies[ body_index ], SituationList[ situation_index ] ), this );
+							if( BodyFilter.TextFilter( S ) )
+								if( !_parent.Config.FilterDifficultScience || BodyFilter.DifficultScienceFilter( S ) )
+									_allScienceInstances.Add( S );
+						}
 					}
 				}
 
 
 
-				// Can't really avoid magic constants here - Kerbin and Shores
+
 				if( ( ( sitMask & (uint)ExperimentSituations.SrfLanded ) != 0 ) && ( ( biomeMask & (uint)ExperimentSituations.SrfLanded ) != 0 ) )
 				{
 					if( _homeWorld != null && _kscBiomes.Count > 0 )
@@ -421,8 +434,13 @@ _logger.Trace( "UpdateKscBiomes Done - " + Elapsed.ToString( ) + "ms" );*/
 							if( SituationList.Contains( ExperimentSituations.SrfLanded ) )
 							{
 //_logger.Trace( "BabyBiomes " + experiment.experimentTitle + ": " + sitMask );
-								for( int x = 0; x < _kscBiomes.Count; x++ ) // Ew.
-									_allScienceInstances.Add( new ScienceInstance( experiment, new Situation( _bodyList[ _homeWorld ], ExperimentSituations.SrfLanded, _kscBiome, _kscBiomes[ x ] ), this ) );
+								for( int x = 0; x < _kscBiomes.Count; x++ )
+								{
+									ScienceInstance S = new ScienceInstance( experiment, new Situation( _bodyList[ _homeWorld ], ExperimentSituations.SrfLanded, _kscBiome, _kscBiomes[ x ] ), this );
+									if( BodyFilter.TextFilter( S ) )
+										if( !_parent.Config.FilterDifficultScience || BodyFilter.DifficultScienceFilter( S ) )
+											_allScienceInstances.Add( S );
+								}
 							}
 						}
 					}

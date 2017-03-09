@@ -17,6 +17,7 @@ namespace ScienceChecklist
 		private readonly ScienceChecklistAddon	_parent;
 		private readonly Logger					_logger;
 		private int								_previousNumExperiments;
+		private float _previousUiScale;
 		private GUIStyle						_experimentButtonStyle;
 		private GUIStyle						_experimentLabelStyle;
 		private GUIStyle						_situationStyle;
@@ -31,6 +32,7 @@ namespace ScienceChecklist
 			: base( "[x] Science! Here and Now", 250, 30 )
 		{
 			_parent = Parent;
+			UiScale = _parent.Config.UiScale;
 			_logger = new Logger( this );
 			_filter = new ExperimentFilter( _parent );
 			_filter.DisplayMode = DisplayMode.CurrentSituation;
@@ -51,6 +53,7 @@ namespace ScienceChecklist
 			_parent.ScienceEventHandler.SituationChanged += ( s, e ) => UpdateSituation( s, e );
 			this.Resizable = false;
 			_filter.UpdateFilter( );
+			_parent.Config.UiScaleChanged += OnUiScaleChange;
 		}
 
 
@@ -63,7 +66,7 @@ namespace ScienceChecklist
 			{
 				fontStyle = FontStyle.BoldAndItalic,
 				alignment = TextAnchor.MiddleCenter,
-				fontSize = 11,
+				fontSize = wScale(11),
 				normal = {
 					textColor = new Color(0.322f, 0.298f, 0.004f)
 				}
@@ -76,11 +79,11 @@ namespace ScienceChecklist
 
 			_situationStyle = new GUIStyle( _skin.label )
 			{
-				fontSize = 13,
+            fontSize = wScale(13),
 				alignment = TextAnchor.MiddleCenter,
 				fontStyle = FontStyle.Normal,
-				fixedHeight = 25,
-				contentOffset = new Vector2(0, 6),
+            fixedHeight = wScale(25),
+            contentOffset = wScale(new Vector2(0, 6)),
 				wordWrap = true,
 				normal = {
 					textColor = new Color(0.7f, 0.8f, 0.8f)
@@ -88,13 +91,28 @@ namespace ScienceChecklist
 			};
 			_experimentButtonStyle = new GUIStyle( _skin.button )
 			{
-				fontSize = 14
+            fontSize = wScale(14)
 			};
 			_experimentLabelStyle = new GUIStyle( _experimentButtonStyle )
 			{
-				fontSize = 14,
+            fontSize = wScale(14),
 				normal = { textColor = Color.black }
 			};
+		}
+
+
+
+		private void OnUiScaleChange( object sender, EventArgs e )
+		{
+			UiScale = _parent.Config.UiScale;
+			_progressLabelStyle = null;
+			_horizontalScrollbarOnboardStyle = null;
+			_situationStyle = null;
+			_experimentButtonStyle = null;
+			_experimentLabelStyle = null;
+
+			base.OnUiScaleChange( );
+			ConfigureStyles( );
 		}
 
 
@@ -103,7 +121,7 @@ namespace ScienceChecklist
 		{
 			GUILayout.BeginVertical( );
 
-			if( _filter.CurrentSituation != null )
+			if( _filter.CurrentSituation != null && _parent.Science.CurrentVesselScience != null)
 			{
 				var desc = _filter.CurrentSituation.Description;
 				GUILayout.Box
@@ -114,18 +132,18 @@ namespace ScienceChecklist
 						"Current Vessel: " + _parent.Science.CurrentVesselScience.Count( ) + " stored experiments"
 					),
 					_situationStyle,
-					GUILayout.Width( 250 )
+               GUILayout.Width(wScale(250))
 				);
 			}
-			int Top = 65;
+         int Top = wScale(65);
 			if( _filter.DisplayScienceInstances != null )
 			{
 				for( var i = 0; i < _filter.DisplayScienceInstances.Count; i++ )
 				{
-					var rect = new Rect( 5, Top, 250, 30 );
+               var rect = new Rect(wScale(5), Top, wScale(250), wScale(30));
 					var experiment = _filter.DisplayScienceInstances[ i ];
 					DrawExperiment( experiment, rect );
-					Top += 35;
+               Top += wScale(35);
 				}
 			}
 			else
@@ -148,7 +166,7 @@ namespace ScienceChecklist
 			}
 			GUILayout.EndHorizontal( );*/
 
-			GUILayout.Space( 2 );
+         GUILayout.Space(wScale(2));
 		}
 
 
@@ -157,9 +175,14 @@ namespace ScienceChecklist
 		{
 			// The window needs to get smaller when the number of experiments drops.
 			// This allows that while preventing flickering.
-			if( _previousNumExperiments != _filter.DisplayScienceInstances.Count )
-				windowPos.height = 30 + ( ( _filter.DisplayScienceInstances.Count + 1 ) * 35 );
-			_previousNumExperiments = _filter.DisplayScienceInstances.Count;
+         if (_previousNumExperiments != _filter.DisplayScienceInstances.Count || _parent.Config.UiScale != _previousUiScale)
+         {
+            windowPos.height = wScale(30) + ((_filter.DisplayScienceInstances.Count + 1) * wScale(35));
+            windowPos.width = wScale(defaultWindowSize.x);
+            _previousNumExperiments = _filter.DisplayScienceInstances.Count;
+            _previousUiScale = _parent.Config.UiScale;
+         }
+
 			base.DrawWindow( );
 		}
 
@@ -178,7 +201,7 @@ namespace ScienceChecklist
 		private void DrawExperiment( ScienceInstance exp, Rect rect )
 		{
 			bool ExperimentRunnable = CanRunExperiment( exp, true );
-			Rect buttonRect = new Rect(rect) { xMax = 200 };
+         Rect buttonRect = new Rect(rect) { xMax = wScale(200) };
 			
 			if( ExperimentRunnable )
 			{
@@ -192,8 +215,8 @@ namespace ScienceChecklist
 			{
 				GUI.Label( buttonRect, exp.ShortDescription, _experimentLabelStyle );
 			}
-			int Dif = (int)( ( ( rect.yMax - rect.yMin ) - 13 ) / 2 );
-			Rect progressRect = new Rect( 205, rect.yMin + Dif, 50, 13 );
+         int Dif = (int)(((rect.yMax - rect.yMin) - wScale(13)) / 2);
+         Rect progressRect = new Rect(wScale(205), rect.yMin + Dif, wScale(50), wScale(13));
 			ProgressBar( progressRect, exp.CompletedScience, exp.TotalScience, exp.CompletedScience + exp.OnboardScience );
 		}
 
@@ -206,14 +229,16 @@ namespace ScienceChecklist
 			var complete = curr > total || (total - curr < 0.1);
 			if( complete )
 				curr = total;
-			var progressRect = new Rect( rect.xMin, rect.yMin, rect.width, 13 );
+         var progressRect = new Rect(rect.xMin, rect.yMin, rect.width, wScale(13));
 
-			GUI.skin.horizontalScrollbar.fixedHeight = 13;
-			GUI.skin.horizontalScrollbarThumb.fixedHeight = 13;
+         GUI.skin.horizontalScrollbar.fixedHeight = wScale(13);
+         GUI.skin.horizontalScrollbarThumb.fixedHeight = wScale(13);
 
-			if (curr2 != 0 && !complete) {
+			if (curr2 != 0 && !complete)
+			{
 				var complete2 = false;
-				if (curr2 > total || (total - curr2 < 0.1)) {
+				if (curr2 > total || (total - curr2 < 0.1))
+				{
 					curr2 = total;
 					complete2 = true;
 				}
@@ -235,7 +260,8 @@ namespace ScienceChecklist
 			var showValues = true;
 			if( showValues )
 			{
-				var labelRect = new Rect( progressRect ) {
+				var labelRect = new Rect( progressRect )
+				{
 					y = progressRect.y + 1,
 				};
 				GUI.Label(labelRect, string.Format("{0:0.#}  /  {1:0.#}", curr, total), _progressLabelStyle);

@@ -14,7 +14,9 @@ namespace ScienceChecklist
 {
 	internal static class CelestialBodyFilters
 	{
+		private static readonly Logger _logger = new Logger( "CelestialBodyFilters" );
 		public static ConfigNode Filters { get; set; }
+		public static ConfigNode TextFilters { get; set; }
 		static CelestialBodyFilters( )
 		{
 			Load( );
@@ -35,6 +37,7 @@ namespace ScienceChecklist
 					var node = ConfigNode.Load( filePath );
 					var root = node.GetNode( "ScienceChecklist" );
 					Filters = root.GetNode( "CelestialBodyFilters" );
+					TextFilters = root.GetNode( "TextFilters" );
 				}
 //				_logger.Trace( "DONE Loading settings file" );
 			}
@@ -43,7 +46,5 @@ namespace ScienceChecklist
 				_logger.Info( "Unable to load filters: " + e.ToString( ) );
 			}
 		}
-
-		private static readonly Logger _logger = new Logger( "CelestialBodyFilters" );
 	}
 }

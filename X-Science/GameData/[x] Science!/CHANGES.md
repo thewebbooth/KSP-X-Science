@@ -1,6 +1,22 @@
 [x] Science!
 ============
 
+5.5
+---
+09-Mar-2017 Built against KSP V1.2.2
+* Ui Scaling contributed by jsmcconn
+* Text Filters in science.cfg
+* Difficult science filter
+* Updated help
+
+
+
+5.4
+---
+07-Dec-2016 Built against KSP V1.2.2
+
+
+
 5.3
 ---
 03-Nov-2016 Built against KSP V1.2.1

@@ -2,6 +2,7 @@
 using System.Linq;
 
 
+
 // This class is a junction box for events concerning science related stuff.
 // Events tend to happen in flurries.  This deals with them and tries to prevent the system slowing down
 // because of event spamming.
@@ -33,15 +34,15 @@ namespace ScienceChecklist
 
 			private	ScienceChecklistAddon	_parent;
 			private Situation				_currentSituation;
-//			private Logger					_logger;
+//private Logger					_logger;
 			
 
 
 		// Constructor
 		public xScienceEventHandler( ScienceChecklistAddon Parent )
 		{
-//			_logger = new Logger( this );
-//			_logger.Trace( "xScienceEventHandler" );
+//_logger = new Logger( this );
+//_logger.Trace( "xScienceEventHandler" );
 			_parent = Parent;
 			
 			_nextExperimentUpdate =		DateTime.Now;
@@ -66,6 +67,7 @@ namespace ScienceChecklist
 			GameEvents.onVesselSOIChanged.Add( new EventData<GameEvents.HostedFromToAction<Vessel, CelestialBody>>.OnEvent( this.VesselSOIChanged ) );
 
 			_parent.Config.CheckDebrisChanged += ( s, e ) => CheckDebrisSettingChanged( );
+			_parent.Config.FilterDifficultScienceChanged += ( s, e ) => FilterDifficultScienceChanged( );
 		}
 
 
@@ -289,6 +291,14 @@ namespace ScienceChecklist
 			{
 //				_logger.Trace( "Callback: CheckDebrisSettingChanged" );
 				ScheduleExperimentUpdate( false );
+			}
+
+
+
+			private void FilterDifficultScienceChanged( )
+			{
+//				_logger.Trace( "Callback: FilterDifficultScienceChanged" );
+				ScheduleExperimentUpdate( true );
 			}
 
 

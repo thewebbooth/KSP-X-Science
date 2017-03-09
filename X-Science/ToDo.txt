@@ -1,4 +1,7 @@
-﻿[DONE] Event handler and no coroutines
+﻿TO DO LIST
+----------
+
+[DONE] Event handler and no coroutines
 [DONE] Window positions
 [DONE] Fix long text
 [DONE] Summary tooltip
@@ -49,12 +52,25 @@
 [DONE] Message on screen when changing biome.
 [DONE] Science in vehicle
 [DONE] Green bar
+[DONE] Ui Scaling from GitHub
+[DONE] FILTER in config file
+next   Difficult science filter <-------------------This next
+
 
 
 Config settings for new window
 Dont show results window.
 Here&Now Settings
+Situation bug on KSC window.
+Open Here&Now before checklist - throws exception
+Orbital Science
+Right click to open h&N
+New Baby Biome - probably a bug - new collider on wrong layer.
+Check map for water biomes.
+Save settings more often - after filter change
 
+Slightly bigger font.
+check weird bugs in status window
 
 
 rename window
@@ -71,7 +87,7 @@ Give icon to own window
 * Window class config
 * Window width
 * Store pre-calculated content where possible.
-* Difficult science filter
+
 
 Remove foreach and Linq
 ---------------------------------------------------

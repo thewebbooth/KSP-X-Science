@@ -21,6 +21,8 @@ namespace ScienceChecklist {
 			private bool _stopTimeWarp;
 			private bool _playNoise;
 			private bool _showResultsWindow;
+			private bool _filterDifficultScience;
+			private float _uiScale;
 
 
 
@@ -33,7 +35,8 @@ namespace ScienceChecklist {
 			public bool StopTimeWarp					{ get { return _stopTimeWarp; }					set { if( _stopTimeWarp != value ) { _stopTimeWarp = value; OnStopTimeWarpChanged( ); } } }
 			public bool PlayNoise						{ get { return _playNoise; }					set { if( _playNoise != value ) { _allFilter = value; OnPlayNoiseChanged( ); } } }
 			public bool ShowResultsWindow				{ get { return _showResultsWindow; }			set { if( _showResultsWindow != value ) { _showResultsWindow = value; OnShowResultsWindowChanged( ); } } }
-
+			public bool FilterDifficultScience			{ get { return _filterDifficultScience; }		set { if( _filterDifficultScience != value ) { _filterDifficultScience = value; OnFilterDifficultScienceChanged( ); } } }
+			public float UiScale						{ get { return _uiScale; }						set { if (_uiScale != value) { _uiScale = value; OnUiScaleChanged(); } } }
 
 
 		// Get notified when settings change
@@ -45,6 +48,8 @@ namespace ScienceChecklist {
 			public event EventHandler StopTimeWarpChanged;
 			public event EventHandler PlayNoiseChanged;
 			public event EventHandler ShowResultsWindowChanged;
+			public event EventHandler FilterDifficultScienceChanged;
+ 			public event EventHandler UiScaleChanged;
 
 			
 
@@ -110,6 +115,22 @@ namespace ScienceChecklist {
 				if( ShowResultsWindowChanged != null )
 				{
 					ShowResultsWindowChanged( this, EventArgs.Empty );
+				}
+			}
+
+			private void OnFilterDifficultScienceChanged( )
+			{
+				if( FilterDifficultScienceChanged != null )
+				{
+					FilterDifficultScienceChanged( this, EventArgs.Empty );
+				}
+			}
+
+			private void OnUiScaleChanged()
+			{
+				if (UiScaleChanged != null)
+				{
+					UiScaleChanged(this, EventArgs.Empty);
 				}
 			}
 
@@ -189,6 +210,8 @@ namespace ScienceChecklist {
 			settings.AddValue( "StopTimeWarp",					_stopTimeWarp );
 			settings.AddValue( "PlayNoise",						_playNoise );
 			settings.AddValue( "ShowResultsWindow",				_showResultsWindow );
+			settings.AddValue( "FilterDifficultScience",		_filterDifficultScience );
+			settings.AddValue( "UiScale",						_uiScale );
 
 
 
@@ -227,6 +250,8 @@ namespace ScienceChecklist {
 			_stopTimeWarp =					true;
 			_playNoise =					true;
 			_showResultsWindow =			true;
+			_filterDifficultScience =		true;
+			_uiScale =						1f;
 
 
 
@@ -274,6 +299,14 @@ namespace ScienceChecklist {
 					V = settings.GetValue( "ShowResultsWindow" );
 					if( V != null )
 						_showResultsWindow = bool.Parse( V );
+
+					V = settings.GetValue( "FilterDifficultScience" );
+					if( V != null )
+						_filterDifficultScience = bool.Parse( V );
+
+					V = settings.GetValue("UiScale");
+					if (V != null)
+						_uiScale = float.Parse(V);
 
 
 
