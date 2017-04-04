@@ -362,9 +362,12 @@ namespace ScienceChecklist {
 									if( V != null )
 										NewWindowSetting.FilterText = V;
 
-									V = WindowNode.GetValue( "Filtermode" );
+									V = WindowNode.GetValue( "FilterMode" );
 									if( V != null )
+									{
 										NewWindowSetting.FilterMode = (DisplayMode)Enum.Parse( typeof( DisplayMode ), V, true );
+										_logger.Info( "FilterMode: " + V + " = " + NewWindowSetting.FilterMode.ToString( ) );
+									}
 
 
 									_windowSettings[ Scene ][ NewWindowSetting.Name ] = NewWindowSetting;

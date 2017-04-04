@@ -37,7 +37,7 @@ namespace ScienceChecklist
 					return;
 				}
 
-                audioSource.PlayOneShot( Clip, Mathf.Clamp( GameSettings.UI_VOLUME, 0f, 1f ) );
+				audioSource.PlayOneShot( Clip, Mathf.Clamp( GameSettings.UI_VOLUME, 0f, 1f ) );
 			}
 			else
 				_logger.Debug( "No AudioSource" );

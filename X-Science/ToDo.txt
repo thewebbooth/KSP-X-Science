@@ -54,46 +54,45 @@
 [DONE] Green bar
 [DONE] Ui Scaling from GitHub
 [DONE] FILTER in config file
-next   Difficult science filter <-------------------This next
+[DONE] Difficult science filter
+[DONE] Check weird bugs in status window
 
+[DONE] Situation bug on KSC window.
+[DONE] Orbital Science
+[DONE] Test with new science plugin by DMagic
+[DONE] Only fire stock science if we can't use the new ones
+[DONE] Add arguments for settings to avoid dependency.
+[DONE] Not storing button settings correctly
+[NOT SEEN] Open Here&Now before checklist - throws exception
+[NOT SEEN] H&N pops even if all science is done - May be when complete but not recovered
 
-
-Config settings for new window
-Dont show results window.
+Save settings more often - after filter change
+Save settings more often - when leaving any scene and going to any scene
+Config settings for Here&Now window
 Here&Now Settings
-Situation bug on KSC window.
-Open Here&Now before checklist - throws exception
-Orbital Science
+New buttons
+Need red icons
+
+
+Body Info Window
+Dont show results window.
 Right click to open h&N
 New Baby Biome - probably a bug - new collider on wrong layer.
 Check map for water biomes.
-Save settings more often - after filter change
-
-Slightly bigger font.
-check weird bugs in status window
-
 
 rename window
 img/sprite class - Load all in one place
 Visibility is weird.
 Funding
-Need red icons
+
 Pop icon when necessary.
 Put each icon into class
 Give icon to own window
-
-
 
 * Window class config
 * Window width
 * Store pre-calculated content where possible.
 
-
-Remove foreach and Linq
----------------------------------------------------
-Nuke Linq -		9 files //		8 Files //		7 Files
-Nuke foreach - 23 instances //	8 instances //	7 instances
----------------------------------------------------
 
 
 /*

@@ -104,7 +104,11 @@ namespace ScienceChecklist
 			if( vessel == null )
 			{
 				if( _currentSituation != null )
+				{
 					_currentSituation = null;
+					if( SituationChanged != null )
+						SituationChanged( this, null );
+				}
 				return;
 			}
 

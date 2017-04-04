@@ -24,7 +24,7 @@ namespace ScienceChecklist {
 			_formattedSubBiome = BiomeToString(_subBiome);
 			_description = string.Format("{0} {1}{2}",
 				ToString(_situation),
-				Body.CelestialBody.theName,
+				Body.CelestialBody.theName,//displayName,
 				string.IsNullOrEmpty(_formattedBiome)
 					? string.Empty
 					: string.IsNullOrEmpty(_formattedSubBiome)
@@ -68,7 +68,8 @@ namespace ScienceChecklist {
 		/// </summary>
 		/// <param name="situation">The ExperimentSituations to be converted.</param>
 		/// <returns>The human-readable form of the ExperimentSituations.</returns>
-		private string ToString (ExperimentSituations situation) {
+		private string ToString ( ExperimentSituations situation )
+		{
 			switch (situation) {
 				case ExperimentSituations.FlyingHigh:
 					return "flying high over";

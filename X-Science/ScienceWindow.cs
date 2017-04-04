@@ -134,7 +134,10 @@ namespace ScienceChecklist
 
 
 // Bung new situation into filter and recalculate everything
-			_filter.CurrentSituation = new Situation( e._body, e._situation, e._biome, e._subBiome );
+			if( e == null )
+				_filter.CurrentSituation = null;
+			else
+				_filter.CurrentSituation = new Situation( e._body, e._situation, e._biome, e._subBiome );
 			_filter.UpdateFilter( );
 		}
 

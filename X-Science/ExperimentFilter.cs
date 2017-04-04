@@ -15,6 +15,8 @@ namespace ScienceChecklist {
 		private Situation		_situation;
 //		private readonly Logger	_logger;
 
+
+
 		/// <summary>
 		/// Creates a new instance of the ExperimentFilter class.
 		/// </summary>
@@ -151,7 +153,7 @@ namespace ScienceChecklist {
 			else
 			{
 				CompleteWithoutRecovery = _parent.Config.CompleteWithoutRecovery;
-				HideCompleteExperiments = _parent.Config.HideCompleteExperiments;			
+				HideCompleteExperiments = _parent.Config.HideCompleteExperiments;
 			}
 
 

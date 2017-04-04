@@ -16,6 +16,7 @@ namespace ScienceChecklist {
 
 		public xScienceEventHandler		ScienceEventHandler;
 		public ScienceContext Science	{ get; private set; }
+		public DMagicFactory DMagic		{ get; private set; }
 		public Config Config			{ get; private set; }
 
 		private bool					_active;			// Are we actually running?
@@ -69,9 +70,18 @@ namespace ScienceChecklist {
 
 
 
+//			_logger.Trace( "Making DMagic Factory" );
+			DMagic = new DMagicFactory( );
+//			_logger.Trace( "Made DMagic Factory" );
+
+
+
 //			_logger.Trace( "Making ScienceContext" );
 			Science = new ScienceContext( this );
 //			_logger.Trace( "Made ScienceContext" );
+
+
+
 
 
 

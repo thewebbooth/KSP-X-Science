@@ -1,6 +1,18 @@
 [x] Science!
 ============
 
+
+
+5.6
+---
+04-Apr-2017 Built against KSP V1.2.2
+* Situation bug on checklist window in KSC scene, now correctly becomes blank.
+* Reading stored setting for checklist filter button correctly
+* Orbital Science support for Here&Now trigger buttons
+* Only using stock calls for triggering science if we can't use DMagic ones (seems to be best)
+
+
+
 5.5
 ---
 09-Mar-2017 Built against KSP V1.2.2
