@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using KSP.Localization;
 
 
 
@@ -24,13 +25,31 @@ namespace ScienceChecklist {
 			_formattedSubBiome = BiomeToString(_subBiome);
 			_description = string.Format("{0} {1}{2}",
 				ToString(_situation),
-				Body.CelestialBody.bodyName,
+				LocalizeBodyName( Body.CelestialBody.displayName ),
 				string.IsNullOrEmpty(_formattedBiome)
 					? string.Empty
 					: string.IsNullOrEmpty(_formattedSubBiome)
 						? string.Format("'s {0}", _formattedBiome)
 						: string.Format("'s {0} ({1})", _formattedSubBiome, _formattedBiome));
 		}
+
+
+
+
+
+
+private string LocalizeBodyName( string input )
+{
+	return Localizer.Format("<<1>>", input);
+}
+
+
+
+
+
+
+
+
 
 		/// <summary>
 		/// Gets the CelestialBody this situation is for.
