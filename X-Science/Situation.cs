@@ -24,7 +24,7 @@ namespace ScienceChecklist {
 			_formattedSubBiome = BiomeToString(_subBiome);
 			_description = string.Format("{0} {1}{2}",
 				ToString(_situation),
-				Body.CelestialBody.theName,//displayName,
+				Body.CelestialBody.bodyName,
 				string.IsNullOrEmpty(_formattedBiome)
 					? string.Empty
 					: string.IsNullOrEmpty(_formattedSubBiome)

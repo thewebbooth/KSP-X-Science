@@ -3,6 +3,12 @@
 
 
 
+5.7
+---
+26-May-2017 Built against KSP V1.3.0
+
+
+
 5.6
 ---
 04-Apr-2017 Built against KSP V1.2.2
