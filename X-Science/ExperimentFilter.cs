@@ -27,7 +27,7 @@ namespace ScienceChecklist {
 			_displayMode = DisplayMode.Unlocked;
 			_text = string.Empty;
 			DisplayScienceInstances = new List<ScienceInstance>( );
-			CompleteCount = TotalCount = 0;
+			CompleteCount = TotalCount = NewScienceCount = 0;
 			EnforceLabLanderMode = false;
 			TotalScience = CompletedScience = OutstandingScience = 0;
 		}
@@ -46,6 +46,7 @@ namespace ScienceChecklist {
 		/// Gets the total number of display experiments.
 		/// </summary>
 		public int              TotalCount         { get; private set; }
+		public int				NewScienceCount			{ get; private set; }
 
 		public float TotalScience { get; private set; }
 		public float CompletedScience { get; private set; }
@@ -178,6 +179,8 @@ namespace ScienceChecklist {
 				TotalScience = RemainingExperiments.Sum( x => x.TotalScience );
 				CompletedScience = RemainingExperiments.Sum( x => x.CompletedScience );
 			}
+
+			NewScienceCount = query.Count(x => (x.CompletedScience + x.OnboardScience) < 0.1);
 
 
 
