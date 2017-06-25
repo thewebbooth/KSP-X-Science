@@ -89,8 +89,6 @@ namespace ScienceChecklist
 			// GasGiant detection
 				_isGasGiant = !_isStar && !_hasSurface;
 
-			// Type
-				_type = _celestialBody.RevealType( ); // Not sure we can trust this
 
 			// Moon detection + Parent
 				_parent = null; // No parent -  a star
@@ -104,12 +102,26 @@ namespace ScienceChecklist
 						_isMoon = true; // A moon - parent isn't the sun
 				}
 
+			// Type
+				_type = FigureOutType( );
+
 
 			// Progress tracking changes
 				Update( );
 		}
 
-
+		private string FigureOutType( )
+		{
+			if( _isGasGiant )
+				return "Gas Giant";
+			if( _isStar )
+				return "Star";
+			if( _isPlanet )
+				return "Planet";
+			if( _isMoon )
+				return "Moon";
+			return "Unknown";
+		}
 
 		public void Update(  )
 		{

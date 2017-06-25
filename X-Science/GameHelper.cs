@@ -1,4 +1,7 @@
-﻿
+﻿using KSP.Localization;
+
+
+
 /* 
  * THIS IS A STATIC CLASS
  */
@@ -56,5 +59,13 @@ namespace ScienceChecklist {
 			if( TimeWarp.CurrentRateIndex > 0 )
 				TimeWarp.SetRate( 0, true );
 		}
+
+		public static string LocalizeBodyName( string input )
+		{
+			return Localizer.Format("<<1>>", input);
+		}
+
+
+
 	}
 }

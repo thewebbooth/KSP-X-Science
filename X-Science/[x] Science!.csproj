@@ -127,6 +127,12 @@
     <EmbeddedResource Include="icons\help.png" />
     <EmbeddedResource Include="icons\icon-status-small.png" />
     <EmbeddedResource Include="icons\icon-status.png" />
+    <EmbeddedResource Include="icons\audio-alert-off.png" />
+    <EmbeddedResource Include="icons\audio-alert.png" />
+    <EmbeddedResource Include="icons\report-x.png" />
+    <EmbeddedResource Include="icons\report.png" />
+    <EmbeddedResource Include="icons\time-warp-x.png" />
+    <EmbeddedResource Include="icons\time-warp.png" />
     <Content Include="ToDo.txt" />
     <EmbeddedResource Include="icons\scienceCompleteCompact.png" />
     <EmbeddedResource Include="icons\scienceProgressCompact.png" />
@@ -156,9 +162,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy "$(TargetPath)" "C:\Games\KSP\KSP_Real\GameData\[x] Science!"
-copy "$(TargetDir)\MiniAVC.dll" "C:\Games\KSP\KSP_Real\GameData\[x] Science!"
-robocopy "$(ProjectDir)GameData\[x] Science!" "C:\Games\KSP\KSP_Real\GameData\[x] Science!" /E
+    <PostBuildEvent>copy "$(TargetPath)" "C:\Games\KSP\KSP_Test\GameData\[x] Science!"
+copy "$(TargetDir)\MiniAVC.dll" "C:\Games\KSP\KSP_Test\GameData\[x] Science!"
+robocopy "$(ProjectDir)GameData\[x] Science!" "C:\Games\KSP\KSP_Test\GameData\[x] Science!" /E
 exit 0</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>

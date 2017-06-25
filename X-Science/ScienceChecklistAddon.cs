@@ -106,14 +106,18 @@ namespace ScienceChecklist {
 			_statusWindow = new StatusWindow( this );
 			_statusWindow.NoiseEvent += OnPlayNoise;
 			_statusWindow.WindowClosed += OnStatusWindowClosed;
-
+			_statusWindow.OnCloseEvent += OnStatusWindowClosed;
+			_statusWindow.OnOpenEvent += OnStatusWindowOpened;
 
 			
+
 			// Checklist window
 			_checklistWindow = new ScienceWindow( this, _settingsWindow, _helpWindow );
 			_checklistWindow.OnCloseEvent += OnChecklistWindowClosed;
 			_checklistWindow.OnOpenEvent += OnChecklistWindowOpened;
 
+			
+			
 			// Save and load checklist window config when the game scene is changed
 			// We are only visible in some scenes
 			GameEvents.onGameSceneSwitchRequested.Add( new EventData<GameEvents.FromToAction<GameScenes, GameScenes>>.OnEvent( this.OnGameSceneSwitch ) );
@@ -199,6 +203,11 @@ namespace ScienceChecklist {
 		// Save and load checklist window config when the game scene is changed
 		private void OnGameSceneSwitch( GameEvents.FromToAction<GameScenes, GameScenes> Data )
 		{
+_logger.Info( "OnGameSceneSwitch FROM " + Data.from.ToString( ) );
+
+
+
+			// Checklist window settings
 			if( GameHelper.AllowChecklistWindow( Data.from ) )
 			{
 				WindowSettings W =_checklistWindow.BuildSettings( );
@@ -213,18 +222,19 @@ namespace ScienceChecklist {
 
 
 
-/*			if( GameHelper.AllowStatusWindow( Data.from ) )
+			// Status window settings
+			if( GameHelper.AllowStatusWindow( Data.from ) )
 			{
-//				WindowSettings W =_statusWindow.BuildSettings( );
-//				Config.SetWindowConfig( W, Data.from );
+				WindowSettings W =_statusWindow.BuildSettings( );
+				Config.SetWindowConfig( W, Data.from );
 			}
 
 			if( GameHelper.AllowStatusWindow( Data.to ) )
 			{
-//				WindowSettings W = Config.GetWindowConfig( WINDOW_NAME_CHECKLIST, Data.to );
-//				_statusWindow.ApplySettings( W );
+				WindowSettings W = Config.GetWindowConfig( WINDOW_NAME_STATUS, Data.to );
+				_statusWindow.ApplySettings( W );
 			}
-*/
+
 
 		}
 
@@ -373,6 +383,20 @@ namespace ScienceChecklist {
 				_checklistButton.SetOn( );
 			UpdateChecklistVisibility( true );
 		}
+
+
+
+		// Let a window suggest settings are saved.
+		public void OnSettingsDirty( object sender, EventArgs e )
+		{
+			if( GameHelper.AllowChecklistWindow( ) )
+			{
+				WindowSettings W =_checklistWindow.BuildSettings( );
+				Config.SetWindowConfig( W, HighLogic.LoadedScene );
+			}
+		}
+
+
 		#endregion
 
 

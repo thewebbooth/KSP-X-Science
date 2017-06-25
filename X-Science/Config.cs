@@ -33,7 +33,7 @@ namespace ScienceChecklist {
 			public bool CheckDebris						{ get { return _checkDebris; }					set { if( _checkDebris != value ) { _checkDebris = value; OnCheckDebrisChanged( ); } } }
 			public bool AllFilter						{ get { return _allFilter; }					set { if( _allFilter != value ) { _allFilter = value; OnAllFilterChanged( ); } } }
 			public bool StopTimeWarp					{ get { return _stopTimeWarp; }					set { if( _stopTimeWarp != value ) { _stopTimeWarp = value; OnStopTimeWarpChanged( ); } } }
-			public bool PlayNoise						{ get { return _playNoise; }					set { if( _playNoise != value ) { _allFilter = value; OnPlayNoiseChanged( ); } } }
+			public bool PlayNoise						{ get { return _playNoise; }					set { if( _playNoise != value ) { _playNoise = value; OnPlayNoiseChanged( ); } } }
 			public bool ShowResultsWindow				{ get { return _showResultsWindow; }			set { if( _showResultsWindow != value ) { _showResultsWindow = value; OnShowResultsWindowChanged( ); } } }
 			public bool FilterDifficultScience			{ get { return _filterDifficultScience; }		set { if( _filterDifficultScience != value ) { _filterDifficultScience = value; OnFilterDifficultScienceChanged( ); } } }
 			public float UiScale						{ get { return _uiScale; }						set { if (_uiScale != value) { _uiScale = value; OnUiScaleChanged(); } } }

@@ -84,6 +84,8 @@ namespace ScienceChecklist
 			GUILayout.Label( "To narrow your search, you may enter text into the filter eg \"kerbin’s shores\"", labelStyle, GUILayout.ExpandWidth( true ) );
 			GUILayout.Label( "Use – to mean NOT eg \"mun space -near\"", labelStyle, GUILayout.ExpandWidth( true ) );
 			GUILayout.Label( "Use | to mean OR eg \"mun|minmus space\"", labelStyle, GUILayout.ExpandWidth( true ) );
+			GUILayout.Label( "Hover the mouse over the \"123/456 completed\" text.  A pop-up will show more infromation.", labelStyle, GUILayout.ExpandWidth( true ) );
+			GUILayout.Label( "Press the X button to clear your text filter.", labelStyle, GUILayout.ExpandWidth( true ) );
 
 			GUILayout.Space( wScale( 20 ) );
 			GUILayout.Label( "The settings are", sectionStyle, GUILayout.ExpandWidth( true ) );

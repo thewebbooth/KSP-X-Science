@@ -58,9 +58,10 @@ namespace ScienceChecklist {
 			get {
 				return _displayMode;
 			} set {
-				if (_displayMode != value) {
+				if( _displayMode != value )
+				{
 					_displayMode = value;
-					UpdateFilter();
+					UpdateFilter( );
 				}
 			}
 		}
@@ -74,9 +75,10 @@ namespace ScienceChecklist {
 			get {
 				return _text;
 			} set {
-				if (_text != value) {
+				if( _text != value )
+				{
 					_text = value;
-					UpdateFilter();
+					UpdateFilter( );
 				}
 			}
 		}

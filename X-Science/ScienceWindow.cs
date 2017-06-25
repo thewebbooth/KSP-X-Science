@@ -152,6 +152,7 @@ namespace ScienceChecklist
 
 		public WindowSettings BuildSettings( )
 		{
+_logger.Info( "BuildSettings" );
 			WindowSettings W = new WindowSettings( );
 			W.Name = ScienceChecklistAddon.WINDOW_NAME_CHECKLIST;
 			W.Top = (int)_rect.yMin;
@@ -390,11 +391,18 @@ namespace ScienceChecklist
 			);
 			GUILayout.FlexibleSpace();
 			GUILayout.Label(new GUIContent(_searchTexture), _experimentProgressLabelStyle);
-			_filter.Text = GUILayout.TextField(_filter.Text, _textFieldStyle, GUILayout.Height(wScale(25)), GUILayout.Width(wScale(150)));
+			string NewFilterText = GUILayout.TextField(_filter.Text, _textFieldStyle, GUILayout.Height(wScale(25)), GUILayout.Width(wScale(150)));
+			if( _filter.Text != NewFilterText )
+			{
+				_filter.Text = NewFilterText;
+				_parent.OnSettingsDirty( this, null );
+			}
+			 
 
 			if (GUILayout.Button(new GUIContent(_clearSearchTexture, "Clear search"), GUILayout.Width(wScale(25)), GUILayout.Height(wScale(25))))
 			{
 				_filter.Text = string.Empty;
+				_parent.OnSettingsDirty( this, null );
 			}
 
 			GUILayout.EndHorizontal();
@@ -447,7 +455,7 @@ namespace ScienceChecklist
 				}
 			}
 
-			_filter.DisplayMode = (DisplayMode) GUILayout.SelectionGrid(
+			DisplayMode NewDisplayMode = (DisplayMode) GUILayout.SelectionGrid(
 				(int)_filter.DisplayMode,
 				FilterButtons,
 				NumButtons,
@@ -455,7 +463,13 @@ namespace ScienceChecklist
 				GUILayout.Height( wScale( 32 ) )
 			);
 
-			
+			if( _filter.DisplayMode != NewDisplayMode )
+			{
+				_filter.DisplayMode = NewDisplayMode;
+				_parent.OnSettingsDirty( this, null );
+			}
+
+		
 
 			GUILayout.FlexibleSpace();
 
@@ -577,6 +591,7 @@ namespace ScienceChecklist
 			if (GUI.Button(new Rect(rect.width - wScale(24), wScale(4), wScale(20), wScale(20)), compactContent, _closeButtonStyle))
 			{
 				_compactMode = !_compactMode;
+				_parent.OnSettingsDirty( this, null );
 			}
 		}
 

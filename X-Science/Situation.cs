@@ -1,5 +1,5 @@
 ﻿using System.Text.RegularExpressions;
-using KSP.Localization;
+
 
 
 
@@ -25,7 +25,7 @@ namespace ScienceChecklist {
 			_formattedSubBiome = BiomeToString(_subBiome);
 			_description = string.Format("{0} {1}{2}",
 				ToString(_situation),
-				LocalizeBodyName( Body.CelestialBody.displayName ),
+				GameHelper.LocalizeBodyName( Body.CelestialBody.displayName ),
 				string.IsNullOrEmpty(_formattedBiome)
 					? string.Empty
 					: string.IsNullOrEmpty(_formattedSubBiome)
@@ -38,10 +38,6 @@ namespace ScienceChecklist {
 
 
 
-private string LocalizeBodyName( string input )
-{
-	return Localizer.Format("<<1>>", input);
-}
 
 
 

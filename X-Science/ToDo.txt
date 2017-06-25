@@ -65,21 +65,31 @@
 [DONE] Not storing button settings correctly
 [NOT SEEN] Open Here&Now before checklist - throws exception
 [NOT SEEN] H&N pops even if all science is done - May be when complete but not recovered
+[DONEish] New Baby Biome - probably a bug - new collider on wrong layer.
+	(Added filter for KSC2.  Being added to "shores" when probably should be grasslands - in RSS - anybody's guess.)
+[DONE] Save settings more often - after filter change
+[NOT SEEN - DONE IT ANYWAY]Save settings more often - when leaving any scene and going to any scene
 
-Save settings more often - after filter change
-Save settings more often - when leaving any scene and going to any scene
-Config settings for Here&Now window
-Here&Now Settings
-New buttons
-Need red icons
+[DONE] Config settings for Here&Now window
+[DONE] Here&Now Settings
+[DONE] New buttons
+[DONE] Dont show results window.
 
 
+
+Popping when science is available but experiments not runnable.
 Body Info Window
-Dont show results window.
-Right click to open h&N
-New Baby Biome - probably a bug - new collider on wrong layer.
+Resources in tracking station
+Right click to open h&N or MusicMute!
+
+
+
+
 Check map for water biomes.
 
+
+
+Need red icons
 rename window
 img/sprite class - Load all in one place
 Visibility is weird.

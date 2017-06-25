@@ -11,8 +11,17 @@ namespace ScienceChecklist
 	{
 		public event EventHandler				NoiseEvent;
 		private readonly Texture2D				_emptyTexture;
+
 		private readonly Texture2D				_progressTexture;
 		private readonly Texture2D				_completeTexture;
+
+		private readonly Texture2D				_GfxTimeWarp;
+		private readonly Texture2D				_GfxTimeWarpOff;
+		private readonly Texture2D				_GfxAudioAlert;
+		private readonly Texture2D				_GfxAudioAlertOff;
+		private readonly Texture2D				_GfxResultsWindow;
+		private readonly Texture2D				_GfxResultsWindowOff;
+
 		private readonly ExperimentFilter		_filter;
 		private readonly ScienceChecklistAddon	_parent;
 		private readonly Logger					_logger;
@@ -28,7 +37,8 @@ namespace ScienceChecklist
 		private IList<ModuleScienceExperiment>	_DMModuleScienceAnimateGenerics;
 		private Dictionary<string, bool>		_availableScienceExperiments;
 
-
+		public event EventHandler OnCloseEvent;
+		public event EventHandler OnOpenEvent;
 
 		public StatusWindow( ScienceChecklistAddon Parent )
 			: base( "[x] Science! Here and Now", 250, 30 )
@@ -45,6 +55,13 @@ namespace ScienceChecklist
 			_emptyTexture.Apply();
 			_progressTexture =						TextureHelper.FromResource( "ScienceChecklist.icons.scienceProgress.png", 13, 13 );
 			_completeTexture =						TextureHelper.FromResource( "ScienceChecklist.icons.scienceComplete.png", 13, 13 );
+
+			_GfxTimeWarp =							TextureHelper.FromResource( "ScienceChecklist.icons.time-warp.png", 13, 13 );
+			_GfxTimeWarpOff =						TextureHelper.FromResource( "ScienceChecklist.icons.time-warp-x.png", 13, 13 );
+			_GfxAudioAlert =						TextureHelper.FromResource( "ScienceChecklist.icons.audio-alert.png", 13, 13 );
+			_GfxAudioAlertOff =						TextureHelper.FromResource( "ScienceChecklist.icons.audio-alert-off.png", 13, 13 );
+			_GfxResultsWindow =						TextureHelper.FromResource( "ScienceChecklist.icons.report.png", 13, 13 );
+			_GfxResultsWindowOff =					TextureHelper.FromResource( "ScienceChecklist.icons.report-x.png", 13, 13 );
 
 			_availableScienceExperiments = new Dictionary<string, bool>( );
 
@@ -131,7 +148,7 @@ namespace ScienceChecklist
 					new GUIContent
 					(
 						char.ToUpper( desc[ 0 ] ) + desc.Substring( 1 ),
-						"Current Vessel: " + _parent.Science.CurrentVesselScience.Count( ) + " stored experiments"
+						MakeSituationToolTip( )
 					),
 					_situationStyle,
 					GUILayout.Width(wScale(250))
@@ -153,22 +170,50 @@ namespace ScienceChecklist
 
 
 
+			if( _filter.DisplayScienceInstances.Count > 0 )
+				GUILayout.Space( wScale( _filter.DisplayScienceInstances.Count * 35 ) ); // Leave space for experiments, as drawn above
+			GUILayout.Space( wScale( 10 ) );
 
-
-/*			GUILayout.BeginHorizontal( GUILayout.ExpandWidth( true ) );
-			if( GUILayout.Button( new GUIContent( "Kill Warp", "Kill Warp" ), GUILayout.Width( wScale( 100 ) ), GUILayout.Height( wScale( 23 ) ) ) )
+			GUILayout.BeginHorizontal( );
+			GUIContent Content = null;
+			if( _parent.Config.StopTimeWarp )
+				Content = new GUIContent( _GfxTimeWarp, "Time warp will be stopped" );
+			else
+				Content = new GUIContent( _GfxTimeWarpOff, "Time warp will not be stopped" );
+			if( GUILayout.Button( Content, GUILayout.Width( wScale( 36 ) ), GUILayout.Height( wScale( 32 ) ) ) )
 			{
-				GameHelper.StopTimeWarp( );
+				_parent.Config.StopTimeWarp = !_parent.Config.StopTimeWarp;
+				_parent.Config.Save( );
 			}
 
-			if( GUILayout.Button( new GUIContent( "Play Noise", "Play Noise" ), GUILayout.Width( wScale( 100 ) ), GUILayout.Height( wScale( 23 ) ) ) )
+
+
+			if( _parent.Config.PlayNoise )
+				Content = new GUIContent( _GfxAudioAlert, "Audio alert will sound" );
+			else
+				Content = new GUIContent( _GfxAudioAlertOff, "No audio alert" );
+			if( GUILayout.Button( Content, GUILayout.Width( wScale( 36 ) ), GUILayout.Height( wScale( 32 ) ) ) )
 			{
-				PlayNoise( );
+				_parent.Config.PlayNoise = !_parent.Config.PlayNoise;
+				_parent.Config.Save( );
 			}
-			GUILayout.EndHorizontal( );*/
+			
+			
+			
+			if( _parent.Config.ShowResultsWindow )
+				Content = new GUIContent( _GfxResultsWindow, "Show results window" );
+			else
+				Content = new GUIContent( _GfxResultsWindowOff, "Supress results window" );
+			if( GUILayout.Button( Content, GUILayout.Width( wScale( 36 ) ), GUILayout.Height( wScale( 32 ) ) ) )
+			{
+				_parent.Config.ShowResultsWindow = !_parent.Config.ShowResultsWindow;
+				_parent.Config.Save( );
+			}
+			GUILayout.EndHorizontal( );
 			GUILayout.EndVertical( );
 
 			GUILayout.Space(wScale(2));
+
 		}
 
 
@@ -186,6 +231,50 @@ namespace ScienceChecklist
 			}
 
 			base.DrawWindow( );
+		}
+
+
+
+		private string MakeSituationToolTip( )
+		{
+			string Text = "";
+
+			
+
+			if( _filter.CurrentSituation != null )
+			{
+				Body Body = _filter.CurrentSituation.Body;
+				Text += "Body: " + GameHelper.LocalizeBodyName( Body.CelestialBody.displayName ) + "\n";
+				Text += Body.Type;
+				if( Body.IsHome )
+					Text += " - Home!";
+				Text += "\n\n";
+				Text += "Space high: " + (Body.CelestialBody.scienceValues.spaceAltitudeThreshold/1000) + "km\n";
+
+				if( Body.HasAtmosphere )
+				{
+					Text += "Atmos depth: " + (Body.CelestialBody.atmosphereDepth/1000) + "km\n";
+					Text += "Flying high: " + (Body.CelestialBody.scienceValues.flyingAltitudeThreshold/1000) + "km\n";
+					if( Body.HasOxygen )
+						Text += "Has oxygen - jets work\n";
+				}
+				else
+					Text += "No kind of atmosphere\n";
+
+				if( Body.HasSurface )
+				{
+					if( Body.HasOcean )
+						Text += "Has oceans\n";
+				}
+				else
+					Text += "No surface\n";
+
+				Text += "\n";
+			}
+
+			Text += "Current vessel: " + _parent.Science.CurrentVesselScience.Count( ) + " stored experiments";
+
+			return Text;
 		}
 
 
@@ -477,18 +566,37 @@ namespace ScienceChecklist
 
 
 
+		public WindowSettings BuildSettings( )
+		{
+_logger.Info( "BuildSettings" );
+			WindowSettings W = new WindowSettings( );
+			W.Name = ScienceChecklistAddon.WINDOW_NAME_STATUS;
+			W.Top = (int)windowPos.yMin;
+			W.Left = (int)windowPos.xMin;
+			W.CompactTop = 0;
+			W.CompactLeft = 0;
+			W.Visible = IsVisible( );
+			W.Compacted = false;
+			W.FilterMode = 0;
+			W.FilterText = "";
+
+			return W;
+		}
 
 
 
+		public void ApplySettings( WindowSettings W )
+		{
+			windowPos.yMin = W.Top;
+			windowPos.xMin = W.Left;
+			windowPos.yMax = W.Top + wScale(30);
+			windowPos.xMax = W.Left + wScale(250);
 
-
-
-
-
-
-
-
-
+			if( W.Visible )
+				OnOpenEvent( this, EventArgs.Empty );
+			else
+				OnCloseEvent( this, EventArgs.Empty );
+		}
 
 
 
