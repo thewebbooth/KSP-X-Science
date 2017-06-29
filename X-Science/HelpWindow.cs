@@ -95,6 +95,8 @@ namespace ScienceChecklist
 			GUILayout.Label( "* Allow all filter – The \"All\" filter button shows science on planets you have never visited using instruments you have not invented yet.  Some people may consider it overpowered.  If you feel like a cheat, turn it off.", labelStyle, GUILayout.ExpandWidth( true ) );
 			GUILayout.Label( "* Filter difficult science – Hide science that is practically impossible.  Flying at stars, that kinda thing.", labelStyle, GUILayout.ExpandWidth( true ) );
 			GUILayout.Label( "* Use blizzy78's toolbar – If you have blizzy78’s toolbar installed then place the [x] Science! button on that instead of the stock \"Launcher\" toolbar.", labelStyle, GUILayout.ExpandWidth( true ) );
+			GUILayout.Label( "* Right click [x] icon – Choose to open the Here and Now window by right clicking.  Hides the second window.  Otherwise mute music.", labelStyle, GUILayout.ExpandWidth( true ) );
+			GUILayout.Label( "* Music starts muted – Music is muted on load.", labelStyle, GUILayout.ExpandWidth( true ) );
 			GUILayout.Label( "* Adjust UI Size – Change the scaling of the UI.", labelStyle, GUILayout.ExpandWidth( true ) );
 
 			GUILayout.Space( wScale( 20 ) );

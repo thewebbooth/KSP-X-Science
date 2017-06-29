@@ -66,22 +66,30 @@
 [NOT SEEN] Open Here&Now before checklist - throws exception
 [NOT SEEN] H&N pops even if all science is done - May be when complete but not recovered
 [DONEish] New Baby Biome - probably a bug - new collider on wrong layer.
-	(Added filter for KSC2.  Being added to "shores" when probably should be grasslands - in RSS - anybody's guess.)
+	(Added filter for KSC2.  Being added to "shores" when probably should be grasslands, in RSS -> anybody's guess.)
 [DONE] Save settings more often - after filter change
 [NOT SEEN - DONE IT ANYWAY]Save settings more often - when leaving any scene and going to any scene
-
 [DONE] Config settings for Here&Now window
 [DONE] Here&Now Settings
 [DONE] New buttons
 [DONE] Dont show results window.
+[DONE] Right click to open h&N or MusicMute!
+
+
+Move decisions as to what is completed into a function
+Setting for when things are considered completed
+If something has 0 science collected then it cant be completed
 
 
 
 Popping when science is available but experiments not runnable.
-Body Info Window
-Resources in tracking station
-Right click to open h&N or MusicMute!
+Deal with CrewReport, EvaReport and SoilSample
 
+
+
+Resources in tracking station
+Body Info Window
+Biome list, has Lab, list of vessels
 
 
 

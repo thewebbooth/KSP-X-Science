@@ -152,7 +152,7 @@ namespace ScienceChecklist
 
 		public WindowSettings BuildSettings( )
 		{
-_logger.Info( "BuildSettings" );
+//_logger.Info( "BuildSettings" );
 			WindowSettings W = new WindowSettings( );
 			W.Name = ScienceChecklistAddon.WINDOW_NAME_CHECKLIST;
 			W.Top = (int)_rect.yMin;

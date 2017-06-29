@@ -568,7 +568,7 @@ namespace ScienceChecklist
 
 		public WindowSettings BuildSettings( )
 		{
-_logger.Info( "BuildSettings" );
+//_logger.Info( "BuildSettings" );
 			WindowSettings W = new WindowSettings( );
 			W.Name = ScienceChecklistAddon.WINDOW_NAME_STATUS;
 			W.Top = (int)windowPos.yMin;

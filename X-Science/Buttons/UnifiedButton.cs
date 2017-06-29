@@ -13,6 +13,7 @@ namespace ScienceChecklist
 
 			public event EventHandler				ButtonOn;
 			public event EventHandler				ButtonOff;
+			public event EventHandler				RightClick;
 
 			public bool								UseBlizzyIfPossible;
 
@@ -49,6 +50,7 @@ namespace ScienceChecklist
 			{
 				_button.Open -= OnButtonOn;
 				_button.Close -= OnButtonOff;
+				_button.RightClick -= OnRightClick;
 				_button.Remove( );
 				_button = null;
 			}
@@ -109,6 +111,7 @@ namespace ScienceChecklist
 
 			_button.Open += OnButtonOn;
 			_button.Close += OnButtonOff;
+			_button.RightClick += OnRightClick;
 			_button.Add( );
 		}
 
@@ -129,5 +132,12 @@ namespace ScienceChecklist
 			if( ButtonOff != null )
 				ButtonOff( this, e );
 		}
+
+		private void OnRightClick( object sender, EventArgs e )
+		{
+			if( RightClick != null )
+				RightClick( this, e );
+		}
+
 	}
 }

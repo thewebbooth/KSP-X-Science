@@ -37,7 +37,7 @@ namespace ScienceChecklist
 		/// </summary>
 		public event EventHandler Close;
 
-
+		public event EventHandler RightClick;
 
 
 		
@@ -64,7 +64,10 @@ namespace ScienceChecklist
 				null,
 				_Visibility,
 				_Texture);
+			_button.onRightClick += OnRightClick;
 		}
+
+
 
 		/// <summary>
 		/// Removes the button from the KSP toolbar.
@@ -130,6 +133,11 @@ namespace ScienceChecklist
 			OnClose( EventArgs.Empty );
 		}
 
+		private void OnRightClick( )
+		{
+			OnRightClick( EventArgs.Empty );
+		}
+
 
 
 		/// <summary>
@@ -154,6 +162,18 @@ namespace ScienceChecklist
 			}
 		}
 
+		/// <summary>
+		/// Raises the RightClick event.
+		/// </summary>
+		/// <param name="e">The EventArgs of this event.</param>
+		private void OnRightClick( EventArgs e )
+		{
+//			_logger.Trace("OnRightClick");
+			if( RightClick != null )
+			{
+				RightClick( this, e );
+			}
+		}
 
 
 		private ApplicationLauncherButton _button;

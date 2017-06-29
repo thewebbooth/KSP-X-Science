@@ -15,7 +15,8 @@ namespace ScienceChecklist
 		private string					_ButtonText;
 		private string					_TexturePath;
 		private GameScenesVisibility	_Visibility;
-		private readonly Logger _logger;
+		private readonly Logger			_logger;
+
 
 
 		/// <summary>
@@ -42,6 +43,13 @@ namespace ScienceChecklist
 		/// Called when the button is toggled off.
 		/// </summary>
 		public event EventHandler Close;
+
+		/// <summary>
+		/// Called when the button is right clicked.
+		/// </summary>
+		public event EventHandler RightClick;
+
+
 
 		/// <summary>
 		/// Returns whether Blizzy's toolbar is available.
@@ -76,13 +84,20 @@ namespace ScienceChecklist
 		/// Handler for the OnClick event on _button.
 		/// </summary>
 		/// <param name="e">The ClickEventArgs of the event.</param>
-		public void OnClick (ClickEvent e) {
-			_open = !_open;
-			if (_open) {
-				OnOpen(EventArgs.Empty);
-			} else {
-				OnClose(EventArgs.Empty);
+		public void OnClick( ClickEvent e )
+		{
+			/// Is 0 for left mouse button, 1 for right mouse button, and 2 for middle mouse button.
+			if( e.MouseButton == 0 )
+			{
+				_open = !_open;
+				if( _open )
+					OnOpen( EventArgs.Empty );
+				else
+					OnClose( EventArgs.Empty );
 			}
+			else
+				OnRightClick( EventArgs.Empty );
+				
 		}
 
 		/// <summary>
@@ -147,6 +162,16 @@ namespace ScienceChecklist
 			if (Close != null) {
 				Close(this, e);
 			}
+		}
+
+		/// <summary>
+		/// Raises the RightClick event.
+		/// </summary>
+		/// <param name="e">The EventArgs to raise.</param>
+		private void OnRightClick( EventArgs e )
+		{
+			if( RightClick != null )
+				RightClick( this, e );
 		}
 	}
 }

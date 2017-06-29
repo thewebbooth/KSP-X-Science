@@ -67,6 +67,11 @@ namespace ScienceChecklist {
 			// Config
 			Config = new Config( );
 			Config.Load( );
+			if( Config.MusicStartsMuted )
+			{
+				Muted = true;
+				ScreenMessages.PostScreenMessage( "[x] Science! - Music Mute" );
+			}
 
 
 
@@ -82,9 +87,6 @@ namespace ScienceChecklist {
 
 
 
-
-
-
 			// Start event handlers
 			ScienceEventHandler = new xScienceEventHandler( this );
 
@@ -93,6 +95,7 @@ namespace ScienceChecklist {
 			// Settings window
 			_settingsWindow = new SettingsWindow( this );
 			Config.UseBlizzysToolbarChanged += Settings_UseBlizzysToolbarChanged;
+			Config.RighClickMutesMusicChanged += Settings_RighClickMutesMusicChanged;
 			
 
 			
@@ -203,7 +206,7 @@ namespace ScienceChecklist {
 		// Save and load checklist window config when the game scene is changed
 		private void OnGameSceneSwitch( GameEvents.FromToAction<GameScenes, GameScenes> Data )
 		{
-_logger.Info( "OnGameSceneSwitch FROM " + Data.from.ToString( ) );
+//_logger.Info( "OnGameSceneSwitch FROM " + Data.from.ToString( ) );
 
 
 
@@ -244,6 +247,8 @@ _logger.Info( "OnGameSceneSwitch FROM " + Data.from.ToString( ) );
 		// Callback from onGUIApplicationLauncherReady
 		private void Load( )
 		{
+			HammerMusicMute( );
+
 			_logger.Trace( "Load" );
 			if( !GameHelper.AllowChecklistWindow( ) )
 			{
@@ -359,14 +364,48 @@ _logger.Info( "OnGameSceneSwitch FROM " + Data.from.ToString( ) );
 //			_logger.Trace("Button_Close");
 			UpdateChecklistVisibility( false );
 		}
-		
+
+		private void ChecklistButton_RightClick( object sender, EventArgs e )
+		{
+			if( Config.RighClickMutesMusic )
+			{
+				// Toggle the muted state
+					Muted = !Muted;
+					ScreenMessages.PostScreenMessage( "[x] Science! - Music Mute" );
+			}
+			else
+			{
+				if( _active && UiActive( ) )
+				{
+					if( GameHelper.AllowStatusWindow( ) )
+					{
+						bool NewVisibility = !_statusWindow.IsVisible( );
+						_statusWindow.SetVisible( NewVisibility );
+						UpdateStatusVisibility( NewVisibility );
+
+						if( _statusWindow.IsVisible( ) )
+						{
+							if( _statusButton != null )
+								_statusButton.SetOn( );
+							ScienceEventHandler.ScheduleExperimentUpdate( );
+						}
+						else
+						{
+							if( _statusButton != null )
+								_statusButton.SetOff( );
+						}
+					}
+				}
+			}
+		}
+
 
 
 		// We add this to our window as a callback
 		// It tells us when the window is closed so we can keep the button in sync
 		public void OnChecklistWindowClosed( object sender, EventArgs e )
 		{
-//			_logger.Trace( "OnWindowClosed" ); 
+			_logger.Trace( "OnWindowClosed" ); 
 			if( _checklistButton != null )
 				_checklistButton.SetOff( );
 			UpdateChecklistVisibility( false );
@@ -378,7 +417,7 @@ _logger.Info( "OnGameSceneSwitch FROM " + Data.from.ToString( ) );
 		// It tells us when the window is opened so we can keep the button in sync
 		public void OnChecklistWindowOpened( object sender, EventArgs e )
 		{
-//			_logger.Trace( "OnWindowOpened" );
+			_logger.Trace( "OnWindowOpened" );
 			if( _checklistButton != null )
 				_checklistButton.SetOn( );
 			UpdateChecklistVisibility( true );
@@ -473,11 +512,41 @@ _logger.Info( "OnGameSceneSwitch FROM " + Data.from.ToString( ) );
 				_checklistButton.SetOn( );
 			else
 				_checklistButton.SetOff( );
-			if( _statusWindow.IsVisible( ) )
-				_statusButton.SetOn( );
-			else
-				_statusButton.SetOff( );
+
+			if( _statusButton != null )
+			{
+				if( _statusWindow.IsVisible( ) )
+					_statusButton.SetOn( );
+				else
+					_statusButton.SetOff( );
+			}
 		}
+
+
+		private void Settings_RighClickMutesMusicChanged( object sender, EventArgs e )
+		{
+			InitButtons( );
+
+
+			// Need to set this
+			if( _checklistWindow.IsVisible )
+				_checklistButton.SetOn( );
+			else
+				_checklistButton.SetOff( );
+
+			if( _statusButton != null )
+			{
+				if( _statusWindow.IsVisible( ) )
+					_statusButton.SetOn( );
+				else
+					_statusButton.SetOff( );
+			}
+		}
+
+
+
+
+
 		#endregion
 
 
@@ -550,59 +619,60 @@ _logger.Info( "OnGameSceneSwitch FROM " + Data.from.ToString( ) );
 
 			_checklistButton.ButtonOn += ChecklistButton_Open;
 			_checklistButton.ButtonOff += ChecklistButton_Close;
+			_checklistButton.RightClick += ChecklistButton_RightClick;
 			_checklistButton.Add( );
 
 
 
 
-
-
-
-			_statusButton = new UnifiedButton( );
-
-
-			if( BlizzysToolbarButton.IsAvailable )
+			if( Config.RighClickMutesMusic ) // So we need both buttons
 			{
-				_statusButton.UseBlizzyIfPossible = Config.UseBlizzysToolbar;
+				_statusButton = new UnifiedButton( );
 
-				var texturePath = "ScienceChecklist/StatusSmall.png";
-				if( !GameDatabase.Instance.ExistsTexture( texturePath ) )
+
+				if( BlizzysToolbarButton.IsAvailable )
 				{
-					var texture = TextureHelper.FromResource( "ScienceChecklist.icons.icon-status-small.png", 24, 24 );
-					var ti = new GameDatabase.TextureInfo( null, texture, false, true, true );
-					ti.name = texturePath;
-					GameDatabase.Instance.databaseTexture.Add( ti );
+					_statusButton.UseBlizzyIfPossible = Config.UseBlizzysToolbar;
+
+					var texturePath = "ScienceChecklist/StatusSmall.png";
+					if( !GameDatabase.Instance.ExistsTexture( texturePath ) )
+					{
+						var texture = TextureHelper.FromResource( "ScienceChecklist.icons.icon-status-small.png", 24, 24 );
+						var ti = new GameDatabase.TextureInfo( null, texture, false, true, true );
+						ti.name = texturePath;
+						GameDatabase.Instance.databaseTexture.Add( ti );
+					}
+	//				_logger.Info( "Load : Blizzy texture" );
+
+
+					_statusButton.BlizzyNamespace = WINDOW_NAME_CHECKLIST;
+					_statusButton.BlizzyButtonId = "status_button";
+					_statusButton.BlizzyToolTip = "[x] Science! Here & Now";
+					_statusButton.BlizzyText = "Science Status Window";
+					_statusButton.BlizzyTexturePath = texturePath;
+					_statusButton.BlizzyVisibility = new GameScenesVisibility( GameScenes.FLIGHT );
+	//				_logger.Info( "Load : Set Blizzy Stuff" );
 				}
-//				_logger.Info( "Load : Blizzy texture" );
 
 
-				_statusButton.BlizzyNamespace = WINDOW_NAME_CHECKLIST;
-				_statusButton.BlizzyButtonId = "status_button";
-				_statusButton.BlizzyToolTip = "[x] Science! Here & Now";
-				_statusButton.BlizzyText = "Science Status Window";
-				_statusButton.BlizzyTexturePath = texturePath;
-				_statusButton.BlizzyVisibility = new GameScenesVisibility( GameScenes.FLIGHT );
-//				_logger.Info( "Load : Set Blizzy Stuff" );
+
+
+				StockTexture = TextureHelper.FromResource( "ScienceChecklist.icons.icon-status.png", 38, 38 );
+	/*			if( StockTexture != null )
+					_logger.Info( "Load : Stock texture" );
+				else
+					_logger.Info( "Load : cant load texture" );*/
+				_statusButton.LauncherTexture = StockTexture;
+				_statusButton.LauncherVisibility =
+					ApplicationLauncher.AppScenes.FLIGHT |
+					ApplicationLauncher.AppScenes.MAPVIEW;
+	//			_logger.Info( "Load : Set Stock Stuff" );
+
+
+				_statusButton.ButtonOn += StatusButton_Open;
+				_statusButton.ButtonOff += StatusButton_Close;
+				_statusButton.Add( );
 			}
-
-
-
-
-			StockTexture = TextureHelper.FromResource( "ScienceChecklist.icons.icon-status.png", 38, 38 );
-/*			if( StockTexture != null )
-				_logger.Info( "Load : Stock texture" );
-			else
-				_logger.Info( "Load : cant load texture" );*/
-			_statusButton.LauncherTexture = StockTexture;
-			_statusButton.LauncherVisibility =
-				ApplicationLauncher.AppScenes.FLIGHT |
-				ApplicationLauncher.AppScenes.MAPVIEW;
-//			_logger.Info( "Load : Set Stock Stuff" );
-
-
-			_statusButton.ButtonOn += StatusButton_Open;
-			_statusButton.ButtonOff += StatusButton_Close;
-			_statusButton.Add( );
 		}
 
 
@@ -613,6 +683,7 @@ _logger.Info( "OnGameSceneSwitch FROM " + Data.from.ToString( ) );
 			{
 				_checklistButton.ButtonOn -= ChecklistButton_Open;
 				_checklistButton.ButtonOff -= ChecklistButton_Close;
+				_checklistButton.RightClick -= ChecklistButton_RightClick;
 				_checklistButton.Remove( );
 				_checklistButton = null;
 			}
@@ -664,6 +735,54 @@ _logger.Info( "OnGameSceneSwitch FROM " + Data.from.ToString( ) );
 				return true;
 			return false;
 		}
+		#endregion
+
+
+
+		#region METHODS Mute functions
+		// Default values
+			bool muted = false;
+				float oldVolume = 0.40f;
+
+
+
+		private void HammerMusicMute( )
+		{
+			if( muted )
+				 MusicLogic.SetVolume( 0f );
+		}
+
+
+
+        public bool Muted
+        {
+            get
+            {
+                return muted;
+            }
+            set
+            {
+                // Mute
+                if (value == true)
+                {
+                    // Save the old music volume
+                    oldVolume = GameSettings.MUSIC_VOLUME;
+
+                    // Mute the music
+                    MusicLogic.SetVolume(0f);
+ //                   _logger.Info("[MusicMute]: Muted music");
+                }
+                // Unmute
+                else
+                {
+                    // Set the music volume to what it was before
+                    MusicLogic.SetVolume(oldVolume);
+ //                   _logger.Info("[MusicMute]: Set music volume to: " + oldVolume);
+                }
+
+                muted = value;
+            }
+        }
 		#endregion
 	}
 }

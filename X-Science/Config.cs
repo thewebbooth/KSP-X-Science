@@ -23,8 +23,10 @@ namespace ScienceChecklist {
 			private bool _showResultsWindow;
 			private bool _filterDifficultScience;
 			private float _uiScale;
+			private bool _musicStartsMuted;
+			private bool _righClickMutesMusic;
 
-
+			
 
 		// Members
 			public bool HideCompleteExperiments			{ get { return _hideCompleteExperiments; }		set { if( _hideCompleteExperiments != value ) { _hideCompleteExperiments = value; OnHideCompleteEventsChanged( ); } } }
@@ -37,6 +39,25 @@ namespace ScienceChecklist {
 			public bool ShowResultsWindow				{ get { return _showResultsWindow; }			set { if( _showResultsWindow != value ) { _showResultsWindow = value; OnShowResultsWindowChanged( ); } } }
 			public bool FilterDifficultScience			{ get { return _filterDifficultScience; }		set { if( _filterDifficultScience != value ) { _filterDifficultScience = value; OnFilterDifficultScienceChanged( ); } } }
 			public float UiScale						{ get { return _uiScale; }						set { if (_uiScale != value) { _uiScale = value; OnUiScaleChanged(); } } }
+			public bool MusicStartsMuted				{ get { return _musicStartsMuted; }				set { if( _musicStartsMuted != value ) { _musicStartsMuted = value; OnMusicStartsMutedChanged( ); } } }
+			public bool RighClickMutesMusic				{ get { return _righClickMutesMusic; }
+				set {
+					if( _righClickMutesMusic != value )
+					{
+						_righClickMutesMusic = value;
+						OnRighClickMutesMusicChanged( );
+						if( _righClickMutesMusic == false )
+						{
+							if( _musicStartsMuted == true )
+							{
+								_musicStartsMuted = false;
+								OnMusicStartsMutedChanged( );
+							}
+						}
+					}
+				}
+			}
+
 
 
 		// Get notified when settings change
@@ -50,8 +71,10 @@ namespace ScienceChecklist {
 			public event EventHandler ShowResultsWindowChanged;
 			public event EventHandler FilterDifficultScienceChanged;
  			public event EventHandler UiScaleChanged;
-
+			public event EventHandler MusicStartsMutedChanged;
+ 			public event EventHandler RighClickMutesMusicChanged;
 			
+
 
 		// For triggering events
 			private void OnUseBlizzysToolbarChanged( )
@@ -134,6 +157,22 @@ namespace ScienceChecklist {
 				}
 			}
 
+			private void OnMusicStartsMutedChanged( )
+			{
+				if( MusicStartsMutedChanged != null )
+				{
+					MusicStartsMutedChanged( this, EventArgs.Empty );
+				}
+			}
+
+			private void OnRighClickMutesMusicChanged( )
+			{
+				if( RighClickMutesMusicChanged != null )
+				{
+					RighClickMutesMusicChanged( this, EventArgs.Empty );
+				}
+			}
+
 
 
 		public Config( )
@@ -212,6 +251,8 @@ namespace ScienceChecklist {
 			settings.AddValue( "ShowResultsWindow",				_showResultsWindow );
 			settings.AddValue( "FilterDifficultScience",		_filterDifficultScience );
 			settings.AddValue( "UiScale",						_uiScale );
+			settings.AddValue( "MusicStartsMuted",				_musicStartsMuted );
+			settings.AddValue( "RighClickMutesMusic",			_righClickMutesMusic );
 
 
 
@@ -252,6 +293,8 @@ namespace ScienceChecklist {
 			_showResultsWindow =			true;
 			_filterDifficultScience =		true;
 			_uiScale =						1f;
+			_musicStartsMuted =				false;
+			_righClickMutesMusic =			true;
 
 
 
@@ -307,6 +350,14 @@ namespace ScienceChecklist {
 					V = settings.GetValue("UiScale");
 					if (V != null)
 						_uiScale = float.Parse(V);
+
+					V = settings.GetValue( "MusicStartsMuted" );
+					if( V != null )
+						_musicStartsMuted = bool.Parse( V );
+
+					V = settings.GetValue( "RighClickMutesMusic" );
+					if( V != null )
+						_righClickMutesMusic = bool.Parse( V );
 
 
 

@@ -1,6 +1,18 @@
 [x] Science!
 ============
 
+5.8
+---
+28-June-2017 Built against KSP V1.3.0
+* Save windows settings more often
+* Window settings for Here&Now
+* New icons on Here&Now window
+* Changed button code to allow right clicks
+* Right click to mute music
+* Right click to open Here&Now
+* Hide Here&Now icon when using right click
+* Option for mute music at start
+
 
 
 5.7

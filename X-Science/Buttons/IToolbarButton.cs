@@ -18,6 +18,11 @@ namespace ScienceChecklist
 		/// </summary>
 		event EventHandler Close;
 
+		/// <summary>
+		/// Called when the button is right clicked.
+		/// </summary>
+		event EventHandler RightClick;
+
 
 
 		/// <summary>
