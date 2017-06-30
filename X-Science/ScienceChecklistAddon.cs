@@ -57,6 +57,7 @@ namespace ScienceChecklist {
 			{
 				// For some reason the addon can be instantiated several times by the KSP addon loader (generally when going to/from the VAB),
 				// even though we set onlyOnce to true in the KSPAddon attribute.
+				HammerMusicMute( ); // Ensure we enforce music volume anyway
 				return;
 			}
 			_addonInitialized = true;
@@ -67,11 +68,18 @@ namespace ScienceChecklist {
 			// Config
 			Config = new Config( );
 			Config.Load( );
+            
+			
+			
+			// Music Muting
 			if( Config.MusicStartsMuted )
 			{
 				Muted = true;
 				ScreenMessages.PostScreenMessage( "[x] Science! - Music Mute" );
 			}
+
+            GameEvents.onGameSceneSwitchRequested.Add( this.onGameSceneSwitchRequested );
+            GameEvents.onLevelWasLoaded.Add( this.onLevelWasLoaded );
 
 
 
@@ -157,6 +165,10 @@ namespace ScienceChecklist {
 		public void OnDestroy( )
 		{
 			_logger.Trace( "OnDestroy" );
+
+			// Music Mute - Unhook from the scene switch events
+            GameEvents.onGameSceneSwitchRequested.Remove( this.onGameSceneSwitchRequested );
+            GameEvents.onLevelWasLoaded.Remove( this.onLevelWasLoaded );
 			RemoveButtons( );
 		}
 
@@ -207,7 +219,7 @@ namespace ScienceChecklist {
 		private void OnGameSceneSwitch( GameEvents.FromToAction<GameScenes, GameScenes> Data )
 		{
 //_logger.Info( "OnGameSceneSwitch FROM " + Data.from.ToString( ) );
-
+			HammerMusicMute( ); // Ensure we enforce music volume anyway
 
 
 			// Checklist window settings
@@ -247,7 +259,7 @@ namespace ScienceChecklist {
 		// Callback from onGUIApplicationLauncherReady
 		private void Load( )
 		{
-			HammerMusicMute( );
+			HammerMusicMute( ); // Ensure we enforce music volume anyway
 
 			_logger.Trace( "Load" );
 			if( !GameHelper.AllowChecklistWindow( ) )
@@ -364,6 +376,8 @@ namespace ScienceChecklist {
 //			_logger.Trace("Button_Close");
 			UpdateChecklistVisibility( false );
 		}
+
+
 
 		private void ChecklistButton_RightClick( object sender, EventArgs e )
 		{
@@ -742,7 +756,7 @@ namespace ScienceChecklist {
 		#region METHODS Mute functions
 		// Default values
 			bool muted = false;
-				float oldVolume = 0.40f;
+			float oldVolume = 0.40f;
 
 
 
@@ -753,6 +767,18 @@ namespace ScienceChecklist {
 		}
 
 
+        // Runs when scene switch is requested
+        private void onGameSceneSwitchRequested( GameEvents.FromToAction<GameScenes, GameScenes> action )
+        {
+			// The game likes to play music when we switch scenes, so we have to tell it to shut up once more
+				HammerMusicMute( );
+        }
+
+        // Runs when scene is done switching
+        private void onLevelWasLoaded( GameScenes action )
+        {
+			HammerMusicMute( ); // Ensure we enforce music volume anyway
+        }
 
         public bool Muted
         {
