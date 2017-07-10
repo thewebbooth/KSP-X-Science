@@ -75,6 +75,9 @@
 [DONE] Dont show results window.
 [DONE] Right click to open h&N or MusicMute!
 
+Resources in tracking station
+Body Info Window
+
 
 Move decisions as to what is completed into a function
 Setting for when things are considered completed
@@ -87,12 +90,7 @@ Deal with CrewReport, EvaReport and SoilSample
 
 
 
-Resources in tracking station
-Body Info Window
 Biome list, has Lab, list of vessels
-
-
-
 Check map for water biomes.
 
 

@@ -3,6 +3,7 @@ using System.Linq;
 
 
 
+
 // This class is a junction box for events concerning science related stuff.
 // Events tend to happen in flurries.  This deals with them and tries to prevent the system slowing down
 // because of event spamming.
@@ -11,6 +12,8 @@ using System.Linq;
 // *	Filter update is the most basic, caused by changes to the current ship
 // *	Experiment update is caused by experiments running, science being recovered or by science being lost in explosions.
 // *	Full Updates are caused by researcing new rocket parts, upgrading KSC or visiting new bodies.
+
+
 
 namespace ScienceChecklist
 {
@@ -21,9 +24,11 @@ namespace ScienceChecklist
 			private bool					_mustDoFullRefresh;
 
 
+
 		// For smaller updates just set to true
 			private DateTime?				_nextFilterCheck;
 			private bool					_filterRefreshPending; // Set to true for a quick refresh of the science lists
+
 
 
 		// Anyone can hook these to get notified
@@ -31,18 +36,21 @@ namespace ScienceChecklist
 			public event EventHandler					ExperimentUpdateEvent;
 			public event EventHandler					FullUpdateEvent;
 			public event EventHandler<NewSituationData> SituationChanged;
+			public event EventHandler<NewSelectionData>	MapObjectSelected;
+
+
 
 			private	ScienceChecklistAddon	_parent;
 			private Situation				_currentSituation;
-//private Logger					_logger;
+private Logger					_logger;
 			
 
 
 		// Constructor
 		public xScienceEventHandler( ScienceChecklistAddon Parent )
 		{
-//_logger = new Logger( this );
-//_logger.Trace( "xScienceEventHandler" );
+_logger = new Logger( this );
+_logger.Trace( "xScienceEventHandler" );
 			_parent = Parent;
 			
 			_nextExperimentUpdate =		DateTime.Now;
@@ -65,6 +73,8 @@ namespace ScienceChecklist
 
 			GameEvents.onDominantBodyChange.Add( new EventData<GameEvents.FromToAction<CelestialBody, CelestialBody>>.OnEvent( this.DominantBodyChange ) );
 			GameEvents.onVesselSOIChanged.Add( new EventData<GameEvents.HostedFromToAction<Vessel, CelestialBody>>.OnEvent( this.VesselSOIChanged ) );
+
+			GameEvents.onPlanetariumTargetChanged.Add( new EventData<MapObject>.OnEvent( this.ActiveShipChanged ) );
 
 			_parent.Config.CheckDebrisChanged += ( s, e ) => CheckDebrisSettingChanged( );
 			_parent.Config.FilterDifficultScienceChanged += ( s, e ) => FilterDifficultScienceChanged( );
@@ -197,6 +207,16 @@ namespace ScienceChecklist
 		}
 
 
+
+		// Clicked on something in the map view
+		private void ActiveShipChanged( MapObject NewTarget )
+		{
+			_logger.Trace( "Callback: ActiveShipChanged" );
+			if( NewTarget == null )
+				return;
+			if( MapObjectSelected != null )
+				MapObjectSelected( this, new NewSelectionData( NewTarget ) );
+		}
 
 
 		// Something happened to the current vessel so we should do a check of the applied filters

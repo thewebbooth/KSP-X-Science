@@ -34,6 +34,7 @@ namespace ScienceChecklist {
 		private StatusWindow			_statusWindow;
 		private SettingsWindow			_settingsWindow;
 		private HelpWindow				_helpWindow;
+		private ShipStateWindow			_shipStateWindow;
 		#endregion
 
 
@@ -127,7 +128,12 @@ namespace ScienceChecklist {
 			_checklistWindow.OnCloseEvent += OnChecklistWindowClosed;
 			_checklistWindow.OnOpenEvent += OnChecklistWindowOpened;
 
-			
+
+
+			// ShipState Window
+			_shipStateWindow = new ShipStateWindow( this );
+
+
 			
 			// Save and load checklist window config when the game scene is changed
 			// We are only visible in some scenes
@@ -205,7 +211,12 @@ namespace ScienceChecklist {
 				if( _statusWindow.IsVisible( ) )
 				{
 					if( HighLogic.LoadedScene == GameScenes.FLIGHT && FlightGlobals.ActiveVessel != null )
-					_statusWindow.DrawWindow( );
+						_statusWindow.DrawWindow( );
+				}
+				if( _shipStateWindow.IsVisible( ) )
+				{
+					if( HighLogic.LoadedScene == GameScenes.TRACKSTATION )
+						_shipStateWindow.DrawWindow( );
 				}
 			}
 		}

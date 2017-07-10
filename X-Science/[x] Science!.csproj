@@ -79,6 +79,7 @@
     <Compile Include="Lib\Window.cs" />
     <Compile Include="Buttons\BlizzysToolbarButton.cs" />
     <Compile Include="Buttons\IToolbarButton.cs" />
+    <Compile Include="NewSelectionData.cs" />
     <Compile Include="NewSituationData.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -104,6 +105,7 @@
     <Compile Include="SettingsWindow.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ShipState.cs" />
     <Compile Include="Situation.cs">
       <SubType>Code</SubType>
     </Compile>
