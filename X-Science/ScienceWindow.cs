@@ -153,16 +153,15 @@ namespace ScienceChecklist
 		public WindowSettings BuildSettings( )
 		{
 //_logger.Info( "BuildSettings" );
-			WindowSettings W = new WindowSettings( );
-			W.Name = ScienceChecklistAddon.WINDOW_NAME_CHECKLIST;
-			W.Top = (int)_rect.yMin;
-			W.Left = (int)_rect.xMin;
-			W.CompactTop = (int)_rect3.yMin;
-			W.CompactLeft = (int)_rect3.xMin;
-			W.Visible = IsVisible;
-			W.Compacted = _compactMode;
-			W.FilterMode = _filter.DisplayMode;
-			W.FilterText = _filter.Text;
+			WindowSettings W = new WindowSettings( ScienceChecklistAddon.WINDOW_NAME_CHECKLIST );
+			W.Set( "Top", (int)_rect.yMin );
+			W.Set( "Left", (int)_rect.xMin );
+			W.Set( "CompactTop", (int)_rect3.yMin );
+			W.Set( "CompactLeft", (int)_rect3.xMin );
+			W.Set( "Visible", IsVisible );
+			W.Set( "Compacted", _compactMode );
+			W.Set( "FilterMode", _filter.DisplayMode.ToString( ) );
+			W.Set( "FilterText", _filter.Text );
 
 			return W;
 		}
@@ -171,22 +170,27 @@ namespace ScienceChecklist
 
 		public void ApplySettings( WindowSettings W )
 		{
-			_rect.yMin = W.Top;
-			_rect.xMin = W.Left;
-			_rect.yMax = W.Top + wScale(400);
-			_rect.xMax = W.Left + wScale(500);
+			_rect.yMin = W.GetInt( "Top", 40 );
+			_rect.xMin = W.GetInt( "Left", 40 );
+			_rect.yMax = _rect.yMin + wScale( 400 );
+			_rect.xMax = _rect.xMin + wScale( 500 );
 
-			_rect3.yMin = W.CompactTop;
-			_rect3.xMin = W.CompactLeft;
-			_rect3.yMax = W.CompactTop + wScale(200);
-			_rect3.xMax = W.CompactLeft + wScale(400);
+			_rect3.yMin = W.GetInt( "CompactTop", 40 );
+			_rect3.xMin = W.GetInt( "CompactLeft", 40 );
+			_rect3.yMax = _rect3.yMin + wScale( 200 );
+			_rect3.xMax = _rect3.xMin + wScale( 400 );
 
-			_compactMode = W.Compacted;
-			_filter.DisplayMode = W.FilterMode;
-			_filter.Text = W.FilterText;
+			_compactMode = W.GetBool( "Compacted", false );
+			
+			string Temp = W.Get( "FilterMode", DisplayMode.Unlocked.ToString( ) );
+			_filter.DisplayMode = (DisplayMode)Enum.Parse( typeof( DisplayMode ), Temp, true );
+
+			_filter.Text = W.Get( "FilterText", "" );
 			_filter.UpdateFilter( );
 
-			if( W.Visible )
+			bool TempVisible = false;
+			TempVisible = W.GetBool( "Visible", false );
+			if( TempVisible )
 				OnOpenEvent( this, EventArgs.Empty );
 			else
 				OnCloseEvent( this, EventArgs.Empty );

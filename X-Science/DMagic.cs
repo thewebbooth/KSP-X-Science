@@ -13,7 +13,7 @@ namespace ScienceChecklist
 
 	public class DMagicFactory
 	{
-		private readonly Logger _logger;
+//		private readonly Logger _logger;
 		private bool _isInstalled;
 		private Type _tDMModuleScienceAnimate;
 		private Type _tDMModuleScienceAnimateGeneric;
@@ -27,8 +27,8 @@ namespace ScienceChecklist
 
 		public DMagicFactory( )
 		{
-			_logger = new Logger( this );
-			_logger.Debug( "DMagic API Start" );
+//			_logger = new Logger( this );
+//			_logger.Trace( "DMagic API Start" );
 			_isInstalled = false;
 
 
@@ -42,28 +42,29 @@ namespace ScienceChecklist
 
 			if( _tDMAPI != null )
 			{
-				_logger.Debug( "DMAPI Available" );
+//				_logger.Trace( "DMAPI Available" );
 				_isInstalled = true;
 				_DMAPI = new DMAPI( _tDMAPI );
 			}
 
-			if( _tDMModuleScienceAnimate != null ) // Don't actually sem to be using this one
-				_logger.Debug( "DMModuleScienceAnimate Available" );
-
+/*			if( _tDMModuleScienceAnimate != null ) // Don't actually seem to be using this one
+				_logger.Trace( "DMModuleScienceAnimate Available" );
+*/
 			if( _tDMModuleScienceAnimateGeneric != null )
 			{
-				_logger.Debug( "DMModuleScienceAnimateGeneric Available" );
+//				_logger.Trace( "DMModuleScienceAnimateGeneric Available" );
 				_isInstalled = true;
 				_DMModuleScienceAnimateGeneric = new DMModuleScienceAnimateGeneric( _tDMModuleScienceAnimateGeneric );
 			}
 
-			if( _tDMBasicScienceModule != null ) // Don't actually sem to be using this one
-				_logger.Debug( "DMBasicScienceModule Available" );
+/*			if( _tDMBasicScienceModule != null ) // Don't actually seem to be using this one
+				_logger.Trace( "DMBasicScienceModule Available" );
 
 			if( _isInstalled )
-				_logger.Debug( "DMagic API Installed" );
+				_logger.Trace( "DMagic API Installed" );
 			else
-				_logger.Debug( "DMagic API Not Found" );
+				_logger.Trace( "DMagic API Not Found" );
+ */
 		}
 
 
@@ -147,14 +148,14 @@ namespace ScienceChecklist
 
 
 
-			_logger.Trace("DMagic API found. Validating Methods.");
+//			_logger.Trace( "DMagic API found. Validating Methods." );
 			ParameterInfo[] p;
 
-			_MIexperimentCanConduct = tDMAPI.GetMethod("experimentCanConduct", BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+			_MIexperimentCanConduct = tDMAPI.GetMethod( "experimentCanConduct", BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy );
 			p = _MIexperimentCanConduct.GetParameters();
 			if (!((p.Length == 1) && (p[0].ParameterType == typeof(IScienceDataContainer)) && _MIexperimentCanConduct.ReturnType == typeof(bool)))
 			{
-				_logger.Trace("DMAPI.experimentCanConduct method signature has changed. [x] Science may not work for DMagic experiments");
+				_logger.Info( "DMAPI.experimentCanConduct method signature has changed. [x] Science may not work for DMagic experiments" );
 				_MIexperimentCanConduct = null;
 			}
 
@@ -164,7 +165,7 @@ namespace ScienceChecklist
 			p = _MIdeployDMExperiment.GetParameters();
 			if (!((p.Length == 2) && (p[0].ParameterType == typeof(IScienceDataContainer)) && (p[1].ParameterType == typeof(bool)) && _MIdeployDMExperiment.ReturnType == typeof(bool)))
 			{
-				_logger.Trace("DMAPI.deployDMExperiment method signature has changed. [x] Science may not work for DMagic experiments");
+				_logger.Info( "DMAPI.deployDMExperiment method signature has changed. [x] Science may not work for DMagic experiments" );
 				_MIdeployDMExperiment = null;
 			}
 
@@ -174,7 +175,7 @@ namespace ScienceChecklist
 			p = _MIgetExperimentSituation.GetParameters();
 			if (!((p.Length == 1) && (p[0].ParameterType == typeof(ModuleScienceExperiment)) && _MIgetExperimentSituation.ReturnType == typeof(ExperimentSituations)))
 			{
-				_logger.Trace("DMAPI.getExperimentSituation method signature has changed. [x] Science may not work for DMagic experiments");
+				_logger.Info( "DMAPI.getExperimentSituation method signature has changed. [x] Science may not work for DMagic experiments" );
 				_MIgetExperimentSituation = null;
 			}
 
@@ -184,7 +185,7 @@ namespace ScienceChecklist
 			p = _MIgetBiome.GetParameters();
 			if (!((p.Length == 2) && (p[0].ParameterType == typeof(ModuleScienceExperiment)) && (p[1].ParameterType == typeof(ExperimentSituations)) && _MIgetBiome.ReturnType == typeof(string)))
 			{
-				_logger.Trace("DMAPI.getBiome method signature has changed. [x] Science may not work for DMagic experiments");
+				_logger.Info( "DMAPI.getBiome method signature has changed. [x] Science may not work for DMagic experiments" );
 				_MIgetBiome = null;
 			}
 
@@ -250,14 +251,14 @@ namespace ScienceChecklist
 
 			if( _tDMModuleScienceAnimateGeneric != null )
 			{
-				_logger.Trace("DMModuleScienceAnimateGeneric found. Validating Methods.");
+//				_logger.Trace( "DMModuleScienceAnimateGeneric found. Validating Methods." );
 				ParameterInfo[] p;
 
 				_MIcanConduct = _tDMModuleScienceAnimateGeneric.GetMethod("canConduct", BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
 				p = _MIcanConduct.GetParameters();
 				if (!((p.Length == 0) && _MIcanConduct.ReturnType == typeof(bool)))
 				{
-					_logger.Trace("DMModuleScienceAnimateGeneric.canConduct method signature has changed. [x] Science may not work for DMModuleScienceAnimateGeneric experiments");
+					_logger.Info( "DMModuleScienceAnimateGeneric.canConduct method signature has changed. [x] Science may not work for DMModuleScienceAnimateGeneric experiments" );
 					_MIcanConduct = null;
 				}
 
@@ -265,7 +266,7 @@ namespace ScienceChecklist
 				p = _MIgatherScienceData.GetParameters();
 				if (!((p.Length == 1) && (p[0].ParameterType == typeof(bool)) && _MIgatherScienceData.ReturnType == typeof(void)))
 				{
-					_logger.Trace("DMModuleScienceAnimateGeneric.gatherScienceData method signature has changed. [x] Science may not work for DMModuleScienceAnimateGeneric experiments");
+					_logger.Info( "DMModuleScienceAnimateGeneric.gatherScienceData method signature has changed. [x] Science may not work for DMModuleScienceAnimateGeneric experiments" );
 					_MIgatherScienceData = null;
 				}
 
@@ -273,7 +274,7 @@ namespace ScienceChecklist
 				p = _MIgetSituation.GetParameters();
 				if (!((p.Length == 0) && _MIgetSituation.ReturnType == typeof(ExperimentSituations)))
 				{
-					_logger.Trace("DMModuleScienceAnimateGeneric.getSituation method signature has changed. [x] Science may not work for DMModuleScienceAnimateGeneric experiments");
+					_logger.Info( "DMModuleScienceAnimateGeneric.getSituation method signature has changed. [x] Science may not work for DMModuleScienceAnimateGeneric experiments" );
 					_MIgetSituation = null;
 				}
 
@@ -281,7 +282,7 @@ namespace ScienceChecklist
 				p = _MIgetBiome.GetParameters();
 				if (!((p.Length == 1) && (p[0].ParameterType == typeof(ExperimentSituations)) && _MIgetBiome.ReturnType == typeof(string)))
 				{
-					_logger.Trace("DMModuleScienceAnimateGeneric.getSituation method signature has changed. [x] Science may not work for DMModuleScienceAnimateGeneric experiments");
+					_logger.Info( "DMModuleScienceAnimateGeneric.getSituation method signature has changed. [x] Science may not work for DMModuleScienceAnimateGeneric experiments" );
 					_MIgetBiome = null;
 				}
 			}

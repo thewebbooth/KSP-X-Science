@@ -25,6 +25,7 @@ namespace ScienceChecklist {
 			private float _uiScale;
 			private bool _musicStartsMuted;
 			private bool _righClickMutesMusic;
+			private bool _selectedObjectWindow;
 
 			
 
@@ -57,6 +58,7 @@ namespace ScienceChecklist {
 					}
 				}
 			}
+			public bool SelectedObjectWindow				{ get { return _selectedObjectWindow; }				set { if( _selectedObjectWindow != value ) { _selectedObjectWindow = value; OnSelectedObjectWindowChanged( ); } } }
 
 
 
@@ -73,6 +75,7 @@ namespace ScienceChecklist {
  			public event EventHandler UiScaleChanged;
 			public event EventHandler MusicStartsMutedChanged;
  			public event EventHandler RighClickMutesMusicChanged;
+			public event EventHandler SelectedObjectWindowChanged;
 			
 
 
@@ -149,9 +152,9 @@ namespace ScienceChecklist {
 				}
 			}
 
-			private void OnUiScaleChanged()
+			private void OnUiScaleChanged( )
 			{
-				if (UiScaleChanged != null)
+				if( UiScaleChanged != null )
 				{
 					UiScaleChanged(this, EventArgs.Empty);
 				}
@@ -173,7 +176,13 @@ namespace ScienceChecklist {
 				}
 			}
 
-
+			private void OnSelectedObjectWindowChanged( )
+			{
+				if( SelectedObjectWindowChanged != null )
+				{
+					SelectedObjectWindowChanged( this, EventArgs.Empty );
+				}
+			}
 
 		public Config( )
 		{
@@ -196,35 +205,41 @@ namespace ScienceChecklist {
 
 			if( W == null )
 				W = new WindowSettings( Name );
-
 			W.TestPosition( );
-/*			if( W.Visible )
-				_logger.Trace( Scene.ToString( ) + " Window Open"  );
+
+/*			bool TempVisible = false;
+			TempVisible = W.GetBool( "Visible", false );
+			if( TempVisible )
+				_logger.Info( Scene.ToString( ) + " Window Open"  );
 			else
-				_logger.Trace( Scene.ToString( ) + " Window Closed"  );
+				_logger.Info( Scene.ToString( ) + " Window Closed"  );
 */
 			return W;
 		}
 
 
 
-		public void SetWindowConfig( WindowSettings W, GameScenes Scene )
+		public void SetWindowConfig( WindowSettings W )
 		{
 			W.TestPosition( );
 
 
+
 			// Write
-				if( !_windowSettings.ContainsKey( Scene ) )
-					_windowSettings.Add( Scene, new Dictionary<string, WindowSettings>( ) );
-				_windowSettings[ Scene ][ W.Name ] = W;
+				if( !_windowSettings.ContainsKey( W._scene ) )
+					_windowSettings.Add( W._scene, new Dictionary<string, WindowSettings>( ) );
+				_windowSettings[ W._scene ][ W._windowName ] = W;
 
 
-//				_logger.Trace( "Setting " + W.Name + " For " + Scene.ToString( ) );
+//				_logger.Trace( "Setting " + W._windowName + " For " + W._scene.ToString( ) );
 
-/*				if( W.Visible )
-					_logger.Trace( "visible" );
+
+/*				bool TempVisible = false;
+				TempVisible = W.GetBool( "Visible", false );
+				if( TempVisible )
+					_logger.Info( "visible" );
 				else
-					_logger.Trace( "closed!" );
+					_logger.Info( "closed!" );
 */
 				Save( );
 		}
@@ -233,7 +248,7 @@ namespace ScienceChecklist {
 
 		public void Save( )
 		{
-//			_logger.Trace("Save");
+//			_logger.Trace( "Save" );
 			var node = new ConfigNode( );
 			var root = node.AddNode( "ScienceChecklist" );
 			var settings = root.AddNode( "Config" );
@@ -253,6 +268,7 @@ namespace ScienceChecklist {
 			settings.AddValue( "UiScale",						_uiScale );
 			settings.AddValue( "MusicStartsMuted",				_musicStartsMuted );
 			settings.AddValue( "RighClickMutesMusic",			_righClickMutesMusic );
+			settings.AddValue( "SelectedObjectWindow",			_selectedObjectWindow );
 
 
 
@@ -262,20 +278,16 @@ namespace ScienceChecklist {
 				foreach( var W in V.Value )
 				{
 					var WindowNode = SceneNode.AddNode( W.Key );
-					WindowNode.AddValue( "Top",	W.Value.Top );
-					WindowNode.AddValue( "Left", W.Value.Left );
-					WindowNode.AddValue( "CompactTop", W.Value.CompactTop );
-					WindowNode.AddValue( "CompactLeft", W.Value.CompactLeft ); 
-					WindowNode.AddValue( "Visible", W.Value.Visible );
-					WindowNode.AddValue( "Compacted", W.Value.Compacted );
-					WindowNode.AddValue( "FilterText", W.Value.FilterText );
-					WindowNode.AddValue( "FilterMode", W.Value.FilterMode.ToString( ) );
+					foreach( var S in W.Value._settings )
+					{
+						WindowNode.AddValue( S.Key,	S.Value );
+					}
 				}
 			}
 
 
 
-//			_logger.Debug("Saving to" + _file);
+//			_logger.Trace( "Saving to" + _file );
 			node.Save( _file );
 		}
 
@@ -295,6 +307,7 @@ namespace ScienceChecklist {
 			_uiScale =						1f;
 			_musicStartsMuted =				false;
 			_righClickMutesMusic =			true;
+			_selectedObjectWindow =			true;
 
 
 
@@ -347,7 +360,7 @@ namespace ScienceChecklist {
 					if( V != null )
 						_filterDifficultScience = bool.Parse( V );
 
-					V = settings.GetValue("UiScale");
+					V = settings.GetValue( "UiScale" );
 					if (V != null)
 						_uiScale = float.Parse(V);
 
@@ -358,6 +371,10 @@ namespace ScienceChecklist {
 					V = settings.GetValue( "RighClickMutesMusic" );
 					if( V != null )
 						_righClickMutesMusic = bool.Parse( V );
+
+					V = settings.GetValue( "SelectedObjectWindow" );
+					if( V != null )
+						_selectedObjectWindow = bool.Parse( V );
 
 
 
@@ -385,49 +402,20 @@ namespace ScienceChecklist {
 
 									WindowSettings NewWindowSetting = new WindowSettings( WindowName );
 
-									V = WindowNode.GetValue( "Top" );
-									if( V != null )
-										NewWindowSetting.Top = int.Parse( V );
 
-									V = WindowNode.GetValue( "Left" );
-									if( V != null )
-										NewWindowSetting.Left = int.Parse( V );
-
-									V = WindowNode.GetValue( "CompactTop" );
-									if( V != null )
-										NewWindowSetting.CompactTop = int.Parse( V );
-
-									V = WindowNode.GetValue( "CompactLeft" );
-									if( V != null )
-										NewWindowSetting.CompactLeft = int.Parse( V );
-
-									V = WindowNode.GetValue( "Visible" );
-									if( V != null )
-										NewWindowSetting.Visible = bool.Parse( V );
-
-									V = WindowNode.GetValue( "Compacted" );
-									if( V != null )
-										NewWindowSetting.Compacted = bool.Parse( V );
-
-									V = WindowNode.GetValue( "FilterText" );
-									if( V != null )
-										NewWindowSetting.FilterText = V;
-
-									V = WindowNode.GetValue( "FilterMode" );
-									if( V != null )
+									for( int x = 0; x < WindowNode.CountValues; x++ )
 									{
-										NewWindowSetting.FilterMode = (DisplayMode)Enum.Parse( typeof( DisplayMode ), V, true );
-										_logger.Info( "FilterMode: " + V + " = " + NewWindowSetting.FilterMode.ToString( ) );
+										NewWindowSetting._settings[ WindowNode.values[ x ].name ] = WindowNode.values[ x ].value;
 									}
 
 
-									_windowSettings[ Scene ][ NewWindowSetting.Name ] = NewWindowSetting;
+									_windowSettings[ Scene ][ NewWindowSetting._windowName ] = NewWindowSetting;
 								}
 							}
 						}
 					}
 
-//					_logger.Info("Loaded successfully.");
+//					_logger.Info( "Loaded successfully." );
 					return; // <--- Return from here --------------------------------------
 				}
 			}

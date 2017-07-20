@@ -176,7 +176,7 @@ namespace ScienceChecklist
 						var crew = proto.GetVesselCrew().Count();
 						mass += res.Values.Sum(d => d.GetMass());
 						var parts = proto.protoPartSnapshots.Count();
-						texts.Add(string.Format("Crew: {0}, Parts: {1}, Mass: {2:f2}t", crew, parts, mass));
+						texts.Add(string.Format( "Crew: {0}, Parts: {1}, Mass: {2:f2}t", crew, parts, mass ) );
 
 
 
@@ -241,6 +241,10 @@ namespace ScienceChecklist
 		{
 			_logger.Trace( "MapObjectSelected" );
 			_logger.Trace( SelectionData._selectedObject.type.ToString( ) );
+
+			if( !_parent.Config.SelectedObjectWindow )
+				return;
+
 			switch( SelectionData._selectedObject.type )
 			{
 				case MapObject.ObjectType.CelestialBody:
@@ -259,8 +263,38 @@ namespace ScienceChecklist
 			}
 			
 		}
-	}
 
+
+
+		public WindowSettings BuildSettings( )
+		{
+//_logger.Info( "BuildSettings" );
+			WindowSettings W = new WindowSettings( ScienceChecklistAddon.WINDOW_NAME_SHIP_STATE );
+			W.Set( "Top", (int)windowPos.yMin );
+			W.Set( "Left", (int)windowPos.xMin );
+			W.Set( "Width", (int)windowPos.width );
+			W.Set( "Height", (int)windowPos.height );
+
+			return W;
+		}
+
+
+
+		public void ApplySettings( WindowSettings W )
+		{
+			windowPos.yMin = W.GetInt( "Top", 40 );
+			windowPos.xMin = W.GetInt( "Left", 40 );
+			windowPos.width = W.GetInt( "Width", 200 );
+			windowPos.height = W.GetInt( "Height", 200 );
+
+			if( windowPos.width < 100 )
+				windowPos.width = 100;
+			
+			if( windowPos.width < 50 )
+				windowPos.width = 50;
+
+		}
+	}
 
 
 

@@ -88,10 +88,17 @@ namespace ScienceChecklist
 				save = true;
 			}
 
-			toggle = GUILayout.Toggle( _parent.Config.FilterDifficultScience, new GUIContent( "Filter difficult science", "Hide a few experiments such as flying at stars and gas giants that are almost impossible.\n Also most EVA reports before upgrading Astronaut Complex " ), toggleStyle );
+			toggle = GUILayout.Toggle( _parent.Config.FilterDifficultScience, new GUIContent( "Filter difficult science", "Hide a few experiments such as flying at stars and gas giants that are almost impossible.\n Also most EVA reports before upgrading Astronaut Complex." ), toggleStyle );
 			if( toggle != _parent.Config.FilterDifficultScience )
 			{
 				_parent.Config.FilterDifficultScience = toggle;
+				save = true;
+			}
+
+			toggle = GUILayout.Toggle( _parent.Config.SelectedObjectWindow, new GUIContent( "Selected Object Window", "Show the Selected Object Window in the Tracking Station." ), toggleStyle );
+			if( toggle != _parent.Config.SelectedObjectWindow )
+			{
+				_parent.Config.SelectedObjectWindow = toggle;
 				save = true;
 			}
 

@@ -1,6 +1,20 @@
 [x] Science!
 ============
 
+5.9
+---
+20-July-2017 Built against KSP V1.3.0
+* Rewrote window settings
+* Added selected object information window to tracking station scene
+* Added body information to selected object window
+* Added vehicle information to selected object window - based on "Resource Details in Tracking Center" by avivey
+* Setting to turn off selected object window
+* Added StationScience experiments to science.cfg as requested
+* Bug fix - Checklist window didn't open on KSC screen after loading saved game.
+  Calling GameSceneSwitch event after mod becomes "_active=true" to enforce visibility
+
+
+
 5.8
 ---
 28-June-2017 Built against KSP V1.3.0

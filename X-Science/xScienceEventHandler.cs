@@ -42,15 +42,15 @@ namespace ScienceChecklist
 
 			private	ScienceChecklistAddon	_parent;
 			private Situation				_currentSituation;
-private Logger					_logger;
+//private Logger					_logger;
 			
 
 
 		// Constructor
 		public xScienceEventHandler( ScienceChecklistAddon Parent )
 		{
-_logger = new Logger( this );
-_logger.Trace( "xScienceEventHandler" );
+//_logger = new Logger( this );
+//_logger.Trace( "xScienceEventHandler" );
 			_parent = Parent;
 			
 			_nextExperimentUpdate =		DateTime.Now;
@@ -211,7 +211,7 @@ _logger.Trace( "xScienceEventHandler" );
 		// Clicked on something in the map view
 		private void ActiveShipChanged( MapObject NewTarget )
 		{
-			_logger.Trace( "Callback: ActiveShipChanged" );
+//_logger.Trace( "Callback: ActiveShipChanged" );
 			if( NewTarget == null )
 				return;
 			if( MapObjectSelected != null )

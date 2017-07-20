@@ -11,6 +11,7 @@ namespace ScienceChecklist {
 		#region FIELDS
 		public const string WINDOW_NAME_CHECKLIST =		"ScienceChecklist";
 		public const string WINDOW_NAME_STATUS =		"StatusWindow";
+		public const string WINDOW_NAME_SHIP_STATE =	"ShipStateWindow";
 
 
 
@@ -161,7 +162,7 @@ namespace ScienceChecklist {
 		// Called by Unity when the application is destroyed.
 		public void OnApplicationQuit( )
 		{
-			_logger.Trace( "OnApplicationQuit" );
+//			_logger.Trace( "OnApplicationQuit" );
 			RemoveButtons( );
 		}
 
@@ -170,7 +171,7 @@ namespace ScienceChecklist {
 		// Called by Unity when this instance is destroyed.
 		public void OnDestroy( )
 		{
-			_logger.Trace( "OnDestroy" );
+//			_logger.Trace( "OnDestroy" );
 
 			// Music Mute - Unhook from the scene switch events
             GameEvents.onGameSceneSwitchRequested.Remove( this.onGameSceneSwitchRequested );
@@ -213,7 +214,7 @@ namespace ScienceChecklist {
 					if( HighLogic.LoadedScene == GameScenes.FLIGHT && FlightGlobals.ActiveVessel != null )
 						_statusWindow.DrawWindow( );
 				}
-				if( _shipStateWindow.IsVisible( ) )
+				if( _shipStateWindow.IsVisible( ) && Config.SelectedObjectWindow )
 				{
 					if( HighLogic.LoadedScene == GameScenes.TRACKSTATION )
 						_shipStateWindow.DrawWindow( );
@@ -229,40 +230,66 @@ namespace ScienceChecklist {
 		// Save and load checklist window config when the game scene is changed
 		private void OnGameSceneSwitch( GameEvents.FromToAction<GameScenes, GameScenes> Data )
 		{
-//_logger.Info( "OnGameSceneSwitch FROM " + Data.from.ToString( ) );
+//			_logger.Trace( "OnGameSceneSwitch FROM " + Data.from.ToString( ) );
+			SwitchingGameScene( Data.from, Data.to );
+		}
+
+
+		private void SwitchingGameScene( GameScenes From, GameScenes To )
+		{
 			HammerMusicMute( ); // Ensure we enforce music volume anyway
 
 
 			// Checklist window settings
-			if( GameHelper.AllowChecklistWindow( Data.from ) )
+			if( GameHelper.AllowChecklistWindow( From ) )
 			{
 				WindowSettings W =_checklistWindow.BuildSettings( );
-				Config.SetWindowConfig( W, Data.from );
+				W._scene = From;
+				Config.SetWindowConfig( W );
 			}
 
-			if( GameHelper.AllowChecklistWindow( Data.to ) )
+			if( GameHelper.AllowChecklistWindow( To ) )
 			{
-				WindowSettings W = Config.GetWindowConfig( WINDOW_NAME_CHECKLIST, Data.to );
+				WindowSettings W = Config.GetWindowConfig( WINDOW_NAME_CHECKLIST, To );
 				_checklistWindow.ApplySettings( W );
 			}
 
 
 
 			// Status window settings
-			if( GameHelper.AllowStatusWindow( Data.from ) )
+			if( GameHelper.AllowStatusWindow( From ) )
 			{
 				WindowSettings W =_statusWindow.BuildSettings( );
-				Config.SetWindowConfig( W, Data.from );
+				W._scene = From;
+				Config.SetWindowConfig( W );
 			}
 
-			if( GameHelper.AllowStatusWindow( Data.to ) )
+			if( GameHelper.AllowStatusWindow( To ) )
 			{
-				WindowSettings W = Config.GetWindowConfig( WINDOW_NAME_STATUS, Data.to );
+				WindowSettings W = Config.GetWindowConfig( WINDOW_NAME_STATUS, To );
 				_statusWindow.ApplySettings( W );
 			}
 
 
+
+			// Selected Object window settings
+			if( GameScenes.TRACKSTATION == From )
+			{
+				WindowSettings W =_shipStateWindow.BuildSettings( );
+				W._scene = From;
+				Config.SetWindowConfig( W );
+			}
+
+			if( GameScenes.TRACKSTATION == To )
+			{
+				WindowSettings W = Config.GetWindowConfig( WINDOW_NAME_SHIP_STATE, To );
+				_shipStateWindow.ApplySettings( W );
+			}
 		}
+
+
+
+
 
 
 
@@ -275,7 +302,7 @@ namespace ScienceChecklist {
 			_logger.Trace( "Load" );
 			if( !GameHelper.AllowChecklistWindow( ) )
 			{
-				_logger.Trace( "Ui is hidden in this scene" );
+//				_logger.Info( "Ui is hidden in this scene" );
 				_active = false;
 				RemoveButtons( );
 				return;
@@ -283,7 +310,7 @@ namespace ScienceChecklist {
 			
 			if( _active )
 			{
-				_logger.Info( "Already loaded." );
+				_logger.Trace( "Already loaded." );
 				return;
 			}
 			
@@ -295,10 +322,11 @@ namespace ScienceChecklist {
 			}
 			_logger.Info( "Game type is " + HighLogic.CurrentGame.Mode + ". Activating." );
 			_active = true;
+			SwitchingGameScene( GameScenes.MAINMENU, HighLogic.LoadedScene ); // Get correct visibility now we are active
 
-//			_logger.Info( "Adding Buttons" );
+//			_logger.Trace( "Adding Buttons" );
 			InitButtons( );
-//			_logger.Info( "Buttons Added" );
+//			_logger.Trace( "Buttons Added" );
 			_launcherVisible = true;
 			ApplicationLauncher.Instance.AddOnShowCallback( Launcher_Show );
 			ApplicationLauncher.Instance.AddOnHideCallback( Launcher_Hide );
@@ -312,19 +340,19 @@ namespace ScienceChecklist {
 		{
 			if( !_active )
 			{
-				_logger.Info( "Already unloaded." );
+//				_logger.Trace( "Already unloaded." );
 				return;
 			}
 			_active = false;
 
-//			_logger.Info( "Removing Buttons" );
+//			_logger.Trace( "Removing Buttons" );
 			RemoveButtons( );
-//			_logger.Info( "Removing Callbacks" );
+//			_logger.Trace( "Removing Callbacks" );
 			ApplicationLauncher.Instance.RemoveOnShowCallback( Launcher_Show );
 			ApplicationLauncher.Instance.RemoveOnHideCallback( Launcher_Hide );
 			_launcherVisible = false;
 
-			_logger.Info( "Unload Done" );
+//			_logger.Trace( "Unload Done" );
 		}
 
 
@@ -347,7 +375,7 @@ namespace ScienceChecklist {
 			if( !_active )
 				return;
 
-			//_logger.Trace("Launcher_Show");
+//			_logger.Trace("Launcher_Show");
 			_launcherVisible = true;
 		}
 
@@ -358,7 +386,7 @@ namespace ScienceChecklist {
 		{
 			if( !_active )
 				return;
-			//			_logger.Trace( "Launcher_Hide" );
+//			_logger.Trace( "Launcher_Hide" );
 			_launcherVisible = false;
 		}
 		#endregion
@@ -372,7 +400,7 @@ namespace ScienceChecklist {
 		{
 			if( !_active )
 				return;
-//			_logger.Trace("Button_Open");
+//			_logger.Trace( "ChecklistButton_Open" );
 			UpdateChecklistVisibility( true );
 		}
 
@@ -384,7 +412,7 @@ namespace ScienceChecklist {
 		{
 			if( !_active )
 				return;
-//			_logger.Trace("Button_Close");
+//			_logger.Trace( "ChecklistButton_Close" );
 			UpdateChecklistVisibility( false );
 		}
 
@@ -430,7 +458,7 @@ namespace ScienceChecklist {
 		// It tells us when the window is closed so we can keep the button in sync
 		public void OnChecklistWindowClosed( object sender, EventArgs e )
 		{
-			_logger.Trace( "OnWindowClosed" ); 
+//			_logger.Trace( "OnChecklistWindowClosed" ); 
 			if( _checklistButton != null )
 				_checklistButton.SetOff( );
 			UpdateChecklistVisibility( false );
@@ -442,7 +470,7 @@ namespace ScienceChecklist {
 		// It tells us when the window is opened so we can keep the button in sync
 		public void OnChecklistWindowOpened( object sender, EventArgs e )
 		{
-			_logger.Trace( "OnWindowOpened" );
+//			_logger.Trace( "OnChecklistWindowOpened" );
 			if( _checklistButton != null )
 				_checklistButton.SetOn( );
 			UpdateChecklistVisibility( true );
@@ -456,7 +484,8 @@ namespace ScienceChecklist {
 			if( GameHelper.AllowChecklistWindow( ) )
 			{
 				WindowSettings W =_checklistWindow.BuildSettings( );
-				Config.SetWindowConfig( W, HighLogic.LoadedScene );
+				W._scene = HighLogic.LoadedScene;
+				Config.SetWindowConfig( W );
 			}
 		}
 
@@ -482,7 +511,7 @@ namespace ScienceChecklist {
 		{
 			if( !_active )
 				return;
-			//			_logger.Trace("Button_Open");
+//			_logger.Trace( "StatusButton_Open" );
 			UpdateStatusVisibility( true );
 		}
 
@@ -493,7 +522,7 @@ namespace ScienceChecklist {
 		{
 			if( !_active )
 				return;
-			//			_logger.Trace("Button_Close");
+//			_logger.Trace( "StatusButton_Close" );
 			UpdateStatusVisibility( false );
 		}
 
@@ -503,7 +532,7 @@ namespace ScienceChecklist {
 		// It tells us when the window is closed so we can keep the button in sync
 		public void OnStatusWindowClosed( object sender, EventArgs e )
 		{
-			//			_logger.Trace( "OnWindowClosed" ); 
+//			_logger.Trace( "OnStatusWindowClosed" ); 
 			if( _statusButton != null )
 				_statusButton.SetOff( );
 			UpdateStatusVisibility( false );
@@ -515,7 +544,7 @@ namespace ScienceChecklist {
 		// It tells us when the window is opened so we can keep the button in sync
 		public void OnStatusWindowOpened( object sender, EventArgs e )
 		{
-			//			_logger.Trace( "OnWindowOpened" );
+//			_logger.Trace( "OnStatusWindowOpened" );
 			if( _statusButton != null )
 				_statusButton.SetOn( );
 			UpdateStatusVisibility( true );
@@ -731,7 +760,7 @@ namespace ScienceChecklist {
 			if( !_active )
 				return;
 
-//			_logger.Trace("UpdateChecklistVisibility");
+//			_logger.Trace( "UpdateChecklistVisibility" );
 			_checklistWindow.IsVisible = NewVisibility;
 			if( _checklistWindow.IsVisible )
 				ScienceEventHandler.ScheduleExperimentUpdate( );
@@ -745,7 +774,7 @@ namespace ScienceChecklist {
 			if( !_active )
 				return;
 
-			//			_logger.Trace("UpdateChecklistVisibility");
+//			_logger.Trace( "UpdateStatusVisibility" );
 			_statusWindow.SetVisible( NewVisibility );
 			if( _statusWindow.IsVisible( ) )
 				ScienceEventHandler.ScheduleExperimentUpdate( );

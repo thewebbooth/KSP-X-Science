@@ -569,16 +569,10 @@ namespace ScienceChecklist
 		public WindowSettings BuildSettings( )
 		{
 //_logger.Info( "BuildSettings" );
-			WindowSettings W = new WindowSettings( );
-			W.Name = ScienceChecklistAddon.WINDOW_NAME_STATUS;
-			W.Top = (int)windowPos.yMin;
-			W.Left = (int)windowPos.xMin;
-			W.CompactTop = 0;
-			W.CompactLeft = 0;
-			W.Visible = IsVisible( );
-			W.Compacted = false;
-			W.FilterMode = 0;
-			W.FilterText = "";
+			WindowSettings W = new WindowSettings( ScienceChecklistAddon.WINDOW_NAME_STATUS );
+			W.Set( "Top", (int)windowPos.yMin );
+			W.Set( "Left", (int)windowPos.xMin );
+			W.Set( "Visible", IsVisible( ) );
 
 			return W;
 		}
@@ -587,12 +581,15 @@ namespace ScienceChecklist
 
 		public void ApplySettings( WindowSettings W )
 		{
-			windowPos.yMin = W.Top;
-			windowPos.xMin = W.Left;
-			windowPos.yMax = W.Top + wScale(30);
-			windowPos.xMax = W.Left + wScale(250);
+			windowPos.yMin = W.GetInt( "Top", 40 );
+			windowPos.xMin = W.GetInt( "Left", 40 );
+			windowPos.yMax = windowPos.yMin + wScale( 30 );
+			windowPos.xMax = windowPos.xMin + wScale( 250 );
 
-			if( W.Visible )
+
+			bool TempVisible = false;
+			TempVisible = W.GetBool( "Visible", false );
+			if( TempVisible )
 				OnOpenEvent( this, EventArgs.Empty );
 			else
 				OnCloseEvent( this, EventArgs.Empty );

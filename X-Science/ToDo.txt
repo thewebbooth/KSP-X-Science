@@ -74,32 +74,41 @@
 [DONE] New buttons
 [DONE] Dont show results window.
 [DONE] Right click to open h&N or MusicMute!
+------------------------------------------------
+[DONE] Resources in tracking station
+[DONE] Body info window
+[DONE] Vehicles
+[DONE] Rewrite settings
+[DONE] Vehicle category from rename window
+[DONE] Window settings for new window
 
-Resources in tracking station
-Body Info Window
 
+
+--- NEXT ----------------------------------------
+In selected object window - Is controlable + Has lab + Total amount of science stored
 
 Move decisions as to what is completed into a function
 Setting for when things are considered completed
 If something has 0 science collected then it cant be completed
+--------------------------------------------------
 
 
 
 Popping when science is available but experiments not runnable.
 Deal with CrewReport, EvaReport and SoilSample
-
-
+Funding
+----------------------------------------------------
 
 Biome list, has Lab, list of vessels
 Check map for water biomes.
-
+----------------------------------------------------
 
 
 Need red icons
 rename window
 img/sprite class - Load all in one place
 Visibility is weird.
-Funding
+
 
 Pop icon when necessary.
 Put each icon into class
@@ -249,9 +258,7 @@ recovery@KerbinFlew
 
 
 
- accepted
-	
-
+--- Pass data to an event -------------------------------------------------
 Make a new EventArgs class such as:
 
     public class ListEventArgs : EventArgs
