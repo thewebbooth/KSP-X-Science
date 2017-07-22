@@ -85,6 +85,9 @@
 
 
 --- NEXT ----------------------------------------
+Add new options to help
+Settings window is getting ugly
+
 In selected object window - Is controlable + Has lab + Total amount of science stored
 
 Move decisions as to what is completed into a function
