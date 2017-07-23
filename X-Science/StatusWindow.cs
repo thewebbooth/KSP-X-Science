@@ -412,7 +412,18 @@ namespace ScienceChecklist
 			_logger.Trace( "ScienceThisBiome: " + _filter.TotalCount + " / " + _filter.CompleteCount );
 			if( _filter.TotalCount > 0 )
 			{
-				if( _filter.TotalCount - _filter.CompleteCount > 0 )
+				//if( _filter.DisplayScienceInstances.Any(x => CanRunExperiment(x)) )
+				var anyRunnableExperiments = false;
+				foreach ( var experiment in _filter.DisplayScienceInstances )
+				{
+					if ( CanRunExperiment(experiment) )
+					{
+						anyRunnableExperiments = true;
+						break;
+					}
+				}
+				
+				if ( anyRunnableExperiments )
 				{
 					if( IsVisible( ) )
 					{
