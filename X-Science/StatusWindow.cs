@@ -412,7 +412,28 @@ namespace ScienceChecklist
 			_logger.Trace( "ScienceThisBiome: " + _filter.TotalCount + " / " + _filter.CompleteCount );
 			if( _filter.TotalCount > 0 )
 			{
-				if( _filter.TotalCount - _filter.CompleteCount > 0 )
+				var anyRunnableExperiments = false;
+				for( var i = 0; i < _filter.DisplayScienceInstances.Count; i++ )
+				{
+					var experiment = _filter.DisplayScienceInstances[ i ];
+					var Id = experiment.ScienceExperiment.id;
+
+					if( Id == "crewReport" || Id == "surfaceSample" || Id == "evaReport" ) // Always pop UI for Kerbal experiments
+					{
+						anyRunnableExperiments = true;
+						break;
+					}
+					else
+					{
+						if( CanRunExperiment( experiment ) )
+						{
+							anyRunnableExperiments = true;
+							break;
+						}
+					}
+				}
+				
+				if( anyRunnableExperiments )
 				{
 					if( IsVisible( ) )
 					{

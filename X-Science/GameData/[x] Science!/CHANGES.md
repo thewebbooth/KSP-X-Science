@@ -1,6 +1,15 @@
 [x] Science!
 ============
 
+
+
+5.10
+----
+14-Aug-2017 Built against KSP V1.3.0
+* Only pop if experiments are runnable, I excluded Kerbal experiments from the check
+
+
+
 5.9
 ---
 20-July-2017 Built against KSP V1.3.0

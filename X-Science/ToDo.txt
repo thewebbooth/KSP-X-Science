@@ -81,7 +81,7 @@
 [DONE] Rewrite settings
 [DONE] Vehicle category from rename window
 [DONE] Window settings for new window
-
+[DONE] Popping when science is available but experiments not runnable.  Deal with CrewReport, EvaReport and SoilSample.
 
 
 --- NEXT ----------------------------------------
@@ -97,8 +97,8 @@ If something has 0 science collected then it cant be completed
 
 
 
-Popping when science is available but experiments not runnable.
-Deal with CrewReport, EvaReport and SoilSample
+
+
 Funding
 ----------------------------------------------------
 
