@@ -98,10 +98,8 @@ If something has 0 science collected then it cant be completed
 
 
 
-
-Funding
 ----------------------------------------------------
-
+Funding
 Biome list, has Lab, list of vessels
 Check map for water biomes.
 ----------------------------------------------------
