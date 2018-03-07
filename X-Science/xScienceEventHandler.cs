@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Linq;
+
 
 
 
@@ -130,7 +130,10 @@ namespace ScienceChecklist
 				? null
 				: Vessel.GetLandedAtString( vessel.landedAt ).Replace( " ", "" );
 
-			var dataCount = vessel.FindPartModulesImplementing<IScienceDataContainer>( ).Sum( x => x.GetData( ).Length );
+			var Parts = vessel.FindPartModulesImplementing<IScienceDataContainer>( );
+			var dataCount = 0;
+			for( var x = 0; x < Parts.Count; x++ )
+				dataCount +=Parts[ x].GetData( ).Length;
 
 			if( _lastDataCount != dataCount )
 			{
