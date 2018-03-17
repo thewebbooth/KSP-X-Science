@@ -3,6 +3,13 @@
 
 
 
+5.13
+----
+16-Mar-2018 Built against KSP V1.4.1
+* Recompiled for KSP V1.4.1, no other changes
+
+
+
 5.12
 ----
 07-Mar-2018 Built against KSP V1.4.0
