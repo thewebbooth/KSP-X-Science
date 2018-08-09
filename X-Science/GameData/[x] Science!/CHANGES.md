@@ -3,9 +3,16 @@
 
 
 
+5.17
+----
+06-Aug-2018 Built against KSP V1.4.5
+* Recompiled for KSP V1.4.5
+
+
+
 5.16
 ----
-06-Apr-2018 Built against KSP V1.4.4
+06-June-2018 Built against KSP V1.4.4
 * Recompiled for KSP V1.4.4
 * edit science.cfg - Ignoring Nehemiah Engineering Orbital Science
 
