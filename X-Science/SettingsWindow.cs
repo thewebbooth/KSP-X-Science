@@ -1,6 +1,6 @@
 ﻿using System;
 using UnityEngine;
-
+using KSP.Localization;
 
 
 namespace ScienceChecklist
@@ -22,7 +22,7 @@ namespace ScienceChecklist
 
 		// Constructor
 		public SettingsWindow( ScienceChecklistAddon Parent )
-			: base( "[x] Science! Settings", 240, 360 )
+			: base(Localizer.Format("#autoLOC_[x]_Science!_085")/*[x] Science! Settings*/, 240, 360 )
 		{
 			_logger = new Logger( this );
 			_parent = Parent;
@@ -60,42 +60,42 @@ namespace ScienceChecklist
 			GUILayout.BeginVertical( );
 
 			bool save = false;
-			var toggle = GUILayout.Toggle( _parent.Config.HideCompleteExperiments, new GUIContent( "Hide complete experiments", "Experiments considered complete will not be shown." ), toggleStyle );
+			var toggle = GUILayout.Toggle( _parent.Config.HideCompleteExperiments, new GUIContent(Localizer.Format("#autoLOC_[x]_Science!_086")/*Hide complete experiments*/, Localizer.Format("#autoLOC_[x]_Science!_087")/*Experiments considered complete will not be shown.*/ ), toggleStyle );
 			if( toggle != _parent.Config.HideCompleteExperiments )
 			{
 				_parent.Config.HideCompleteExperiments = toggle;
 				save = true;
 			}
 
-			toggle = GUILayout.Toggle( _parent.Config.CompleteWithoutRecovery, new GUIContent( "Complete without recovery", "Show experiments as completed even if they have not been recovered yet.\nYou still need to recover the science to get the points!\nJust easier to see what is left." ), toggleStyle );
+			toggle = GUILayout.Toggle( _parent.Config.CompleteWithoutRecovery, new GUIContent( Localizer.Format("#autoLOC_[x]_Science!_088")/*Complete without recovery*/, Localizer.Format("#autoLOC_[x]_Science!_089")/*Show experiments as completed even if they have not been recovered yet.\nYou still need to recover the science to get the points!\nJust easier to see what is left.*/ ), toggleStyle );
 			if( toggle != _parent.Config.CompleteWithoutRecovery )
 			{
 				_parent.Config.CompleteWithoutRecovery = toggle;
 				save = true;
 			}
 
-			toggle = GUILayout.Toggle( _parent.Config.CheckDebris, new GUIContent( "Check debris", "Vessels marked as debris will be checked for recoverable science." ), toggleStyle );
+			toggle = GUILayout.Toggle( _parent.Config.CheckDebris, new GUIContent( Localizer.Format("#autoLOC_[x]_Science!_091")/*Check debris*/, Localizer.Format("#autoLOC_[x]_Science!_090")/*Vessels marked as debris will be checked for recoverable science.*/ ), toggleStyle );
 			if( toggle != _parent.Config.CheckDebris )
 			{
 				_parent.Config.CheckDebris = toggle;
 				save = true;
 			}
 
-			toggle = GUILayout.Toggle( _parent.Config.AllFilter, new GUIContent( "Allow all filter", "Adds a filter button showing all experiments, even on unexplored bodies using unavailable instruments.\nMight be considered cheating." ), toggleStyle );
+			toggle = GUILayout.Toggle( _parent.Config.AllFilter, new GUIContent( Localizer.Format("#autoLOC_[x]_Science!_092")/*Allow all filter*/, Localizer.Format("#autoLOC_[x]_Science!_093")/*Adds a filter button showing all experiments, even on unexplored bodies using unavailable instruments.\nMight be considered cheating.*/ ), toggleStyle );
 			if( toggle != _parent.Config.AllFilter )
 			{
 				_parent.Config.AllFilter = toggle;
 				save = true;
 			}
 
-			toggle = GUILayout.Toggle( _parent.Config.FilterDifficultScience, new GUIContent( "Filter difficult science", "Hide a few experiments such as flying at stars and gas giants that are almost impossible.\n Also most EVA reports before upgrading Astronaut Complex." ), toggleStyle );
+			toggle = GUILayout.Toggle( _parent.Config.FilterDifficultScience, new GUIContent( Localizer.Format("#autoLOC_[x]_Science!_094")/*Filter difficult science*/, Localizer.Format("#autoLOC_[x]_Science!_095")/*Hide a few experiments such as flying at stars and gas giants that are almost impossible.\n Also most EVA reports before upgrading Astronaut Complex.*/ ), toggleStyle );
 			if( toggle != _parent.Config.FilterDifficultScience )
 			{
 				_parent.Config.FilterDifficultScience = toggle;
 				save = true;
 			}
 
-			toggle = GUILayout.Toggle( _parent.Config.SelectedObjectWindow, new GUIContent( "Selected Object Window", "Show the Selected Object Window in the Tracking Station." ), toggleStyle );
+			toggle = GUILayout.Toggle( _parent.Config.SelectedObjectWindow, new GUIContent( Localizer.Format("#autoLOC_[x]_Science!_096")/*Selected Object Window*/, Localizer.Format("#autoLOC_[x]_Science!_097")/*Show the Selected Object Window in the Tracking Station.*/ ), toggleStyle );
 			if( toggle != _parent.Config.SelectedObjectWindow )
 			{
 				_parent.Config.SelectedObjectWindow = toggle;
@@ -104,7 +104,7 @@ namespace ScienceChecklist
 
 			if( BlizzysToolbarButton.IsAvailable )
 			{
-				toggle = GUILayout.Toggle( _parent.Config.UseBlizzysToolbar, new GUIContent( "Use blizzy78's toolbar", "Remove [x] Science button from stock toolbar and add to blizzy78 toolbar." ), toggleStyle );
+				toggle = GUILayout.Toggle( _parent.Config.UseBlizzysToolbar, new GUIContent( Localizer.Format("#autoLOC_[x]_Science!_098")/*Use blizzy78's toolbar*/, Localizer.Format("#autoLOC_[x]_Science!_099")/*Remove [x] Science button from stock toolbar and add to blizzy78 toolbar.*/ ), toggleStyle );
 				if( toggle != _parent.Config.UseBlizzysToolbar )
 				{
 					_parent.Config.UseBlizzysToolbar = toggle;
@@ -117,10 +117,10 @@ namespace ScienceChecklist
 			if( !_parent.Config.RighClickMutesMusic )
 				selected = 1;
 			int new_selected = selected;
-			GUILayout.Label( "Right click [x] icon", labelStyle );
+			GUILayout.Label(Localizer.Format("#autoLOC_[x]_Science!_100")/*Right click [x] icon*/, labelStyle );
 			GUIContent[] Options = {
-				new GUIContent( "Mute music", "Here & Now window gets its own icon" ),
-				new GUIContent( "Opens Here & Now window", "Here & Now icon is hidden" )
+				new GUIContent( Localizer.Format("#autoLOC_[x]_Science!_101")/*Mute music*/, Localizer.Format("#autoLOC_[x]_Science!_102")/*Here & Now window gets its own icon*/ ),
+				new GUIContent( Localizer.Format("#autoLOC_[x]_Science!_103")/*Opens Here & Now window*/, Localizer.Format("#autoLOC_[x]_Science!_104")/*Here & Now icon is hidden*/ )
 			};
 			new_selected = GUILayout.SelectionGrid( selected, Options, 1, selectionStyle );
 			if( new_selected != selected )
@@ -134,7 +134,7 @@ namespace ScienceChecklist
 
 			if( _parent.Config.RighClickMutesMusic )
 			{
-				toggle = GUILayout.Toggle( _parent.Config.MusicStartsMuted, new GUIContent( "Music starts muted", "Title music is silenced upon load.  No need to right click" ), toggleStyle );
+				toggle = GUILayout.Toggle( _parent.Config.MusicStartsMuted, new GUIContent( Localizer.Format("#autoLOC_[x]_Science!_105")/*Music starts muted*/, Localizer.Format("#autoLOC_[x]_Science!_106")/*Title music is silenced upon load.  No need to right click*/ ), toggleStyle );
 				if( toggle != _parent.Config.MusicStartsMuted )
 				{
 					_parent.Config.MusicStartsMuted = toggle;
@@ -143,7 +143,7 @@ namespace ScienceChecklist
 			}
 
 			GUILayout.Space(2);
-			GUILayout.Label(new GUIContent( "Adjust UI size", "Adjusts the the UI scaling." ), labelStyle );
+			GUILayout.Label(new GUIContent( Localizer.Format("#autoLOC_[x]_Science!_107")/*Adjust UI size*/, Localizer.Format("#autoLOC_[x]_Science!_108")/*Adjusts the the UI scaling.*/ ), labelStyle );
 			var slider = GUILayout.HorizontalSlider( _parent.Config.UiScale, 1, 2 );
 			if( slider != _parent.Config.UiScale )
 			{
@@ -156,7 +156,7 @@ namespace ScienceChecklist
 
 			GUILayout.EndVertical( );
 			GUILayout.Space(10);
-			GUI.Label( new Rect( 4, windowPos.height - 13, windowPos.width - 20, 12 ), "[x] Science! V" + version, versionStyle );
+			GUI.Label( new Rect( 4, windowPos.height - 13, windowPos.width - 20, 12 ), Localizer.Format("#autoLOC_[x]_Science!_109")/*[x] Science! V*/ + version, versionStyle );
 		}
 	}
 }

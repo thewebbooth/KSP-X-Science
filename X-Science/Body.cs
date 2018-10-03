@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-
+using KSP.Localization;
 
 
 namespace ScienceChecklist
@@ -113,14 +113,15 @@ namespace ScienceChecklist
 		private string FigureOutType( )
 		{
 			if( _isGasGiant )
-				return "Gas Giant";
+				return Localizer.Format("#autoLOC_[x]_Science!_009")/*Gas Giant*/;
 			if( _isStar )
-				return "Star";
+				return Localizer.Format("#autoLOC_[x]_Science!_010")/*Star*/;
 			if( _isPlanet )
-				return "Planet";
+				return Localizer.Format("#autoLOC_[x]_Science!_011")/*Planet*/;
 			if( _isMoon )
-				return "Moon";
-			return "Unknown";
+				return Localizer.Format("#autoLOC_[x]_Science!_012")/*Moon*/;
+			
+			return Localizer.Format("#autoLOC_[x]_Science!_013")/*Unknown*/;
 		}
 
 		public void Update(  )

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-
+using KSP.Localization;
 
 
 namespace ScienceChecklist {
@@ -421,7 +421,7 @@ namespace ScienceChecklist {
 			}
 			catch( Exception e )
 			{
-				_logger.Info( "Unable to load config: " + e.ToString( ) );
+				_logger.Info(Localizer.Format("#autoLOC_[x]_Science!_014")/*Unable to load config: */ + e.ToString( ) );
 			}
 		}
 

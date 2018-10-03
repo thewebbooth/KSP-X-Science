@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-
+using KSP.Localization;
 
 
 namespace ScienceChecklist
@@ -19,7 +19,7 @@ namespace ScienceChecklist
 		{
 			if( gameObject == null )
 			{
-				_logger.Debug( "gameObject is null!" );
+				_logger.Debug(Localizer.Format("#autoLOC_[x]_Science!_058")/*gameObject is null!*/ );
 				return;
 			}
 
@@ -33,14 +33,14 @@ namespace ScienceChecklist
 				Clip = GameDatabase.Instance.GetAudioClip( _file );
 				if( Clip == null )
 				{
-					_logger.Debug( "No noise to play!" );
+					_logger.Debug(Localizer.Format("#autoLOC_[x]_Science!_059")/*No noise to play!*/ );
 					return;
 				}
 
 				audioSource.PlayOneShot( Clip, Mathf.Clamp( GameSettings.UI_VOLUME, 0f, 1f ) );
 			}
 			else
-				_logger.Debug( "No AudioSource" );
+				_logger.Debug(Localizer.Format("#autoLOC_[x]_Science!_060")/*No AudioSource*/ );
 		}
 	}
 }
