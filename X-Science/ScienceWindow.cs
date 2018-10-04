@@ -386,13 +386,13 @@ namespace ScienceChecklist
 			GUILayout.BeginHorizontal( );
 			GUILayout.Label
 			(
-				new GUIContent(
-					string.Format("{0}/{1} complete.", _filter.CompleteCount, _filter.TotalCount),
-					string.Format( "{0} remaining\n{1:0.#} mits", _filter.TotalCount - _filter.CompleteCount, _filter.TotalScience - _filter.CompletedScience )
+					new GUIContent(
+					string.Format("{0}/{1}"+ Localizer.Format("#autoLOC_[x]_Science!_153")/*complete.*/, _filter.CompleteCount, _filter.TotalCount),
+					string.Format( "{0}" + Localizer.Format("#autoLOC_[x]_Science!_154")/*remaining\n*/ + "{1:0.#}" + Localizer.Format("#autoLOC_[x]_Science!_155")/*mits*/, _filter.TotalCount - _filter.CompleteCount, _filter.TotalScience - _filter.CompletedScience )
 				),
 				_experimentProgressLabelStyle,
 				GUILayout.Width(wScale(150))
-			);
+			);			
 			GUILayout.FlexibleSpace();
 			GUILayout.Label(new GUIContent(_searchTexture), _experimentProgressLabelStyle);
 			string NewFilterText = GUILayout.TextField(_filter.Text, _textFieldStyle, GUILayout.Height(wScale(25)), GUILayout.Width(wScale(150)));
