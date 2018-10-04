@@ -29,8 +29,8 @@ namespace ScienceChecklist {
 				string.IsNullOrEmpty(_formattedBiome)
 					? string.Empty
 					: string.IsNullOrEmpty(_formattedSubBiome)
-						? string.Format((Localizer.Format("#autoLOC_[x]_Science!_152")/*'s*/) + "{0}", _formattedBiome)
-						: string.Format((Localizer.Format("#autoLOC_[x]_Science!_152")/*'s*/ ) + "{0} ({1})", _formattedSubBiome, _formattedBiome));
+						? string.Format((Localizer.Format("#autoLOC_[x]_Science!_152")/*'s*/) + " {0} ", _formattedBiome)
+						: string.Format((Localizer.Format("#autoLOC_[x]_Science!_152")/*'s*/ ) + " {0} ({1})", _formattedSubBiome, _formattedBiome));
 		}
 
 

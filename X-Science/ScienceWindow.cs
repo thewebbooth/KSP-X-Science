@@ -387,8 +387,8 @@ namespace ScienceChecklist
 			GUILayout.Label
 			(
 					new GUIContent(
-					string.Format("{0}/{1}"+ Localizer.Format("#autoLOC_[x]_Science!_153")/*complete.*/, _filter.CompleteCount, _filter.TotalCount),
-					string.Format( "{0}" + Localizer.Format("#autoLOC_[x]_Science!_154")/*remaining\n*/ + "{1:0.#}" + Localizer.Format("#autoLOC_[x]_Science!_155")/*mits*/, _filter.TotalCount - _filter.CompleteCount, _filter.TotalScience - _filter.CompletedScience )
+					string.Format(" {0}/{1} "+ Localizer.Format("#autoLOC_[x]_Science!_153")/*complete.*/, _filter.CompleteCount, _filter.TotalCount),
+					string.Format( " {0} " + Localizer.Format("#autoLOC_[x]_Science!_154")/*remaining\n*/ + " {1:0.#} " + Localizer.Format("#autoLOC_[x]_Science!_155")/*mits*/, _filter.TotalCount - _filter.CompleteCount, _filter.TotalScience - _filter.CompletedScience )
 				),
 				_experimentProgressLabelStyle,
 				GUILayout.Width(wScale(150))

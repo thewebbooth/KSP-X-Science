@@ -81,7 +81,7 @@ namespace ScienceChecklist {
 		/// </summary>
 		public string Description {
 			get {
-				return string.Format("{0}" + Localizer.Format("#autoLOC_[x]_Science!_151")/* while */ + "{1}",
+				return string.Format(" {0} " + Localizer.Format("#autoLOC_[x]_Science!_151")/* while */ + " {1} ",
 					ScienceExperiment.experimentTitle,
 					Situation.Description);
 			}
