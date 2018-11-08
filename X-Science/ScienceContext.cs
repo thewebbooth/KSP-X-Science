@@ -163,7 +163,7 @@ namespace ScienceChecklist
 					var node = new ConfigNode( );
 					HighLogic.CurrentGame.flightState.Save( node );
 					if( node == null )
-						_logger.Trace(Localizer.Format("#autoLOC_[x]_Science!_070")/*flightState save is null*/ );
+						_logger.Trace("flightState save is null");
 					else
 					{
 						// Grab the unloaded vessels
@@ -315,7 +315,7 @@ _logger.Trace( "UpdateKscBiomes Done - " + Elapsed.ToString( ) + "ms" );*/
 			// Quick check for things we depend on
 			if( ResearchAndDevelopment.Instance == null || PartLoader.Instance == null  )
 			{
-				_logger.Debug(Localizer.Format("#autoLOC_[x]_Science!_071")/*ResearchAndDevelopment and PartLoader must be instantiated.*/ );
+				_logger.Debug("ResearchAndDevelopment and PartLoader must be instantiated.");
 				return;
 			}
 

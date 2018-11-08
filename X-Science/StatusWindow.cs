@@ -166,7 +166,7 @@ namespace ScienceChecklist
 				}
 			}
 			else
-				_logger.Trace( Localizer.Format("#autoLOC_[x]_Science!_130")/*DisplayExperiments is null*/ );
+				_logger.Trace("DisplayExperiments is null");
 
 
 
@@ -409,7 +409,7 @@ namespace ScienceChecklist
 
 
 
-			_logger.Trace( Localizer.Format("#autoLOC_[x]_Science!_145")/*ScienceThisBiome: */ + _filter.TotalCount + " / " + _filter.CompleteCount );
+			_logger.Trace("ScienceThisBiome:" + _filter.TotalCount + " / " + _filter.CompleteCount );
 			if( _filter.TotalCount > 0 )
 			{
 				var anyRunnableExperiments = false;
@@ -515,7 +515,7 @@ namespace ScienceChecklist
 
 					if (m != null)
 					{
-						_logger.Debug(Localizer.Format("#autoLOC_[x]_Science!_148")/*Running DMModuleScienceAnimateGenerics Experiment */ + m.experimentID + Localizer.Format("#autoLOC_[x]_Science!_149")/* on part */ + m.part.partInfo.name);
+						_logger.Debug("Running DMModuleScienceAnimateGenerics Experiment" + m.experimentID + "on part" + m.part.partInfo.name);
 						NewDMagicInstance.gatherScienceData( m, !_parent.Config.ShowResultsWindow );
 						return;
 					}
@@ -541,7 +541,7 @@ namespace ScienceChecklist
 
 					if (m != null)
 					{
-						_logger.Trace(Localizer.Format("#autoLOC_[x]_Science!_148")/*Running DMModuleScienceAnimateGenerics Experiment */ + m.experimentID + Localizer.Format("#autoLOC_[x]_Science!_149")/* on part */ + m.part.partInfo.name);
+						_logger.Trace("Running DMModuleScienceAnimateGenerics Experiment" + m.experimentID + "on part" + m.part.partInfo.name);
 						DMAPIInstance.deployDMExperiment( m, !_parent.Config.ShowResultsWindow );
 						return;
 					}
@@ -554,7 +554,7 @@ namespace ScienceChecklist
 			m = FindExperiment( s, runSingleUse );
 			if( m != null )
 			{
-				_logger.Trace( Localizer.Format("#autoLOC_[x]_Science!_150")/*Running Experiment */ + m.experimentID + Localizer.Format("#autoLOC_[x]_Science!_149")/* on part */ + m.part.partInfo.name );
+				_logger.Trace("Running Experiment" + m.experimentID + "on part" + m.part.partInfo.name );
 				RunStandardModuleScienceExperiment( m );
 				return;
 			}

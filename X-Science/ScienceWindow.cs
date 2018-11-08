@@ -414,7 +414,7 @@ namespace ScienceChecklist
 			_scrollPos = GUILayout.BeginScrollView(_scrollPos, _skin.scrollView);
 			var i = 0;
 			if( _filter.DisplayScienceInstances == null )
-				_logger.Trace(Localizer.Format("#autoLOC_[x]_Science!_074")/*DisplayExperiments is null*/ );
+				_logger.Trace("DisplayExperiments is null");
 			else
 			{
 				for( ; i < _filter.DisplayScienceInstances.Count; i++ )
@@ -534,7 +534,7 @@ namespace ScienceChecklist
 				}
 			}
 			else
-				_logger.Trace(Localizer.Format("#autoLOC_[x]_Science!_079")/*DisplayExperiments is null*/ );
+				_logger.Trace("DisplayExperiments is null");
 			GUILayout.Space(wScale(15) * i);
 			GUILayout.EndScrollView();
 			GUILayout.EndVertical();

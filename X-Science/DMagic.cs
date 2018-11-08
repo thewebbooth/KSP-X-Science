@@ -155,7 +155,7 @@ namespace ScienceChecklist
 			p = _MIexperimentCanConduct.GetParameters();
 			if (!((p.Length == 1) && (p[0].ParameterType == typeof(IScienceDataContainer)) && _MIexperimentCanConduct.ReturnType == typeof(bool)))
 			{
-				_logger.Info(Localizer.Format("#autoLOC_[x]_Science!_015")/*DMAPI.experimentCanConduct method signature has changed. [x] Science may not work for DMagic experiments*/ );
+				_logger.Info("DMAPI.experimentCanConduct method signature has changed. [x] Science may not work for DMagic experiments");
 				_MIexperimentCanConduct = null;
 			}
 
@@ -165,7 +165,7 @@ namespace ScienceChecklist
 			p = _MIdeployDMExperiment.GetParameters();
 			if (!((p.Length == 2) && (p[0].ParameterType == typeof(IScienceDataContainer)) && (p[1].ParameterType == typeof(bool)) && _MIdeployDMExperiment.ReturnType == typeof(bool)))
 			{
-				_logger.Info(Localizer.Format("#autoLOC_[x]_Science!_016")/*DMAPI.deployDMExperiment method signature has changed. [x] Science may not work for DMagic experiments*/ );
+				_logger.Info("DMAPI.deployDMExperiment method signature has changed. [x] Science may not work for DMagic experiments");
 				_MIdeployDMExperiment = null;
 			}
 
@@ -175,7 +175,7 @@ namespace ScienceChecklist
 			p = _MIgetExperimentSituation.GetParameters();
 			if (!((p.Length == 1) && (p[0].ParameterType == typeof(ModuleScienceExperiment)) && _MIgetExperimentSituation.ReturnType == typeof(ExperimentSituations)))
 			{
-				_logger.Info(Localizer.Format("#autoLOC_[x]_Science!_017")/*DMAPI.getExperimentSituation method signature has changed. [x] Science may not work for DMagic experiments*/ );
+				_logger.Info("DMAPI.getExperimentSituation method signature has changed. [x] Science may not work for DMagic experiments");
 				_MIgetExperimentSituation = null;
 			}
 
@@ -185,7 +185,7 @@ namespace ScienceChecklist
 			p = _MIgetBiome.GetParameters();
 			if (!((p.Length == 2) && (p[0].ParameterType == typeof(ModuleScienceExperiment)) && (p[1].ParameterType == typeof(ExperimentSituations)) && _MIgetBiome.ReturnType == typeof(string)))
 			{
-				_logger.Info(Localizer.Format("#autoLOC_[x]_Science!_018")/*DMAPI.getBiome method signature has changed. [x] Science may not work for DMagic experiments*/ );
+				_logger.Info("DMAPI.getBiome method signature has changed. [x] Science may not work for DMagic experiments");
 				_MIgetBiome = null;
 			}
 
@@ -258,7 +258,7 @@ namespace ScienceChecklist
 				p = _MIcanConduct.GetParameters();
 				if (!((p.Length == 0) && _MIcanConduct.ReturnType == typeof(bool)))
 				{
-					_logger.Info(Localizer.Format("#autoLOC_[x]_Science!_019")/*DMModuleScienceAnimateGeneric.canConduct method signature has changed. [x] Science may not work for DMModuleScienceAnimateGeneric experiments*/ );
+					_logger.Info("DMModuleScienceAnimateGeneric.canConduct method signature has changed. [x] Science may not work for DMModuleScienceAnimateGeneric experiments");
 					_MIcanConduct = null;
 				}
 
@@ -266,7 +266,7 @@ namespace ScienceChecklist
 				p = _MIgatherScienceData.GetParameters();
 				if (!((p.Length == 1) && (p[0].ParameterType == typeof(bool)) && _MIgatherScienceData.ReturnType == typeof(void)))
 				{
-					_logger.Info(Localizer.Format("#autoLOC_[x]_Science!_020")/*DMModuleScienceAnimateGeneric.gatherScienceData method signature has changed. [x] Science may not work for DMModuleScienceAnimateGeneric experiments*/ );
+					_logger.Info("DMModuleScienceAnimateGeneric.gatherScienceData method signature has changed. [x] Science may not work for DMModuleScienceAnimateGeneric experiments");
 					_MIgatherScienceData = null;
 				}
 
@@ -274,7 +274,7 @@ namespace ScienceChecklist
 				p = _MIgetSituation.GetParameters();
 				if (!((p.Length == 0) && _MIgetSituation.ReturnType == typeof(ExperimentSituations)))
 				{
-					_logger.Info(Localizer.Format("#autoLOC_[x]_Science!_021")/*DMModuleScienceAnimateGeneric.getSituation method signature has changed. [x] Science may not work for DMModuleScienceAnimateGeneric experiments*/ );
+					_logger.Info("DMModuleScienceAnimateGeneric.getSituation method signature has changed. [x] Science may not work for DMModuleScienceAnimateGeneric experiments");
 					_MIgetSituation = null;
 				}
 
@@ -282,7 +282,7 @@ namespace ScienceChecklist
 				p = _MIgetBiome.GetParameters();
 				if (!((p.Length == 1) && (p[0].ParameterType == typeof(ExperimentSituations)) && _MIgetBiome.ReturnType == typeof(string)))
 				{
-					_logger.Info(Localizer.Format("#autoLOC_[x]_Science!_021")/*DMModuleScienceAnimateGeneric.getSituation method signature has changed. [x] Science may not work for DMModuleScienceAnimateGeneric experiments*/ );
+					_logger.Info("DMModuleScienceAnimateGeneric.getSituation method signature has changed. [x] Science may not work for DMModuleScienceAnimateGeneric experiments");
 					_MIgetBiome = null;
 				}
 			}
