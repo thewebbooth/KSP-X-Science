@@ -2,7 +2,7 @@
 using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
-
+using KSP.Localization;
 using System.Reflection;
 using KSP.UI.Screens;
 
@@ -23,7 +23,7 @@ namespace ScienceChecklist
 
 
 		public ShipStateWindow( ScienceChecklistAddon Parent )
-			: base( "[x] Science! Selected Object", 250, 30 )
+			: base( Localizer.Format("#autoLOC_[x]_Science!_110")/*[x] Science! Selected Object*/, 250, 30 )
 		{
 			_parent = Parent;
 			UiScale = _parent.Config.UiScale;
@@ -93,31 +93,31 @@ namespace ScienceChecklist
 			if( SelectedObject.celestialBody )
 			{
 				Body Body = _parent.Science.BodyList[ SelectedObject.celestialBody ];
-				Title += "Body: " + GameHelper.LocalizeBodyName( Body.CelestialBody.displayName ) + "\n";
+				Title += Localizer.Format("#autoLOC_[x]_Science!_111")/*Body: */ + GameHelper.LocalizeBodyName( Body.CelestialBody.displayName ) + "\n";
 				Title += Body.Type;
 				if( Body.IsHome )
-					Title += " - Home!";
+					Title += Localizer.Format("#autoLOC_[x]_Science!_112")/* - Home!*/;
 
 
 
-				Text += "Space high: " + (Body.CelestialBody.scienceValues.spaceAltitudeThreshold/1000) + "km";
+				Text += Localizer.Format("#autoLOC_[x]_Science!_113")/*Space high: */ + (Body.CelestialBody.scienceValues.spaceAltitudeThreshold/1000) + "km";
 				if( Body.HasAtmosphere )
 				{
-					Text += "\nAtmos depth: " + (Body.CelestialBody.atmosphereDepth/1000) + "km";
-					Text += "\nFlying high: " + (Body.CelestialBody.scienceValues.flyingAltitudeThreshold/1000) + "km";
+					Text += Localizer.Format("#autoLOC_[x]_Science!_114")/*\nAtmos depth: */ + (Body.CelestialBody.atmosphereDepth/1000) + "km";
+					Text += Localizer.Format("#autoLOC_[x]_Science!_115")/*\nFlying high: */ + (Body.CelestialBody.scienceValues.flyingAltitudeThreshold/1000) + "km";
 					if( Body.HasOxygen )
-						Text += "\nHas oxygen - jets work";
+						Text += Localizer.Format("#autoLOC_[x]_Science!_116")/*\nHas oxygen - jets work*/;
 				}
 				else
-					Text += "\nNo kind of atmosphere";
+					Text += Localizer.Format("#autoLOC_[x]_Science!_117")/*\nNo kind of atmosphere*/;
 
 				if( Body.HasSurface )
 				{
 					if( Body.HasOcean )
-						Text += "\nHas oceans";
+						Text += Localizer.Format("#autoLOC_[x]_Science!_118")/*\nHas oceans*/;
 				}
 				else
-					Text += "\nNo surface";
+					Text += Localizer.Format("#autoLOC_[x]_Science!_119")/*\nNo surface*/;
 			}
 
 			scrollPosition = GUILayout.BeginScrollView( scrollPosition );
@@ -142,7 +142,7 @@ namespace ScienceChecklist
 			if( SelectedObject.vessel != null && SelectedObject.vessel.protoVessel != null )
 			{
 				if( SelectedObject.vessel.DiscoveryInfo.Level != DiscoveryLevels.Owned )
-					Title = "Unowned object";
+					Title = Localizer.Format("#autoLOC_[x]_Science!_120")/*Unowned object*/;
 				else
 				{
 					Title = SelectedObject.vessel.GetName( );
@@ -185,10 +185,10 @@ namespace ScienceChecklist
 							case Statuses.pod:
 								break;
 							case Statuses.none:
-								texts.Add( "No command pod" );
+								texts.Add( Localizer.Format("#autoLOC_[x]_Science!_121")/*No command pod*/ );
 								break;
 							case Statuses.seat:
-								texts.Add( "Has command seat" );
+								texts.Add( Localizer.Format("#autoLOC_[x]_Science!_122")/*Has command seat*/ );
 								break;
 						}
 					}

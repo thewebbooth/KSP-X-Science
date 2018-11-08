@@ -1,5 +1,5 @@
 ﻿using System.Text.RegularExpressions;
-
+using KSP.Localization;
 
 
 
@@ -29,8 +29,8 @@ namespace ScienceChecklist {
 				string.IsNullOrEmpty(_formattedBiome)
 					? string.Empty
 					: string.IsNullOrEmpty(_formattedSubBiome)
-						? string.Format("'s {0}", _formattedBiome)
-						: string.Format("'s {0} ({1})", _formattedSubBiome, _formattedBiome));
+						? string.Format((Localizer.Format("#autoLOC_[x]_Science!_152")/*'s*/) + " {0} ", _formattedBiome)
+						: string.Format((Localizer.Format("#autoLOC_[x]_Science!_152")/*'s*/ ) + " {0} ({1})", _formattedSubBiome, _formattedBiome));
 		}
 
 
@@ -87,17 +87,17 @@ namespace ScienceChecklist {
 		{
 			switch (situation) {
 				case ExperimentSituations.FlyingHigh:
-					return "flying high over";
+					return Localizer.Format("#autoLOC_[x]_Science!_123")/*flying high over*/;
 				case ExperimentSituations.FlyingLow:
-					return "flying low over";
+					return Localizer.Format("#autoLOC_[x]_Science!_124")/*flying low over*/;
 				case ExperimentSituations.InSpaceHigh:
-					return "in space high over";
+					return Localizer.Format("#autoLOC_[x]_Science!_125")/*in space high over*/;
 				case ExperimentSituations.InSpaceLow:
-					return "in space near";
+					return Localizer.Format("#autoLOC_[x]_Science!_126")/*in space near*/;
 				case ExperimentSituations.SrfLanded:
-					return "landed at";
+					return Localizer.Format("#autoLOC_[x]_Science!_127")/*landed at*/;
 				case ExperimentSituations.SrfSplashed:
-					return "splashed down at";
+					return Localizer.Format("#autoLOC_[x]_Science!_128")/*splashed down at*/;
 				default:
 					return situation.ToString();
 			}

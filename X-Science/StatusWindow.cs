@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-
+using KSP.Localization;
 
 
 namespace ScienceChecklist
@@ -41,7 +41,7 @@ namespace ScienceChecklist
 		public event EventHandler OnOpenEvent;
 
 		public StatusWindow( ScienceChecklistAddon Parent )
-			: base( "[x] Science! Here and Now", 250, 30 )
+			: base( Localizer.Format("#autoLOC_[x]_Science!_129")/*[x] Science! Here and Now*/, 250, 30 )
 		{
 			_parent = Parent;
 			UiScale = _parent.Config.UiScale;
@@ -166,7 +166,7 @@ namespace ScienceChecklist
 				}
 			}
 			else
-				_logger.Trace( "DisplayExperiments is null" );
+				_logger.Trace("DisplayExperiments is null");
 
 
 
@@ -177,9 +177,9 @@ namespace ScienceChecklist
 			GUILayout.BeginHorizontal( );
 			GUIContent Content = null;
 			if( _parent.Config.StopTimeWarp )
-				Content = new GUIContent( _GfxTimeWarp, "Time warp will be stopped" );
+				Content = new GUIContent( _GfxTimeWarp, Localizer.Format("#autoLOC_[x]_Science!_131")/*Time warp will be stopped*/ );
 			else
-				Content = new GUIContent( _GfxTimeWarpOff, "Time warp will not be stopped" );
+				Content = new GUIContent( _GfxTimeWarpOff, Localizer.Format("#autoLOC_[x]_Science!_132")/*Time warp will not be stopped*/ );
 			if( GUILayout.Button( Content, GUILayout.Width( wScale( 36 ) ), GUILayout.Height( wScale( 32 ) ) ) )
 			{
 				_parent.Config.StopTimeWarp = !_parent.Config.StopTimeWarp;
@@ -189,9 +189,9 @@ namespace ScienceChecklist
 
 
 			if( _parent.Config.PlayNoise )
-				Content = new GUIContent( _GfxAudioAlert, "Audio alert will sound" );
+				Content = new GUIContent( _GfxAudioAlert, Localizer.Format("#autoLOC_[x]_Science!_133")/*Audio alert will sound*/ );
 			else
-				Content = new GUIContent( _GfxAudioAlertOff, "No audio alert" );
+				Content = new GUIContent( _GfxAudioAlertOff, Localizer.Format("#autoLOC_[x]_Science!_134")/*No audio alert*/ );
 			if( GUILayout.Button( Content, GUILayout.Width( wScale( 36 ) ), GUILayout.Height( wScale( 32 ) ) ) )
 			{
 				_parent.Config.PlayNoise = !_parent.Config.PlayNoise;
@@ -201,9 +201,9 @@ namespace ScienceChecklist
 			
 			
 			if( _parent.Config.ShowResultsWindow )
-				Content = new GUIContent( _GfxResultsWindow, "Show results window" );
+				Content = new GUIContent( _GfxResultsWindow, Localizer.Format("#autoLOC_[x]_Science!_135")/*Show results window*/ );
 			else
-				Content = new GUIContent( _GfxResultsWindowOff, "Supress results window" );
+				Content = new GUIContent( _GfxResultsWindowOff, Localizer.Format("#autoLOC_[x]_Science!_136")/*Supress results window*/ );
 			if( GUILayout.Button( Content, GUILayout.Width( wScale( 36 ) ), GUILayout.Height( wScale( 32 ) ) ) )
 			{
 				_parent.Config.ShowResultsWindow = !_parent.Config.ShowResultsWindow;
@@ -244,35 +244,35 @@ namespace ScienceChecklist
 			if( _filter.CurrentSituation != null )
 			{
 				Body Body = _filter.CurrentSituation.Body;
-				Text += "Body: " + GameHelper.LocalizeBodyName( Body.CelestialBody.displayName ) + "\n";
+				Text += Localizer.Format("#autoLOC_[x]_Science!_111")/*Body: */ + GameHelper.LocalizeBodyName( Body.CelestialBody.displayName ) + "\n";
 				Text += Body.Type;
 				if( Body.IsHome )
-					Text += " - Home!";
+					Text += Localizer.Format("#autoLOC_[x]_Science!_112")/* - Home!*/;
 				Text += "\n\n";
-				Text += "Space high: " + (Body.CelestialBody.scienceValues.spaceAltitudeThreshold/1000) + "km\n";
+				Text += Localizer.Format("#autoLOC_[x]_Science!_113")/*Space high: */ + (Body.CelestialBody.scienceValues.spaceAltitudeThreshold/1000) + "km\n";
 
 				if( Body.HasAtmosphere )
 				{
-					Text += "Atmos depth: " + (Body.CelestialBody.atmosphereDepth/1000) + "km\n";
-					Text += "Flying high: " + (Body.CelestialBody.scienceValues.flyingAltitudeThreshold/1000) + "km\n";
+					Text += Localizer.Format("#autoLOC_[x]_Science!_137")/*Atmos depth: */ + (Body.CelestialBody.atmosphereDepth/1000) + "km\n";
+					Text += Localizer.Format("#autoLOC_[x]_Science!_138")/*Flying high: */ + (Body.CelestialBody.scienceValues.flyingAltitudeThreshold/1000) + "km\n";
 					if( Body.HasOxygen )
-						Text += "Has oxygen - jets work\n";
+						Text += Localizer.Format("#autoLOC_[x]_Science!_139")/*Has oxygen - jets work\n*/;
 				}
 				else
-					Text += "No kind of atmosphere\n";
+					Text += Localizer.Format("#autoLOC_[x]_Science!_140")/*No kind of atmosphere\n*/;
 
 				if( Body.HasSurface )
 				{
 					if( Body.HasOcean )
-						Text += "Has oceans\n";
+						Text += Localizer.Format("#autoLOC_[x]_Science!_141")/*Has oceans\n*/;
 				}
 				else
-					Text += "No surface\n";
+					Text += Localizer.Format("#autoLOC_[x]_Science!_142")/*No surface\n*/;
 
 				Text += "\n";
 			}
 
-			Text += "Current vessel: " + _parent.Science.CurrentVesselScience.Count( ) + " stored experiments";
+			Text += Localizer.Format("#autoLOC_[x]_Science!_143")/*Current vessel: */ + _parent.Science.CurrentVesselScience.Count( ) + Localizer.Format("#autoLOC_[x]_Science!_144")/* stored experiments*/;
 
 			return Text;
 		}
@@ -409,7 +409,7 @@ namespace ScienceChecklist
 
 
 
-			_logger.Trace( "ScienceThisBiome: " + _filter.TotalCount + " / " + _filter.CompleteCount );
+			_logger.Trace("ScienceThisBiome:" + _filter.TotalCount + " / " + _filter.CompleteCount );
 			if( _filter.TotalCount > 0 )
 			{
 				var anyRunnableExperiments = false;
@@ -442,7 +442,7 @@ namespace ScienceChecklist
 						if( _parent.Config.PlayNoise )
 							PlayNoise( );
 						if( _parent.Config.StopTimeWarp || _parent.Config.PlayNoise )
-							ScreenMessages.PostScreenMessage( "New Situation: " + _filter.CurrentSituation.Description );
+							ScreenMessages.PostScreenMessage( Localizer.Format("#autoLOC_[x]_Science!_146")/*New Situation: */ + _filter.CurrentSituation.Description );
 					}
 				}
 			}
@@ -494,7 +494,7 @@ namespace ScienceChecklist
 
 		public void RunExperiment(ScienceInstance s, bool runSingleUse = true)
 		{
-			_logger.Trace( "Finding Module for Science Report: " + s.ScienceExperiment.id );
+			_logger.Trace( Localizer.Format("#autoLOC_[x]_Science!_147")/*Finding Module for Science Report: */ + s.ScienceExperiment.id );
 			ModuleScienceExperiment m = null;
 
 
@@ -515,7 +515,7 @@ namespace ScienceChecklist
 
 					if (m != null)
 					{
-						_logger.Debug("Running DMModuleScienceAnimateGenerics Experiment " + m.experimentID + " on part " + m.part.partInfo.name);
+						_logger.Debug("Running DMModuleScienceAnimateGenerics Experiment" + m.experimentID + "on part" + m.part.partInfo.name);
 						NewDMagicInstance.gatherScienceData( m, !_parent.Config.ShowResultsWindow );
 						return;
 					}
@@ -541,7 +541,7 @@ namespace ScienceChecklist
 
 					if (m != null)
 					{
-						_logger.Trace("Running DMModuleScienceAnimates Experiment " + m.experimentID + " on part " + m.part.partInfo.name);
+						_logger.Trace("Running DMModuleScienceAnimateGenerics Experiment" + m.experimentID + "on part" + m.part.partInfo.name);
 						DMAPIInstance.deployDMExperiment( m, !_parent.Config.ShowResultsWindow );
 						return;
 					}
@@ -554,7 +554,7 @@ namespace ScienceChecklist
 			m = FindExperiment( s, runSingleUse );
 			if( m != null )
 			{
-				_logger.Trace( "Running Experiment " + m.experimentID + " on part " + m.part.partInfo.name );
+				_logger.Trace("Running Experiment" + m.experimentID + "on part" + m.part.partInfo.name );
 				RunStandardModuleScienceExperiment( m );
 				return;
 			}

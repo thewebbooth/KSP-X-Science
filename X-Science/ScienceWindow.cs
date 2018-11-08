@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using KSP;
-
+using KSP.Localization;
 
 
 namespace ScienceChecklist
@@ -318,7 +318,7 @@ namespace ScienceChecklist
 			}
 			else
 			{
-				_rect = GUILayout.Window( _windowId, _rect, DrawControls, "[x] Science!");
+				_rect = GUILayout.Window( _windowId, _rect, DrawControls, Localizer.Format("#autoLOC_[x]_Science!_072")/*[x] Science!*/);
 			}
 
 
@@ -386,13 +386,13 @@ namespace ScienceChecklist
 			GUILayout.BeginHorizontal( );
 			GUILayout.Label
 			(
-				new GUIContent(
-					string.Format("{0}/{1} complete.", _filter.CompleteCount, _filter.TotalCount),
-					string.Format( "{0} remaining\n{1:0.#} mits", _filter.TotalCount - _filter.CompleteCount, _filter.TotalScience - _filter.CompletedScience )
+					new GUIContent(
+					string.Format(" {0}/{1} "+ Localizer.Format("#autoLOC_[x]_Science!_153")/*complete.*/, _filter.CompleteCount, _filter.TotalCount),
+					string.Format( " {0} " + Localizer.Format("#autoLOC_[x]_Science!_154")/*remaining\n*/ + " {1:0.#} " + Localizer.Format("#autoLOC_[x]_Science!_155")/*mits*/, _filter.TotalCount - _filter.CompleteCount, _filter.TotalScience - _filter.CompletedScience )
 				),
 				_experimentProgressLabelStyle,
 				GUILayout.Width(wScale(150))
-			);
+			);			
 			GUILayout.FlexibleSpace();
 			GUILayout.Label(new GUIContent(_searchTexture), _experimentProgressLabelStyle);
 			string NewFilterText = GUILayout.TextField(_filter.Text, _textFieldStyle, GUILayout.Height(wScale(25)), GUILayout.Width(wScale(150)));
@@ -403,7 +403,7 @@ namespace ScienceChecklist
 			}
 			 
 
-			if (GUILayout.Button(new GUIContent(_clearSearchTexture, "Clear search"), GUILayout.Width(wScale(25)), GUILayout.Height(wScale(25))))
+			if (GUILayout.Button(new GUIContent(_clearSearchTexture, Localizer.Format("#autoLOC_[x]_Science!_073")/*Clear search*/), GUILayout.Width(wScale(25)), GUILayout.Height(wScale(25))))
 			{
 				_filter.Text = string.Empty;
 				_parent.OnSettingsDirty( this, null );
@@ -414,7 +414,7 @@ namespace ScienceChecklist
 			_scrollPos = GUILayout.BeginScrollView(_scrollPos, _skin.scrollView);
 			var i = 0;
 			if( _filter.DisplayScienceInstances == null )
-				_logger.Trace( "DisplayExperiments is null" );
+				_logger.Trace("DisplayExperiments is null");
 			else
 			{
 				for( ; i < _filter.DisplayScienceInstances.Count; i++ )
@@ -439,14 +439,14 @@ namespace ScienceChecklist
 			var TextWidth = wScale(290);
 			var NumButtons = 3;
 			GUIContent[ ] FilterButtons = {
-					new GUIContent(_currentSituationTexture, "Show experiments available right now"),
-					new GUIContent(_currentVesselTexture, "Show experiments available on this vessel"),
-					new GUIContent(_unlockedTexture, "Show all unlocked experiments")
+					new GUIContent(_currentSituationTexture, Localizer.Format("#autoLOC_[x]_Science!_075")/*Show experiments available right now*/),
+					new GUIContent(_currentVesselTexture, Localizer.Format("#autoLOC_[x]_Science!_076")/*Show experiments available on this vessel*/),
+					new GUIContent(_unlockedTexture, Localizer.Format("#autoLOC_[x]_Science!_077")/*Show all unlocked experiments*/)
 				};
 			if( _parent.Config.AllFilter )
 			{
 				Array.Resize( ref FilterButtons, 4 );
-				FilterButtons[ 3 ] = new GUIContent(_allTexture, "Show all experiments");
+				FilterButtons[ 3 ] = new GUIContent(_allTexture, Localizer.Format("#autoLOC_[x]_Science!_078")/*Show all experiments*/);
 				TextWidth = wScale(260);
 				NumButtons = 4;
 			}
@@ -534,7 +534,7 @@ namespace ScienceChecklist
 				}
 			}
 			else
-				_logger.Trace( "DisplayExperiments is null" );
+				_logger.Trace("DisplayExperiments is null");
 			GUILayout.Space(wScale(15) * i);
 			GUILayout.EndScrollView();
 			GUILayout.EndVertical();
@@ -568,20 +568,20 @@ namespace ScienceChecklist
 
 		private void DrawTitleBarButtons( Rect rect, bool NeedMaxIcon = false )
 		{
-			var closeContent = ( _closeTexture != null ) ? new GUIContent( _closeTexture, "Close window" ) : new GUIContent( "X", "Close window" );
+			var closeContent = ( _closeTexture != null ) ? new GUIContent( _closeTexture, Localizer.Format("#autoLOC_[x]_Science!_080")/*Close window*/ ) : new GUIContent( "X", Localizer.Format("#autoLOC_[x]_Science!_080")/*Close window*/ );
 			if (GUI.Button(wScale(new Rect(4, 4, 20, 20)), closeContent, _closeButtonStyle))
 			{
 				IsVisible = false;
 				OnCloseEvent( this, EventArgs.Empty );
 			}
 
-			var helpContent = ( _helpTexture != null ) ? new GUIContent( _helpTexture, "Open help window" ) : new GUIContent( "?", "Open help window" );
+			var helpContent = ( _helpTexture != null ) ? new GUIContent( _helpTexture, Localizer.Format("#autoLOC_[x]_Science!_081")/*Open help window*/ ) : new GUIContent( "?", Localizer.Format("#autoLOC_[x]_Science!_081")/*Open help window*/ );
 			if (GUI.Button(new Rect(rect.width - wScale(72), wScale(4), wScale(20), wScale(20)), helpContent, _closeButtonStyle))
 			{
 				_helpWindow.ToggleVisible( );
 			}
 
-			var setingsContent = ( _settingsTexture != null ) ? new GUIContent( _settingsTexture, "Open settings window" ) : new GUIContent( "S", "Open settings window" );
+			var setingsContent = ( _settingsTexture != null ) ? new GUIContent( _settingsTexture, Localizer.Format("#autoLOC_[x]_Science!_082")/*Open settings window*/ ) : new GUIContent( "S", Localizer.Format("#autoLOC_[x]_Science!_082")/*Open settings window*/ );
 			if (GUI.Button(new Rect(rect.width - wScale(48), wScale(4), wScale(20), wScale(20)), setingsContent, _closeButtonStyle))
 			{
 				_settingsWindow.ToggleVisible( );
@@ -589,9 +589,9 @@ namespace ScienceChecklist
 
 			GUIContent compactContent;
 			if( NeedMaxIcon )
-				compactContent = ( _maximizeTexture != null ) ? new GUIContent( _maximizeTexture, "Maximise window" ) : new GUIContent( "S", "Maximise window" );
+				compactContent = ( _maximizeTexture != null ) ? new GUIContent( _maximizeTexture, Localizer.Format("#autoLOC_[x]_Science!_083")/*Maximise window*/ ) : new GUIContent( "S", Localizer.Format("#autoLOC_[x]_Science!_083")/*Maximise window*/ );
 			else
-				compactContent = ( _minimizeTexture != null ) ? new GUIContent( _minimizeTexture, "Compact window" ) : new GUIContent( "S", "Compact window" );
+				compactContent = ( _minimizeTexture != null ) ? new GUIContent( _minimizeTexture, Localizer.Format("#autoLOC_[x]_Science!_084")/*Compact window*/ ) : new GUIContent( "S", Localizer.Format("#autoLOC_[x]_Science!_084")/*Compact window*/ );
 			if (GUI.Button(new Rect(rect.width - wScale(24), wScale(4), wScale(20), wScale(20)), compactContent, _closeButtonStyle))
 			{
 				_compactMode = !_compactMode;

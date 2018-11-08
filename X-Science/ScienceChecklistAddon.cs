@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using KSP.UI.Screens;
-
+using KSP.Localization;
 
 
 namespace ScienceChecklist {
@@ -45,7 +45,7 @@ namespace ScienceChecklist {
 		public void Awake( )
 		{
 			_logger = new Logger( this );
-			_logger.Trace( "Awake" );
+			_logger.Trace(Localizer.Format("#autoLOC_[x]_Science!_061")/*Awake*/ );
 		}
 
 
@@ -53,7 +53,7 @@ namespace ScienceChecklist {
 		// Called by Unity once to initialize the class, just before Update is called.
 		public void Start( )
 		{
-			_logger.Trace( "Start" );
+			_logger.Trace(Localizer.Format("#autoLOC_[x]_Science!_062")/*Start*/ );
 
 			if( _addonInitialized == true )
 			{
@@ -77,7 +77,7 @@ namespace ScienceChecklist {
 			if( Config.MusicStartsMuted )
 			{
 				Muted = true;
-				ScreenMessages.PostScreenMessage( "[x] Science! - Music Mute" );
+				ScreenMessages.PostScreenMessage(Localizer.Format("#autoLOC_[x]_Science!_063")/*[x] Science! - Music Mute*/ );
 			}
 
             GameEvents.onGameSceneSwitchRequested.Add( this.onGameSceneSwitchRequested );
@@ -154,7 +154,7 @@ namespace ScienceChecklist {
 			DontDestroyOnLoad( this );
 
 			
-			_logger.Trace( "Done Start" );
+			_logger.Trace("Done Start");
 		}
 
 
@@ -299,7 +299,7 @@ namespace ScienceChecklist {
 		{
 			HammerMusicMute( ); // Ensure we enforce music volume anyway
 
-			_logger.Trace( "Load" );
+			_logger.Trace("Load");
 			if( !GameHelper.AllowChecklistWindow( ) )
 			{
 //				_logger.Info( "Ui is hidden in this scene" );
@@ -310,17 +310,17 @@ namespace ScienceChecklist {
 			
 			if( _active )
 			{
-				_logger.Trace( "Already loaded." );
+				_logger.Trace("Already loaded.");
 				return;
 			}
 			
 			if( HighLogic.CurrentGame.Mode != Game.Modes.CAREER && HighLogic.CurrentGame.Mode != Game.Modes.SCIENCE_SANDBOX )
 			{
-				_logger.Info( "Game type is " + HighLogic.CurrentGame.Mode + ". Deactivating." );
+				_logger.Info("Game type is" + HighLogic.CurrentGame.Mode + ". Deactivating.");
 				_active = false;
 				return;
 			}
-			_logger.Info( "Game type is " + HighLogic.CurrentGame.Mode + ". Activating." );
+			_logger.Info("Game type is" + HighLogic.CurrentGame.Mode + ". Activating.");
 			_active = true;
 			SwitchingGameScene( GameScenes.MAINMENU, HighLogic.LoadedScene ); // Get correct visibility now we are active
 
@@ -424,7 +424,7 @@ namespace ScienceChecklist {
 			{
 				// Toggle the muted state
 					Muted = !Muted;
-					ScreenMessages.PostScreenMessage( "[x] Science! - Music Mute" );
+					ScreenMessages.PostScreenMessage(Localizer.Format("#autoLOC_[x]_Science!_063")/*[x] Science! - Music Mute*/ );
 			}
 			else
 			{
@@ -803,7 +803,7 @@ namespace ScienceChecklist {
 		private void HammerMusicMute( )
 		{
 			if( muted )
-				 MusicLogic.SetVolume( 0f );
+				 MusicLogic.SetVolume( 0f, 0f );
 		}
 
 
@@ -835,14 +835,14 @@ namespace ScienceChecklist {
                     oldVolume = GameSettings.MUSIC_VOLUME;
 
                     // Mute the music
-                    MusicLogic.SetVolume(0f);
+                    MusicLogic.SetVolume(0f, 0f);
  //                   _logger.Info("[MusicMute]: Muted music");
                 }
                 // Unmute
                 else
                 {
                     // Set the music volume to what it was before
-                    MusicLogic.SetVolume(oldVolume);
+                    MusicLogic.SetVolume(oldVolume,oldVolume);
  //                   _logger.Info("[MusicMute]: Set music volume to: " + oldVolume);
                 }
 
