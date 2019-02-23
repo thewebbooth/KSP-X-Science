@@ -1,18 +1,18 @@
 {
-    "NAME":"[x] Science!",
-    "URL":"https://themoose.co.uk/ksp/%5Bx%5D%20Science!.version",
-    "DOWNLOAD":"https://themoose.co.uk/ksp/downloads.html",
-    "CHANGE_LOG_URL":"https://themoose.co.uk/ksp/CHANGES.md",
+    "NAME":"[x] Science! Continued",
+    "URL":"http://ksp.floppy.men/%5Bx%5D%20Science%21/%5Bx%5D%20Science%21.version",
+    "DOWNLOAD":"http://ksp.floppy.men/%5Bx%5D%20Science%21/",
+    "CHANGE_LOG_URL":"http://ksp.floppy.men/%5Bx%5D%20Science%21/CHANGES.md",
     "VERSION":
     {
         "MAJOR":5,
-        "MINOR":19,
+        "MINOR":20,
         "PATCH":0
     },
     "KSP_VERSION":
     {
         "MAJOR":1,
         "MINOR":6,
-        "PATCH":0
+        "PATCH":1
     }
 }

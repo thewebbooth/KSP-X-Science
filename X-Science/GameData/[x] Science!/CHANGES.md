@@ -1,6 +1,13 @@
 [x] Science!
 ============
 
+5.20
+----
+23-Feb-2019 Built against KSP V1.6.1
+* Recompiled for KSP V1.6.1
+
+
+
 5.19
 ----
 22-Dec-2018 Built against KSP V1.6.0
