@@ -389,7 +389,7 @@ namespace ScienceChecklist
 
 
 
-			_filter.UpdateFilter( );
+			_filter.UpdateFilter( _DMModuleScienceAnimateGenerics );
 		}
 
 
