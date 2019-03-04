@@ -66,7 +66,6 @@ namespace ScienceChecklist
 			GameEvents.onGameStateSave.Add( new EventData<ConfigNode>.OnEvent( this.GameStateSave ) );
 			GameEvents.OnPartPurchased.Add( new EventData<AvailablePart>.OnEvent( this.PartPurchased ) );
 			GameEvents.OnTechnologyResearched.Add( new EventData<GameEvents.HostTargetAction<RDTech, RDTech.OperationResult>>.OnEvent( this.TechnologyResearched ) );
-			GameEvents.OnScienceChanged.Add( new EventData<float, TransactionReasons>.OnEvent( this.ScienceChanged ) );
 			GameEvents.OnScienceRecieved.Add( new EventData<float, ScienceSubject, ProtoVessel, bool>.OnEvent( this.ScienceRecieved ) );
 			GameEvents.onVesselRename.Add( new EventData<GameEvents.HostedFromToAction<Vessel, string>>.OnEvent( this.VesselRename ) );
 			GameEvents.OnKSCFacilityUpgraded.Add( new EventData<Upgradeables.UpgradeableFacility, int>.OnEvent( this.FacilityUpgrade ) );
@@ -248,12 +247,6 @@ namespace ScienceChecklist
 			private void GameStateSave( ConfigNode C )
 			{
 //				_logger.Trace( "Callback: GameStateSave" );
-				ScheduleExperimentUpdate( );
-			}
-
-			private void ScienceChanged( float V, TransactionReasons R )
-			{
-//				_logger.Trace( "Callback: ScienceChanged" );
 				ScheduleExperimentUpdate( );
 			}
 

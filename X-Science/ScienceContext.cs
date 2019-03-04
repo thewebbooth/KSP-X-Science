@@ -73,10 +73,11 @@ namespace ScienceChecklist
 				return;
 			UpdateBodies( );
 			UpdateOnboardScience( );
-			UpdateScienceSubjects( );
 			UpdateExperiments( );
 			UpdateKscBiomes( );
 			RefreshExperimentCache( );
+			_scienceSubjects = null;
+			UpdateScienceSubjects( );
 		}
 
 
@@ -151,35 +152,35 @@ namespace ScienceChecklist
 				}
 
 
-
+			// TODO: the code below causes performance issues and was commented out because of that
 			// Look for science in unloaded vessels.
 			// Don't do debris or already loaded vessels(from routine above)
 			// I was having execptions because something was NULL.
 			// Only happend on a brand-new game, not a load.
 			// This seemed to fix it
-				if( HighLogic.CurrentGame != null && HighLogic.CurrentGame.flightState != null )
-				{
-					// Dump all the vessels to a save.
-					var node = new ConfigNode( );
-					HighLogic.CurrentGame.flightState.Save( node );
-					if( node == null )
-						_logger.Trace( "flightState save is null" );
-					else
-					{
-						// Grab the unloaded vessels
-						ConfigNode[] vessels = node.GetNodes( "VESSEL" );
-						onboardScience.AddRange
-						(
-							vessels.Where( x => _parent.Config.CheckDebris || x.GetValue( "type" ) != "Debris" )
-								.Where( x => !vesselIds.Contains( x.GetValue( "pid" ) ) ) // Not the active ones, we have them already
-									.SelectMany( x => x.GetNodes( "PART" )
-										.SelectMany( y => y.GetNodes( "MODULE" )
-											.SelectMany( z => z.GetNodes( "ScienceData" ) ).Select( z => new ScienceData( z ) )
-										)
-									)
-						);
-					}
-				}
+				//if( HighLogic.CurrentGame != null && HighLogic.CurrentGame.flightState != null )
+				//{
+				//	// Dump all the vessels to a save.
+				//	var node = new ConfigNode( );
+				//	HighLogic.CurrentGame.flightState.Save( node );
+				//	if( node == null )
+				//		_logger.Trace( "flightState save is null" );
+				//	else
+				//	{
+				//		// Grab the unloaded vessels
+				//		ConfigNode[] vessels = node.GetNodes( "VESSEL" );
+				//		onboardScience.AddRange
+				//		(
+				//			vessels.Where( x => _parent.Config.CheckDebris || x.GetValue( "type" ) != "Debris" )
+				//				.Where( x => !vesselIds.Contains( x.GetValue( "pid" ) ) ) // Not the active ones, we have them already
+				//					.SelectMany( x => x.GetNodes( "PART" )
+				//						.SelectMany( y => y.GetNodes( "MODULE" )
+				//							.SelectMany( z => z.GetNodes( "ScienceData" ) ).Select( z => new ScienceData( z ) )
+				//						)
+				//					)
+				//		);
+				//	}
+				//}
 
 
 
@@ -202,20 +203,31 @@ namespace ScienceChecklist
 
 		private void UpdateScienceSubjects( )
 		{
-//var StartTime = DateTime.Now;
+			//var StartTime = DateTime.Now;
 
-
-
-			var SciSubjects = ( ResearchAndDevelopment.GetSubjects( ) ?? new List<ScienceSubject>( ) );
-			Dictionary<string,ScienceSubject> SciDict = SciSubjects.ToDictionary( p => p.id );
-
-
-
-//_logger.Trace( "Science Subjects contains " + SciSubjects.Count.ToString( ) + " items" );
-//_logger.Trace( "Science Subjects contains " + SciDict.Count.ToString( ) + " items" );
-//var Elapsed = DateTime.Now - StartTime;
-//_logger.Trace( "UpdateScienceSubjects Done - " + Elapsed.ToString( ) + "ms" );
-			_scienceSubjects = SciDict;
+			var SciSubjects = (ResearchAndDevelopment.GetSubjects() ?? new List<ScienceSubject>());
+			if (_scienceSubjects != null)
+			{
+				for (int i = 0; i < SciSubjects.Count; i++)
+				{
+					var subj = SciSubjects[i];
+					ScienceSubject subj2;
+					if (_scienceSubjects.TryGetValue(subj.id, out subj2))
+					{
+						subj2.science = subj.science;
+						subj2.scientificValue = subj.scientificValue;
+					}
+				}
+			}
+			else
+			{
+				_scienceSubjects = SciSubjects.ToDictionary(p => p.id);
+			}
+				
+			//_logger.Trace( "Science Subjects contains " + SciSubjects.Count.ToString( ) + " items" );
+			//_logger.Trace( "Science Subjects contains " + SciDict.Count.ToString( ) + " items" );
+			//var Elapsed = DateTime.Now - StartTime;
+			//_logger.Trace( "UpdateScienceSubjects Done - " + Elapsed.ToString( ) + "ms" );
 		}
 
 
