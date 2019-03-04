@@ -508,7 +508,7 @@ namespace ScienceChecklist
 					IEnumerable<ModuleScienceExperiment> lm = _DMModuleScienceAnimateGenerics.Where(x => (
 						x.experimentID == s.ScienceExperiment.id &&
 						!x.Inoperable &&
-						((int)x.Fields.GetValue("experimentLimit") > 1 ? NewDMagicInstance.canConduct(x) : NewDMagicInstance.canConduct(x) && (x.rerunnable || runSingleUse))
+						((int)x.Fields.GetValue("experimentsLimit") > 1 ? NewDMagicInstance.canConduct(x) : NewDMagicInstance.canConduct(x) && (x.rerunnable || runSingleUse))
 						));
 					if (lm.Count() != 0)
 						m = lm.First();
