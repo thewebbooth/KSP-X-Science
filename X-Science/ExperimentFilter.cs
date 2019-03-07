@@ -192,13 +192,13 @@ namespace ScienceChecklist {
 		private bool IsAmountLimitedByDMagic(ScienceInstance x, IList<ModuleScienceExperiment> DMModuleScienceAnimateGenerics)
 		{
 			if (DMModuleScienceAnimateGenerics == null || DMModuleScienceAnimateGenerics.Count == 0)
-				return true;
+				return false;
 			
 			var dmm = DMModuleScienceAnimateGenerics.FirstOrDefault(d => d.experimentID == x.ScienceExperiment.id);
-			if (dmm == null) return true;
+			if (dmm == null) return false;
 			
 			var f = (float)dmm.Fields.GetValue("totalScienceLevel");
-			if (f == 1f) return true;
+			if (f == 1f) return false;
 
 			var completedScience = x.ScienceSubject.science * HighLogic.CurrentGame.Parameters.Career.ScienceGainMultiplier;
 			var totalScience = x.ScienceSubject.scienceCap * HighLogic.CurrentGame.Parameters.Career.ScienceGainMultiplier * f;
