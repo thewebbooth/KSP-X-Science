@@ -505,20 +505,23 @@ namespace ScienceChecklist
 				DMModuleScienceAnimateGeneric NewDMagicInstance = _parent.DMagic.GetDMModuleScienceAnimateGeneric( );
 				if( NewDMagicInstance != null )
 				{
-					IEnumerable<ModuleScienceExperiment> lm = _DMModuleScienceAnimateGenerics.Where(x => (
-						x.experimentID == s.ScienceExperiment.id &&
-						!x.Inoperable &&
-						((int)x.Fields.GetValue("experimentsLimit") > 1 ? NewDMagicInstance.canConduct(x) : NewDMagicInstance.canConduct(x) && (x.rerunnable || runSingleUse))
-						));
-					if (lm.Count() != 0)
-						m = lm.First();
-
-					if (m != null)
+					IEnumerable<ModuleScienceExperiment> lm = _DMModuleScienceAnimateGenerics.Where(x => x.experimentID == s.ScienceExperiment.id);
+					if (lm.Any())
 					{
-						_logger.Debug("Running DMModuleScienceAnimateGenerics Experiment " + m.experimentID + " on part " + m.part.partInfo.name);
-						NewDMagicInstance.gatherScienceData( m, !_parent.Config.ShowResultsWindow );
+						m = lm.FirstOrDefault(x =>
+							(int)x.Fields.GetValue("experimentsLimit") > 1 ? NewDMagicInstance.canConduct(x) : NewDMagicInstance.canConduct(x) && 
+							(x.rerunnable || runSingleUse)
+							);
+
+						if (m != null)
+						{
+							_logger.Debug("Running DMModuleScienceAnimateGenerics Experiment " + m.experimentID + " on part " + m.part.partInfo.name);
+							NewDMagicInstance.gatherScienceData( m, !_parent.Config.ShowResultsWindow );
+						}
+
 						return;
 					}
+
 				}
 			}
 
@@ -530,19 +533,22 @@ namespace ScienceChecklist
 				DMAPI DMAPIInstance = _parent.DMagic.GetDMAPI( );
 				if( DMAPIInstance != null )
 				{
-					IEnumerable<ModuleScienceExperiment> lm = _DMModuleScienceAnimates.Where(x =>
+					IEnumerable<ModuleScienceExperiment> lm = _DMModuleScienceAnimates.Where(x => x.experimentID == s.ScienceExperiment.id);
+					if (lm.Any())
 					{
-						return x.experimentID == s.ScienceExperiment.id &&
-						!x.Inoperable &&
-						((int)x.Fields.GetValue("experimentLimit") > 1 ? DMAPIInstance.experimentCanConduct(x) : DMAPIInstance.experimentCanConduct(x) && (x.rerunnable || runSingleUse));
-					});
-					if (lm.Count() != 0)
-						m = lm.First();
+						m = lm.FirstOrDefault(x =>
+						{
+							return !x.Inoperable &&
+							((int)x.Fields.GetValue("experimentLimit") > 1 ? DMAPIInstance.experimentCanConduct(x) : DMAPIInstance.experimentCanConduct(x) && 
+							(x.rerunnable || runSingleUse));
+						});
 
-					if (m != null)
-					{
-						_logger.Trace("Running DMModuleScienceAnimates Experiment " + m.experimentID + " on part " + m.part.partInfo.name);
-						DMAPIInstance.deployDMExperiment( m, !_parent.Config.ShowResultsWindow );
+						if (m != null)
+						{
+							_logger.Trace("Running DMModuleScienceAnimates Experiment " + m.experimentID + " on part " + m.part.partInfo.name);
+							DMAPIInstance.deployDMExperiment( m, !_parent.Config.ShowResultsWindow );
+						}
+
 						return;
 					}
 				}
