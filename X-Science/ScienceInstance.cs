@@ -100,11 +100,15 @@ namespace ScienceChecklist {
 		/// <param name="onboardScience">The total onboard ScienceData.</param>
 		public void Update( ScienceContext Sci )
 		{
-			if( Sci.ScienceSubjects.ContainsKey( Id ) )
-				ScienceSubject = Sci.ScienceSubjects[ Id ];
-			else ScienceSubject = new ScienceSubject(ScienceExperiment, Situation.ExperimentSituation, Situation.Body.CelestialBody, Situation.SubBiome ?? Situation.Biome ?? string.Empty);
-
-
+			ScienceSubject tmp;
+			if( Sci.ScienceSubjects.TryGetValue( Id, out tmp ) )
+				ScienceSubject = tmp;
+			else
+			{
+					ScienceSubject = new ScienceSubject(ScienceExperiment, Situation.ExperimentSituation, Situation.Body.CelestialBody, Situation.SubBiome ?? Situation.Biome ?? string.Empty);
+					Sci.ScienceSubjects.Add( Id, ScienceSubject );
+			}
+			
 			IsUnlocked = Sci.UnlockedInstruments.IsUnlocked( ScienceExperiment.id ) && ( Situation.Body.Reached != null );
 
 			CompletedScience = ScienceSubject.science * HighLogic.CurrentGame.Parameters.Career.ScienceGainMultiplier;

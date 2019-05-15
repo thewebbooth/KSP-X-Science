@@ -24,6 +24,7 @@ namespace ScienceChecklist {
 			private bool _filterDifficultScience;
 			private float _uiScale;
 			private bool _musicStartsMuted;
+			private bool _checkUnloadedVessels;
 			private bool _righClickMutesMusic;
 			private bool _selectedObjectWindow;
 
@@ -59,6 +60,7 @@ namespace ScienceChecklist {
 				}
 			}
 			public bool SelectedObjectWindow				{ get { return _selectedObjectWindow; }				set { if( _selectedObjectWindow != value ) { _selectedObjectWindow = value; OnSelectedObjectWindowChanged( ); } } }
+			public bool CheckUnloadedVessels				{ get { return _checkUnloadedVessels; }					set { if(_checkUnloadedVessels != value ) { _checkUnloadedVessels = value; OnCheckUnloadedVesselsChanged( ); } } }
 
 
 
@@ -76,6 +78,7 @@ namespace ScienceChecklist {
 			public event EventHandler MusicStartsMutedChanged;
  			public event EventHandler RighClickMutesMusicChanged;
 			public event EventHandler SelectedObjectWindowChanged;
+			public event EventHandler CheckUnloadedVesselsChanged;
 			
 
 
@@ -184,6 +187,14 @@ namespace ScienceChecklist {
 				}
 			}
 
+			private void OnCheckUnloadedVesselsChanged( )
+			{
+				if( CheckUnloadedVesselsChanged != null )
+				{
+					CheckUnloadedVesselsChanged( this, EventArgs.Empty );
+				}
+			}
+
 		public Config( )
 		{
 			_logger = new Logger( this );
@@ -267,6 +278,7 @@ namespace ScienceChecklist {
 			settings.AddValue( "FilterDifficultScience",		_filterDifficultScience );
 			settings.AddValue( "UiScale",						_uiScale );
 			settings.AddValue( "MusicStartsMuted",				_musicStartsMuted );
+			settings.AddValue( "CheckUnloadedVessels",			_checkUnloadedVessels );
 			settings.AddValue( "RighClickMutesMusic",			_righClickMutesMusic );
 			settings.AddValue( "SelectedObjectWindow",			_selectedObjectWindow );
 
@@ -306,6 +318,7 @@ namespace ScienceChecklist {
 			_filterDifficultScience =		true;
 			_uiScale =						1f;
 			_musicStartsMuted =				false;
+			_checkUnloadedVessels =			false;
 			_righClickMutesMusic =			true;
 			_selectedObjectWindow =			true;
 
@@ -375,6 +388,10 @@ namespace ScienceChecklist {
 					V = settings.GetValue( "SelectedObjectWindow" );
 					if( V != null )
 						_selectedObjectWindow = bool.Parse( V );
+
+					V = settings.GetValue( "CheckUnloadedVessels" );
+					if( V != null )
+						_checkUnloadedVessels = bool.Parse( V );
 
 
 

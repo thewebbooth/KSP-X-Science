@@ -389,7 +389,7 @@ namespace ScienceChecklist
 
 
 
-			_filter.UpdateFilter( );
+			_filter.UpdateFilter( _DMModuleScienceAnimateGenerics );
 		}
 
 
@@ -456,7 +456,20 @@ namespace ScienceChecklist
 			bool IsAvailable = false;
 			if( _availableScienceExperiments.ContainsKey( s.ScienceExperiment.id ) )
 				return _availableScienceExperiments[ s.ScienceExperiment.id ];
-			if( _moduleScienceExperiments != null && _moduleScienceExperiments.Count > 0 )
+
+			IEnumerable<ModuleScienceExperiment> dlm = FindDMAnimateGenericsForExperiment(s.ScienceExperiment.id);
+			if ( dlm != null && dlm.Any() )
+			{
+				DMModuleScienceAnimateGeneric NewDMagicInstance = _parent.DMagic.GetDMModuleScienceAnimateGeneric();
+				IsAvailable = dlm.Any(x =>
+					(int)x.Fields.GetValue("experimentsLimit") > 1 ? NewDMagicInstance.canConduct(x) : NewDMagicInstance.canConduct(x) &&
+					(x.rerunnable || runSingleUse));
+
+				_availableScienceExperiments[s.ScienceExperiment.id] = IsAvailable;
+				return IsAvailable;
+			}
+
+			if ( _moduleScienceExperiments != null && _moduleScienceExperiments.Count > 0 )
 			{
 				IEnumerable<ModuleScienceExperiment> lm = _moduleScienceExperiments.Where(x => (
 					x.experimentID == s.ScienceExperiment.id &&
@@ -500,26 +513,21 @@ namespace ScienceChecklist
 
 
 			// If possible run with DMagic new API
-			if( _DMModuleScienceAnimateGenerics != null && _DMModuleScienceAnimateGenerics.Count > 0)
+			IEnumerable<ModuleScienceExperiment> lm = FindDMAnimateGenericsForExperiment(s.ScienceExperiment.id);
+			if ( lm != null && lm.Any() )
 			{
 				DMModuleScienceAnimateGeneric NewDMagicInstance = _parent.DMagic.GetDMModuleScienceAnimateGeneric( );
-				if( NewDMagicInstance != null )
-				{
-					IEnumerable<ModuleScienceExperiment> lm = _DMModuleScienceAnimateGenerics.Where(x => (
-						x.experimentID == s.ScienceExperiment.id &&
-						!x.Inoperable &&
-						((int)x.Fields.GetValue("experimentLimit") > 1 ? NewDMagicInstance.canConduct(x) : NewDMagicInstance.canConduct(x) && (x.rerunnable || runSingleUse))
-						));
-					if (lm.Count() != 0)
-						m = lm.First();
+				m = lm.FirstOrDefault(x =>
+					(int)x.Fields.GetValue("experimentsLimit") > 1 ? NewDMagicInstance.canConduct(x) : NewDMagicInstance.canConduct(x) && 
+					(x.rerunnable || runSingleUse));
 
-					if (m != null)
-					{
-						_logger.Debug("Running DMModuleScienceAnimateGenerics Experiment " + m.experimentID + " on part " + m.part.partInfo.name);
-						NewDMagicInstance.gatherScienceData( m, !_parent.Config.ShowResultsWindow );
-						return;
-					}
+				if (m != null)
+				{
+					_logger.Debug("Running DMModuleScienceAnimateGenerics Experiment " + m.experimentID + " on part " + m.part.partInfo.name);
+					NewDMagicInstance.gatherScienceData( m, !_parent.Config.ShowResultsWindow );
 				}
+
+				return;
 			}
 
 
@@ -530,19 +538,22 @@ namespace ScienceChecklist
 				DMAPI DMAPIInstance = _parent.DMagic.GetDMAPI( );
 				if( DMAPIInstance != null )
 				{
-					IEnumerable<ModuleScienceExperiment> lm = _DMModuleScienceAnimates.Where(x =>
+					IEnumerable<ModuleScienceExperiment> lm2 = _DMModuleScienceAnimates.Where(x => x.experimentID == s.ScienceExperiment.id);
+					if (lm2.Any())
 					{
-						return x.experimentID == s.ScienceExperiment.id &&
-						!x.Inoperable &&
-						((int)x.Fields.GetValue("experimentLimit") > 1 ? DMAPIInstance.experimentCanConduct(x) : DMAPIInstance.experimentCanConduct(x) && (x.rerunnable || runSingleUse));
-					});
-					if (lm.Count() != 0)
-						m = lm.First();
+						m = lm2.FirstOrDefault(x =>
+						{
+							return !x.Inoperable &&
+							((int)x.Fields.GetValue("experimentLimit") > 1 ? DMAPIInstance.experimentCanConduct(x) : DMAPIInstance.experimentCanConduct(x) && 
+							(x.rerunnable || runSingleUse));
+						});
 
-					if (m != null)
-					{
-						_logger.Trace("Running DMModuleScienceAnimates Experiment " + m.experimentID + " on part " + m.part.partInfo.name);
-						DMAPIInstance.deployDMExperiment( m, !_parent.Config.ShowResultsWindow );
+						if (m != null)
+						{
+							_logger.Trace("Running DMModuleScienceAnimates Experiment " + m.experimentID + " on part " + m.part.partInfo.name);
+							DMAPIInstance.deployDMExperiment( m, !_parent.Config.ShowResultsWindow );
+						}
+
 						return;
 					}
 				}
@@ -584,6 +595,20 @@ namespace ScienceChecklist
 		}
 
 
+
+		public IEnumerable<ModuleScienceExperiment> FindDMAnimateGenericsForExperiment(string experimentId)
+		{
+			if (_DMModuleScienceAnimateGenerics != null && _DMModuleScienceAnimateGenerics.Count > 0)
+			{
+				DMModuleScienceAnimateGeneric NewDMagicInstance = _parent.DMagic.GetDMModuleScienceAnimateGeneric();
+				if (NewDMagicInstance != null)
+				{
+					return _DMModuleScienceAnimateGenerics.Where(x => x.experimentID == experimentId);
+				}
+			}
+
+			return null;
+		}
 
 
 

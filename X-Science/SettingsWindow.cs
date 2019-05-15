@@ -74,6 +74,13 @@ namespace ScienceChecklist
 				save = true;
 			}
 
+			toggle = GUILayout.Toggle(_parent.Config.CheckUnloadedVessels, new GUIContent("Check unloaded vessels", "Unloaded vessels will be checked for recoverable science."), toggleStyle);
+			if( toggle != _parent.Config.CheckUnloadedVessels )
+			{
+				_parent.Config.CheckUnloadedVessels = toggle;
+				save = true;
+			}
+
 			toggle = GUILayout.Toggle( _parent.Config.CheckDebris, new GUIContent( "Check debris", "Vessels marked as debris will be checked for recoverable science." ), toggleStyle );
 			if( toggle != _parent.Config.CheckDebris )
 			{

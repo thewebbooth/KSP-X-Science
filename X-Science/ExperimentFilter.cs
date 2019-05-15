@@ -104,7 +104,7 @@ namespace ScienceChecklist {
 		/// <summary>
 		/// Recalculates the experiments to be displayed.
 		/// </summary>
-		public void UpdateFilter () {
+		public void UpdateFilter ( IList<ModuleScienceExperiment>  DMModuleScienceAnimateGenerics = null) {
 			var StartTime = DateTime.Now;
 //			_logger.Trace("UpdateFilter");
 			var query = _parent.Science.AllScienceInstances.AsEnumerable( );
@@ -162,7 +162,7 @@ namespace ScienceChecklist {
 
 			if( CompleteWithoutRecovery ) // Lab lander mode.  Complete is a green bar ( Recovered+OnBoard )
 			{
-				DisplayScienceInstances = query.Where( x => !HideCompleteExperiments || !x.IsCollected ).ToList( );
+				DisplayScienceInstances = query.Where( x => !HideCompleteExperiments || !x.IsCollected && !IsAmountLimitedByDMagic(x, DMModuleScienceAnimateGenerics) ).ToList( );
 
 				IList<ScienceInstance> RemainingExperiments = new List<ScienceInstance>( );
 				RemainingExperiments = query.Where( x => !x.IsCollected ).ToList( );
@@ -172,7 +172,7 @@ namespace ScienceChecklist {
 			}
 			else // Normal mode, must recover/transmit to KSC
 			{
-				DisplayScienceInstances = query.Where( x => !HideCompleteExperiments || !x.IsComplete ).ToList( );
+				DisplayScienceInstances = query.Where( x => !HideCompleteExperiments || !x.IsComplete && !IsAmountLimitedByDMagic(x, DMModuleScienceAnimateGenerics) ).ToList( );
 
 				IList<ScienceInstance> RemainingExperiments = new List<ScienceInstance>( );
 				RemainingExperiments = query.Where( x => !x.IsComplete ).ToList( );
@@ -185,6 +185,26 @@ namespace ScienceChecklist {
 
 			var Elapsed = DateTime.Now - StartTime;
 //			_logger.Trace( "UpdateFilter Done - " + Elapsed.ToString( ) + "ms" );
+		}
+
+
+
+		private bool IsAmountLimitedByDMagic(ScienceInstance x, IList<ModuleScienceExperiment> DMModuleScienceAnimateGenerics)
+		{
+			if (DMModuleScienceAnimateGenerics == null || DMModuleScienceAnimateGenerics.Count == 0)
+				return false;
+			
+			var dmm = DMModuleScienceAnimateGenerics.FirstOrDefault(d => d.experimentID == x.ScienceExperiment.id);
+			if (dmm == null) return false;
+			
+			var f = (float)dmm.Fields.GetValue("totalScienceLevel");
+			if (f == 1f) return false;
+
+			var completedScience = x.ScienceSubject.science * HighLogic.CurrentGame.Parameters.Career.ScienceGainMultiplier;
+			var totalScience = x.ScienceSubject.scienceCap * HighLogic.CurrentGame.Parameters.Career.ScienceGainMultiplier * f;
+			var isComplete = completedScience > totalScience || totalScience - completedScience < 0.1;
+
+			return isComplete;
 		}
 
 
