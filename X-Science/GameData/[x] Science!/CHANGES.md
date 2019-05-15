@@ -4,7 +4,8 @@
 5.22
 ----
 15-May-2019 Built against KSP V1.7.0
-* Optimizations and fixes
+* Optimisations and fixes thanks to @siimav
+* Should now be backwards compatible down until 1.5.0
 
 
 
