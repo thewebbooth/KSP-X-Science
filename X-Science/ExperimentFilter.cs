@@ -103,7 +103,7 @@ namespace ScienceChecklist {
 		/// <summary>
 		/// Recalculates the experiments to be displayed.
 		/// </summary>
-		public void UpdateFilter ( IList<ModuleScienceExperiment>  DMModuleScienceAnimateGenerics = null, float scienceThreshold = 0.1f)
+		public void UpdateFilter ( IList<ModuleScienceExperiment>  DMModuleScienceAnimateGenerics = null )
         {
 //            var sw = System.Diagnostics.Stopwatch.StartNew();
 //			_logger.Trace("UpdateFilter");

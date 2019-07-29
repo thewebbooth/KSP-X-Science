@@ -38,9 +38,7 @@ namespace ScienceChecklist
 		private IList<ModuleScienceExperiment>	_DMModuleScienceAnimateGenerics;
 		private Dictionary<string, bool>		_availableScienceExperiments;
 
-        private float _scienceThreshold = 0.1f;
-
-		public event EventHandler OnCloseEvent;
+        public event EventHandler OnCloseEvent;
 		public event EventHandler OnOpenEvent;
 
 		public StatusWindow( ScienceChecklistAddon Parent )
@@ -169,21 +167,22 @@ namespace ScienceChecklist
 
             GUILayout.Label("Min Science", _scienceThresholdLabelStyle);
 
-            float prev_scienceThreshold = _scienceThreshold;
-            _scienceThreshold = GUILayout.HorizontalSlider(_scienceThreshold, 0.1f, 50f);
+            float prev_scienceThreshold = _parent.Config.ScienceThreshold;
+            float scienceThreshold = GUILayout.HorizontalSlider(_parent.Config.ScienceThreshold, 0.1f, 50f);
 
-            if (_scienceThreshold > 0.1f)
+            if (scienceThreshold > 0.1f)
             {
                 // simulate 0.5 step
-                _scienceThreshold = (float)(Math.Round(_scienceThreshold * 2f, MidpointRounding.AwayFromZero) / 2f);
+                scienceThreshold = (float)(Math.Round(scienceThreshold * 2f, MidpointRounding.AwayFromZero) / 2f);
             }
 
-            if (prev_scienceThreshold != _scienceThreshold)
+            if (prev_scienceThreshold != scienceThreshold)
             {
+                _parent.Config.ScienceThreshold = scienceThreshold;
                 _parent.Config.Save();
             }
 
-            GUILayout.Label(_scienceThreshold.ToString("F1"), _scienceThresholdLabelStyle, GUILayout.Width(wScale(26)));
+            GUILayout.Label(_parent.Config.ScienceThreshold.ToString("F1"), _scienceThresholdLabelStyle, GUILayout.Width(wScale(26)));
 
             GUILayout.EndHorizontal();
 
@@ -194,7 +193,7 @@ namespace ScienceChecklist
 				{
 					var experiment = _filter.DisplayScienceInstances[ i ];
                     
-                    if (experiment.NextScienceIncome >= _scienceThreshold)
+                    if (experiment.NextScienceIncome >= _parent.Config.ScienceThreshold)
                     {
                         var rect = new Rect(wScale(5), Top, wScale(250), wScale(30));
                         DrawExperiment(experiment, rect);
@@ -433,7 +432,7 @@ namespace ScienceChecklist
 
 
 
-			_filter.UpdateFilter( _DMModuleScienceAnimateGenerics, _scienceThreshold );
+			_filter.UpdateFilter( _DMModuleScienceAnimateGenerics );
 		}
 
 
@@ -462,7 +461,7 @@ namespace ScienceChecklist
 					var experiment = _filter.DisplayScienceInstances[ i ];
 					var Id = experiment.ScienceExperiment.id;
 
-                    if (experiment.NextScienceIncome < _scienceThreshold)
+                    if (experiment.NextScienceIncome < _parent.Config.ScienceThreshold)
                     {
                         continue;
                     }
@@ -668,7 +667,6 @@ namespace ScienceChecklist
 			W.Set( "Top", (int)windowPos.yMin );
 			W.Set( "Left", (int)windowPos.xMin );
 			W.Set( "Visible", IsVisible( ) );
-            W.Set( "Threshold", _scienceThreshold.ToString() );
 
 			return W;
 		}
@@ -681,7 +679,6 @@ namespace ScienceChecklist
 			windowPos.xMin = W.GetInt( "Left", 40 );
 			windowPos.yMax = windowPos.yMin + wScale( 30 );
 			windowPos.xMax = windowPos.xMin + wScale( 250 );
-            _scienceThreshold = float.Parse(W.Get("Threshold", "0.1" ));
 
 
 			bool TempVisible = false;
