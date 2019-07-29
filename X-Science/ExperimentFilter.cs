@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
-
+using UnityEngine;
 
 namespace ScienceChecklist {
 	/// <summary>
@@ -104,10 +103,12 @@ namespace ScienceChecklist {
 		/// <summary>
 		/// Recalculates the experiments to be displayed.
 		/// </summary>
-		public void UpdateFilter ( IList<ModuleScienceExperiment>  DMModuleScienceAnimateGenerics = null) {
-			var StartTime = DateTime.Now;
+		public void UpdateFilter ( IList<ModuleScienceExperiment>  DMModuleScienceAnimateGenerics = null, float scienceThreshold = 0.1f)
+        {
+//            var sw = System.Diagnostics.Stopwatch.StartNew();
 //			_logger.Trace("UpdateFilter");
-			var query = _parent.Science.AllScienceInstances.AsEnumerable( );
+
+            var query = _parent.Science.AllScienceInstances.AsEnumerable( );
 			switch (_displayMode) {
 				case DisplayMode.All:
 					break;
@@ -140,7 +141,14 @@ namespace ScienceChecklist {
 				}));
 			}
 
-			query = query.OrderBy( x => x.TotalScience );
+            var onboardData = GetCurrentVesselOnboardData();
+
+            foreach (var x in query)
+            {
+                x.NextScienceIncome = GetNextExperimentScience(x, onboardData);
+            }
+
+            query = query.OrderBy( x => x.TotalScience );
 			TotalCount = query.Count( );
 
 
@@ -181,15 +189,58 @@ namespace ScienceChecklist {
 				CompletedScience = RemainingExperiments.Sum( x => x.CompletedScience );
 			}
 
-
-
-			var Elapsed = DateTime.Now - StartTime;
-//			_logger.Trace( "UpdateFilter Done - " + Elapsed.ToString( ) + "ms" );
+//          sw.Stop();
+//			_logger.Trace( $"UpdateFilter Done - {sw.ElapsedMilliseconds}ms" );
 		}
 
 
 
-		private bool IsAmountLimitedByDMagic(ScienceInstance x, IList<ModuleScienceExperiment> DMModuleScienceAnimateGenerics)
+        private float GetNextExperimentScience(ScienceInstance exp, List<ScienceData> onboardData)
+        {
+            float experimentValue = 0f;
+            var subjectOnboardData = onboardData.Where(d => d.subjectID == exp.ScienceSubject.id).ToArray();
+
+            if (subjectOnboardData.Length == 0)
+            {
+                experimentValue = ResearchAndDevelopment.GetScienceValue(exp.ScienceExperiment.baseValue * exp.ScienceExperiment.dataScale, exp.ScienceSubject)
+                    * HighLogic.CurrentGame.Parameters.Career.ScienceGainMultiplier;
+            }
+            else
+            {
+                experimentValue = ResearchAndDevelopment.GetNextScienceValue(exp.ScienceExperiment.baseValue * exp.ScienceExperiment.dataScale, exp.ScienceSubject)
+                    * HighLogic.CurrentGame.Parameters.Career.ScienceGainMultiplier;
+
+                if (subjectOnboardData.Length > 1)
+                {
+                    experimentValue /= Mathf.Pow(4f, subjectOnboardData.Length - 1);
+                }
+            }
+
+            return experimentValue;
+        }
+
+
+
+        private List<ScienceData> GetCurrentVesselOnboardData()
+        {
+            var foundData = new List<ScienceData>();
+
+            if (FlightGlobals.ActiveVessel != null)
+            {
+                var containers = FlightGlobals.ActiveVessel.FindPartModulesImplementing<IScienceDataContainer>();
+
+                foreach (var container in containers)
+                {
+                    foundData.AddRange(container.GetData());
+                }
+            }
+
+            return foundData;
+        }
+
+
+
+        private bool IsAmountLimitedByDMagic(ScienceInstance x, IList<ModuleScienceExperiment> DMModuleScienceAnimateGenerics)
 		{
 			if (DMModuleScienceAnimateGenerics == null || DMModuleScienceAnimateGenerics.Count == 0)
 				return false;

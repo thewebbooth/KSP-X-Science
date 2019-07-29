@@ -124,7 +124,12 @@ namespace ScienceChecklist
 		// This is the lightest update used when the vessel changes
 		public void RefreshFilter( object sender, EventArgs e )
 		{
-			//			_logger.Trace("RefreshFilter");
+            //			_logger.Trace("RefreshFilter");
+            if (!IsVisible)
+            {
+                return;
+            }
+
 			_filter.UpdateFilter( );
 		}
 
