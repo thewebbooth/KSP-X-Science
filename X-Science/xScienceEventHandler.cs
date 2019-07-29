@@ -50,12 +50,6 @@ namespace ScienceChecklist
 		// Constructor
 		public xScienceEventHandler( ScienceChecklistAddon Parent )
 		{
-            FilterUpdateEvent += (s,e) => { UnityEngine.Debug.Log("FilterUpdateEvent -----------------------------"); };
-            ExperimentUpdateEvent += (s, e) => { UnityEngine.Debug.Log("ExperimentUpdateEvent -----------------------------"); };
-            FullUpdateEvent += (s, e) => { UnityEngine.Debug.Log("FullUpdateEvent -----------------------------"); };
-            SituationChanged += (s, e) => { UnityEngine.Debug.Log("SituationChanged -----------------------------"); };
-            MapObjectSelected += (s, e) => { UnityEngine.Debug.Log("MapObjectSelected -----------------------------"); };
-
 //_logger = new Logger( this );
 //_logger.Trace( "xScienceEventHandler" );
 			_parent = Parent;
