@@ -105,7 +105,7 @@ namespace ScienceChecklist {
 		/// </summary>
 		public void UpdateFilter ( IList<ModuleScienceExperiment>  DMModuleScienceAnimateGenerics = null )
         {
-//            var sw = System.Diagnostics.Stopwatch.StartNew();
+            //var sw = System.Diagnostics.Stopwatch.StartNew();
 //			_logger.Trace("UpdateFilter");
 
             var query = _parent.Science.AllScienceInstances.AsEnumerable( );
@@ -123,9 +123,8 @@ namespace ScienceChecklist {
 					break;
 				default:
 					break;
-			}
-
-			string[] Words = Text.Split(' ');
+			}            
+            string[] Words = Text.Split(' ');
 			for(int x = 0; x < Words.Count(); x++ )
 			{
 				var options = Words[x].Split('|');
@@ -140,20 +139,18 @@ namespace ScienceChecklist {
 					return sci_inst.Description.ToLowerInvariant().Contains(s.ToLowerInvariant()) == !negate;
 				}));
 			}
-
+            var scienceList = query.ToArray();
             var onboardData = GetCurrentVesselOnboardData();
 
-            foreach (var x in query)
+            foreach (var x in scienceList)
             {
                 x.NextScienceIncome = GetNextExperimentScience(x, onboardData);
             }
 
-            query = query.OrderBy( x => x.TotalScience );
-			TotalCount = query.Count( );
+            scienceList = scienceList.OrderBy( x => x.TotalScience ).ToArray();
+			TotalCount = scienceList.Length;
 
-
-
-			bool CompleteWithoutRecovery;
+            bool CompleteWithoutRecovery;
 			bool HideCompleteExperiments;
 			if( EnforceLabLanderMode )
 			{
@@ -170,28 +167,25 @@ namespace ScienceChecklist {
 
 			if( CompleteWithoutRecovery ) // Lab lander mode.  Complete is a green bar ( Recovered+OnBoard )
 			{
-				DisplayScienceInstances = query.Where( x => !HideCompleteExperiments || !x.IsCollected && !IsAmountLimitedByDMagic(x, DMModuleScienceAnimateGenerics) ).ToList( );
+				DisplayScienceInstances = scienceList.Where( x => !HideCompleteExperiments || !x.IsCollected && !IsAmountLimitedByDMagic(x, DMModuleScienceAnimateGenerics) ).ToList( );
 
-				IList<ScienceInstance> RemainingExperiments = new List<ScienceInstance>( );
-				RemainingExperiments = query.Where( x => !x.IsCollected ).ToList( );
-				CompleteCount = TotalCount - RemainingExperiments.Count( );
+				var RemainingExperiments = scienceList.Where( x => !x.IsCollected ).ToArray( );
+				CompleteCount = TotalCount - RemainingExperiments.Length;
 				TotalScience = RemainingExperiments.Sum( x => x.TotalScience ) - RemainingExperiments.Sum( x => x.OnboardScience ); ;
 				CompletedScience = RemainingExperiments.Sum( x => x.CompletedScience );
 			}
 			else // Normal mode, must recover/transmit to KSC
 			{
-				DisplayScienceInstances = query.Where( x => !HideCompleteExperiments || !x.IsComplete && !IsAmountLimitedByDMagic(x, DMModuleScienceAnimateGenerics) ).ToList( );
+				DisplayScienceInstances = scienceList.Where( x => !HideCompleteExperiments || !x.IsComplete && !IsAmountLimitedByDMagic(x, DMModuleScienceAnimateGenerics) ).ToList( );
 
-				IList<ScienceInstance> RemainingExperiments = new List<ScienceInstance>( );
-				RemainingExperiments = query.Where( x => !x.IsComplete ).ToList( );
-				CompleteCount = TotalCount - RemainingExperiments.Count( );
+				var RemainingExperiments = scienceList.Where( x => !x.IsComplete ).ToArray( );
+				CompleteCount = TotalCount - RemainingExperiments.Length;
 				TotalScience = RemainingExperiments.Sum( x => x.TotalScience );
 				CompletedScience = RemainingExperiments.Sum( x => x.CompletedScience );
 			}
-
-//          sw.Stop();
+            //sw.Stop();
 //			_logger.Trace( $"UpdateFilter Done - {sw.ElapsedMilliseconds}ms" );
-		}
+        }
 
 
 

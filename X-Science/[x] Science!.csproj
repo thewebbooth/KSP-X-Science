@@ -75,6 +75,7 @@
     <Compile Include="HelpWindow.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Lib\Adds.cs" />
     <Compile Include="Lib\Logging.cs" />
     <Compile Include="Lib\Utilities.cs" />
     <Compile Include="Lib\Window.cs" />

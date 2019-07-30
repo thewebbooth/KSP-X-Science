@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ScienceChecklist.Lib.Adds;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -168,13 +169,11 @@ namespace ScienceChecklist
             GUILayout.Label("Min Science", _scienceThresholdLabelStyle);
 
             float prev_scienceThreshold = _parent.Config.ScienceThreshold;
-            float scienceThreshold = GUILayout.HorizontalSlider(_parent.Config.ScienceThreshold, 0.1f, 50f);
-
-            if (scienceThreshold > 0.1f)
-            {
-                // simulate 0.5 step
-                scienceThreshold = (float)(Math.Round(scienceThreshold * 2f, MidpointRounding.AwayFromZero) / 2f);
-            }
+            float scienceThreshold = Adds.AcceleratedSlider(_parent.Config.ScienceThreshold, 0.1f, 50f, 1.8f, new[] {
+                new Adds.StepRule(0.5f, 10f),
+                new Adds.StepRule(1f, 40f),
+                new Adds.StepRule(2f, 50f),
+            });
 
             if (prev_scienceThreshold != scienceThreshold)
             {
@@ -440,6 +439,10 @@ namespace ScienceChecklist
 		// Bung new situation into filter and recalculate everything
 		public void UpdateSituation( object sender, NewSituationData e )
 		{
+            if (!IsVisible())
+            {
+                return;
+            }
 //			_logger.Trace( "UpdateSituation" );
 			if( e == null )
 			{
@@ -447,9 +450,9 @@ namespace ScienceChecklist
 				return;
 			}
 			else
+            {
 				_filter.CurrentSituation = new Situation( e._body, e._situation, e._biome, e._subBiome );
-			RefreshFilter( sender, e );
-            
+            }
 
 			//_logger.Trace( "ScienceThisBiome: " + _filter.TotalCount + " / " + _filter.CompleteCount );
 
