@@ -242,7 +242,17 @@ namespace ScienceChecklist
 			for( int x = 0; x < PartLoader.LoadedPartsList.Count; x++ )
 			{
 				AvailablePart P = PartLoader.LoadedPartsList[ x ];
-				List<ModuleScienceExperiment> Modules = P.partPrefab.FindModulesImplementing<ModuleScienceExperiment>( );
+				List<ModuleScienceExperiment> Modules;
+
+				// In KSP 1.8.0, this can throw a NullReferenceException.
+				try {
+					Modules = P.partPrefab.FindModulesImplementing<ModuleScienceExperiment>( );
+				}
+				catch (NullReferenceException e) {
+					_logger.Info( P.name + " threw NullReferenceException in " + e.TargetSite );
+					continue;
+				}
+
 				for( int y = 0; y < Modules.Count; y++ )
 				{
 					ModuleScienceExperiment Module = Modules[ y ];
