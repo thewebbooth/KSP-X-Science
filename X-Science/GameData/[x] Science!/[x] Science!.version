@@ -1,24 +1,24 @@
 {
     "NAME":"[x] Science!",
     "URL":"http://ksp.floppy.men/[x] Science!/[x] Science!.version",
-    "DOWNLOAD":"http://ksp.floppy.men/[x] Science!/x-science-v5.22.zip",
+    "DOWNLOAD":"http://ksp.floppy.men/[x] Science!/x-science-v5.23.zip",
     "CHANGE_LOG_URL":"http://ksp.floppy.men/[x] Science!/CHANGES.md",
     "VERSION":
     {
         "MAJOR":5,
-        "MINOR":22,
+        "MINOR":23,
         "PATCH":0
     },
     "KSP_VERSION_MIN":
     {
         "MAJOR": 1,
-        "MINOR": 5,
+        "MINOR": 8,
         "PATCH": 0
     },
     "KSP_VERSION_MAX":
     {
         "MAJOR": 1,
-        "MINOR": 7,
+        "MINOR": 8,
         "PATCH": 9
     }
 }

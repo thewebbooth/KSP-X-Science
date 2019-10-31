@@ -1,6 +1,13 @@
 [x] Science!
 ============
 
+5.23
+---
+31-Oct-2019 Built agaisnt KSP v1.8.0
+* .NET Framework updated to 4 from 3
+
+
+
 5.22
 ----
 15-May-2019 Built against KSP V1.7.0
