@@ -1,6 +1,13 @@
 [x] Science!
 ============
 
+5.24
+---
+14-Feb-2020 Built agaisnt KSP v1.9.0
+* Recompiled for KSP V1.9.0
+
+
+
 5.23
 ---
 31-Oct-2019 Built agaisnt KSP v1.8.0
