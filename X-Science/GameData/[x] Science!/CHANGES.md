@@ -1,6 +1,13 @@
 [x] Science!
 ============
 
+5.24.1
+---
+14-Feb-2020 Built agaisnt KSP v1.9.0
+* Min value typo from 1.0.0 to 1.9.0 (9!=0)
+
+
+
 5.24
 ---
 14-Feb-2020 Built agaisnt KSP v1.9.0
