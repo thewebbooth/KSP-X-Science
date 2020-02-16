@@ -124,21 +124,30 @@ namespace ScienceChecklist
 		// This is the lightest update used when the vessel changes
 		public void RefreshFilter( object sender, EventArgs e )
 		{
-			//			_logger.Trace("RefreshFilter");
+            //			_logger.Trace("RefreshFilter");
+            if (!IsVisible)
+            {
+                return;
+            }
+
 			_filter.UpdateFilter( );
 		}
 
 		public void UpdateSituation( object sender, NewSituationData e )
 		{
-			//			_logger.Trace("UpdateSituation");
+            if (!IsVisible)
+            {
+                return;
+            }
+
+            //			_logger.Trace("UpdateSituation");
 
 
-// Bung new situation into filter and recalculate everything
-			if( e == null )
+            // Bung new situation into filter and recalculate everything
+            if ( e == null )
 				_filter.CurrentSituation = null;
 			else
 				_filter.CurrentSituation = new Situation( e._body, e._situation, e._biome, e._subBiome );
-			_filter.UpdateFilter( );
 		}
 
 
@@ -186,7 +195,6 @@ namespace ScienceChecklist
 			_filter.DisplayMode = (DisplayMode)Enum.Parse( typeof( DisplayMode ), Temp, true );
 
 			_filter.Text = W.Get( "FilterText", "" );
-			_filter.UpdateFilter( );
 
 			bool TempVisible = false;
 			TempVisible = W.GetBool( "Visible", false );

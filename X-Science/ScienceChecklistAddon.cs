@@ -440,7 +440,7 @@ namespace ScienceChecklist {
 						{
 							if( _statusButton != null )
 								_statusButton.SetOn( );
-							ScienceEventHandler.ScheduleExperimentUpdate( );
+							ScienceEventHandler.ScheduleExperimentUpdate(seconds: 0.1f);
 						}
 						else
 						{
@@ -763,7 +763,7 @@ namespace ScienceChecklist {
 //			_logger.Trace( "UpdateChecklistVisibility" );
 			_checklistWindow.IsVisible = NewVisibility;
 			if( _checklistWindow.IsVisible )
-				ScienceEventHandler.ScheduleExperimentUpdate( );
+				ScienceEventHandler.ScheduleExperimentUpdate(seconds: 0.1f);
 		}
 
 
@@ -777,7 +777,7 @@ namespace ScienceChecklist {
 //			_logger.Trace( "UpdateStatusVisibility" );
 			_statusWindow.SetVisible( NewVisibility );
 			if( _statusWindow.IsVisible( ) )
-				ScienceEventHandler.ScheduleExperimentUpdate( );
+				ScienceEventHandler.ScheduleExperimentUpdate(seconds: 0.1f);
 		}
 		
 

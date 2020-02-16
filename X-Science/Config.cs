@@ -19,6 +19,7 @@ namespace ScienceChecklist {
 			private bool _checkDebris;
 			private bool _allFilter;
 			private bool _stopTimeWarp;
+            private float _scienceThreshold;
 			private bool _playNoise;
 			private bool _showResultsWindow;
 			private bool _filterDifficultScience;
@@ -36,6 +37,7 @@ namespace ScienceChecklist {
 			public bool CompleteWithoutRecovery			{ get { return _completeWithoutRecovery; }		set { if( _completeWithoutRecovery != value ) { _completeWithoutRecovery = value; OnCompleteWithoutRecoveryChanged( ); } } }
 			public bool CheckDebris						{ get { return _checkDebris; }					set { if( _checkDebris != value ) { _checkDebris = value; OnCheckDebrisChanged( ); } } }
 			public bool AllFilter						{ get { return _allFilter; }					set { if( _allFilter != value ) { _allFilter = value; OnAllFilterChanged( ); } } }
+            public float ScienceThreshold				{ get { return _scienceThreshold; }				set { if (_scienceThreshold != value) { _scienceThreshold = value; } } }
 			public bool StopTimeWarp					{ get { return _stopTimeWarp; }					set { if( _stopTimeWarp != value ) { _stopTimeWarp = value; OnStopTimeWarpChanged( ); } } }
 			public bool PlayNoise						{ get { return _playNoise; }					set { if( _playNoise != value ) { _playNoise = value; OnPlayNoiseChanged( ); } } }
 			public bool ShowResultsWindow				{ get { return _showResultsWindow; }			set { if( _showResultsWindow != value ) { _showResultsWindow = value; OnShowResultsWindowChanged( ); } } }
@@ -272,6 +274,7 @@ namespace ScienceChecklist {
 			settings.AddValue( "CompleteWithoutRecovery",		_completeWithoutRecovery );
 			settings.AddValue( "CheckDebris",					_checkDebris );
 			settings.AddValue( "AllFilter",						_allFilter );
+            settings.AddValue( "ScienceThreshold",				_scienceThreshold );
 			settings.AddValue( "StopTimeWarp",					_stopTimeWarp );
 			settings.AddValue( "PlayNoise",						_playNoise );
 			settings.AddValue( "ShowResultsWindow",				_showResultsWindow );
@@ -312,6 +315,7 @@ namespace ScienceChecklist {
 			_completeWithoutRecovery =		false;
 			_checkDebris =					false;
 			_allFilter =					true;
+            _scienceThreshold =             0.1f;
 			_stopTimeWarp =					true;
 			_playNoise =					true;
 			_showResultsWindow =			true;
@@ -356,8 +360,12 @@ namespace ScienceChecklist {
 					V = settings.GetValue( "AllFilter" );
 					if( V != null )
 						_allFilter = bool.Parse( V );
+                    
+                    V = settings.GetValue( "ScienceThreshold" );
+                    if( V != null )
+                        _scienceThreshold = float.Parse( V );
 
-					V = settings.GetValue( "StopTimeWarp" );
+                    V = settings.GetValue( "StopTimeWarp" );
 					if( V != null )
 						_stopTimeWarp = bool.Parse( V );
 

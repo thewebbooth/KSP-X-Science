@@ -71,10 +71,16 @@ namespace ScienceChecklist {
 		/// Gets the amount of science for this experiment that is currently stored on vessels.
 		/// </summary>
 		public float OnboardScience		{ get; private set; }
-		/// <summary>
-		/// Gets the ScienceSubject containing information on how much science has been retrieved from this experiment.
+
+        /// <summary>
+		/// Amount of science to receice with next experiment.
 		/// </summary>
-		public ScienceSubject ScienceSubject { get; private set; }
+		public float NextScienceIncome = 0f;
+
+        /// <summary>
+        /// Gets the ScienceSubject containing information on how much science has been retrieved from this experiment.
+        /// </summary>
+        public ScienceSubject ScienceSubject { get; private set; }
 
 		/// <summary>
 		/// Gets the human-readable description of this experiment.
