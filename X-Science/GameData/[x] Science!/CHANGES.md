@@ -1,6 +1,15 @@
 [x] Science!
 ============
 
+5.26
+---
+16-Feb-2020 Built agaisnt KSP v1.9.0
+* Merged @IDizor branch
+* Improved Performance
+* Science Threshold Slider
+
+
+
 5.24.1
 ---
 14-Feb-2020 Built agaisnt KSP v1.9.0
