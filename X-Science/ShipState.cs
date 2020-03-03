@@ -239,8 +239,8 @@ namespace ScienceChecklist
 
 		public void MapObjectSelected( object sender, NewSelectionData SelectionData )
 		{
-			_logger.Trace( "MapObjectSelected" );
-			_logger.Trace( SelectionData._selectedObject.type.ToString( ) );
+			//_logger.Trace( "MapObjectSelected" );
+			//_logger.Trace( SelectionData._selectedObject.type.ToString( ) );
 
 			if( !_parent.Config.SelectedObjectWindow )
 				return;

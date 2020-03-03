@@ -1,6 +1,70 @@
 [x] Science!
 ============
 
+5.26
+---
+16-Feb-2020 Built agaisnt KSP v1.9.0
+* Merged @IDizor branch
+* Improved Performance
+* Science Threshold Slider
+
+
+
+5.24.1
+---
+14-Feb-2020 Built agaisnt KSP v1.9.0
+* Min value typo from 1.0.0 to 1.9.0 (9!=0)
+
+
+
+5.24
+---
+14-Feb-2020 Built agaisnt KSP v1.9.0
+* Recompiled for KSP V1.9.0
+
+
+
+5.23
+---
+31-Oct-2019 Built agaisnt KSP v1.8.0
+* .NET Framework updated to 4 from 3
+
+
+
+5.22
+----
+15-May-2019 Built against KSP V1.7.0
+* Optimisations and fixes thanks to @siimav
+* Should now be backwards compatible down until 1.5.0
+
+
+
+5.21
+----
+19-Apr-2019 Built against KSP V1.7.0
+* Recompiled for KSP V1.7.0
+
+
+
+5.20
+----
+23-Feb-2019 Built against KSP V1.6.1
+* Recompiled for KSP V1.6.1
+
+
+
+5.19
+----
+22-Dec-2018 Built against KSP V1.6.0
+* Recompiled for KSP V1.6.0
+
+
+
+5.18
+----
+20-Oct-2018 Built against KSP V1.5.1
+* Recompiled for KSP V1.5.1
+
 
 
 5.17

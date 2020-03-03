@@ -440,7 +440,7 @@ namespace ScienceChecklist {
 						{
 							if( _statusButton != null )
 								_statusButton.SetOn( );
-							ScienceEventHandler.ScheduleExperimentUpdate( );
+							ScienceEventHandler.ScheduleExperimentUpdate(seconds: 0.1f);
 						}
 						else
 						{
@@ -763,7 +763,7 @@ namespace ScienceChecklist {
 //			_logger.Trace( "UpdateChecklistVisibility" );
 			_checklistWindow.IsVisible = NewVisibility;
 			if( _checklistWindow.IsVisible )
-				ScienceEventHandler.ScheduleExperimentUpdate( );
+				ScienceEventHandler.ScheduleExperimentUpdate(seconds: 0.1f);
 		}
 
 
@@ -777,7 +777,7 @@ namespace ScienceChecklist {
 //			_logger.Trace( "UpdateStatusVisibility" );
 			_statusWindow.SetVisible( NewVisibility );
 			if( _statusWindow.IsVisible( ) )
-				ScienceEventHandler.ScheduleExperimentUpdate( );
+				ScienceEventHandler.ScheduleExperimentUpdate(seconds: 0.1f);
 		}
 		
 
@@ -803,7 +803,7 @@ namespace ScienceChecklist {
 		private void HammerMusicMute( )
 		{
 			if( muted )
-				 MusicLogic.SetVolume( 0f );
+				 MusicLogic.SetVolume( 0f, 0f );
 		}
 
 
@@ -835,14 +835,14 @@ namespace ScienceChecklist {
                     oldVolume = GameSettings.MUSIC_VOLUME;
 
                     // Mute the music
-                    MusicLogic.SetVolume(0f);
+                    MusicLogic.SetVolume(0f, 0f);
  //                   _logger.Info("[MusicMute]: Muted music");
                 }
                 // Unmute
                 else
                 {
                     // Set the music volume to what it was before
-                    MusicLogic.SetVolume(oldVolume);
+                    MusicLogic.SetVolume(oldVolume, oldVolume);
  //                   _logger.Info("[MusicMute]: Set music volume to: " + oldVolume);
                 }
 

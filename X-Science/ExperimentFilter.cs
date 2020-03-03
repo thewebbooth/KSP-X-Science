@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
-
+using UnityEngine;
 
 namespace ScienceChecklist {
 	/// <summary>
@@ -104,10 +103,12 @@ namespace ScienceChecklist {
 		/// <summary>
 		/// Recalculates the experiments to be displayed.
 		/// </summary>
-		public void UpdateFilter () {
-			var StartTime = DateTime.Now;
+		public void UpdateFilter ( IList<ModuleScienceExperiment>  DMModuleScienceAnimateGenerics = null )
+        {
+            //var sw = System.Diagnostics.Stopwatch.StartNew();
 //			_logger.Trace("UpdateFilter");
-			var query = _parent.Science.AllScienceInstances.AsEnumerable( );
+
+            var query = _parent.Science.AllScienceInstances.AsEnumerable( );
 			switch (_displayMode) {
 				case DisplayMode.All:
 					break;
@@ -122,9 +123,8 @@ namespace ScienceChecklist {
 					break;
 				default:
 					break;
-			}
-
-			string[] Words = Text.Split(' ');
+			}            
+            string[] Words = Text.Split(' ');
 			for(int x = 0; x < Words.Count(); x++ )
 			{
 				var options = Words[x].Split('|');
@@ -139,13 +139,18 @@ namespace ScienceChecklist {
 					return sci_inst.Description.ToLowerInvariant().Contains(s.ToLowerInvariant()) == !negate;
 				}));
 			}
+            var scienceList = query.ToArray();
+            var onboardData = GetCurrentVesselOnboardData();
 
-			query = query.OrderBy( x => x.TotalScience );
-			TotalCount = query.Count( );
+            foreach (var x in scienceList)
+            {
+                x.NextScienceIncome = GetNextExperimentScience(x, onboardData);
+            }
 
+            scienceList = scienceList.OrderBy( x => x.TotalScience ).ToArray();
+			TotalCount = scienceList.Length;
 
-
-			bool CompleteWithoutRecovery;
+            bool CompleteWithoutRecovery;
 			bool HideCompleteExperiments;
 			if( EnforceLabLanderMode )
 			{
@@ -162,29 +167,89 @@ namespace ScienceChecklist {
 
 			if( CompleteWithoutRecovery ) // Lab lander mode.  Complete is a green bar ( Recovered+OnBoard )
 			{
-				DisplayScienceInstances = query.Where( x => !HideCompleteExperiments || !x.IsCollected ).ToList( );
+				DisplayScienceInstances = scienceList.Where( x => !HideCompleteExperiments || !x.IsCollected && !IsAmountLimitedByDMagic(x, DMModuleScienceAnimateGenerics) ).ToList( );
 
-				IList<ScienceInstance> RemainingExperiments = new List<ScienceInstance>( );
-				RemainingExperiments = query.Where( x => !x.IsCollected ).ToList( );
-				CompleteCount = TotalCount - RemainingExperiments.Count( );
+				var RemainingExperiments = scienceList.Where( x => !x.IsCollected ).ToArray( );
+				CompleteCount = TotalCount - RemainingExperiments.Length;
 				TotalScience = RemainingExperiments.Sum( x => x.TotalScience ) - RemainingExperiments.Sum( x => x.OnboardScience ); ;
 				CompletedScience = RemainingExperiments.Sum( x => x.CompletedScience );
 			}
 			else // Normal mode, must recover/transmit to KSC
 			{
-				DisplayScienceInstances = query.Where( x => !HideCompleteExperiments || !x.IsComplete ).ToList( );
+				DisplayScienceInstances = scienceList.Where( x => !HideCompleteExperiments || !x.IsComplete && !IsAmountLimitedByDMagic(x, DMModuleScienceAnimateGenerics) ).ToList( );
 
-				IList<ScienceInstance> RemainingExperiments = new List<ScienceInstance>( );
-				RemainingExperiments = query.Where( x => !x.IsComplete ).ToList( );
-				CompleteCount = TotalCount - RemainingExperiments.Count( );
+				var RemainingExperiments = scienceList.Where( x => !x.IsComplete ).ToArray( );
+				CompleteCount = TotalCount - RemainingExperiments.Length;
 				TotalScience = RemainingExperiments.Sum( x => x.TotalScience );
 				CompletedScience = RemainingExperiments.Sum( x => x.CompletedScience );
 			}
+            //sw.Stop();
+//			_logger.Trace( $"UpdateFilter Done - {sw.ElapsedMilliseconds}ms" );
+        }
 
 
 
-			var Elapsed = DateTime.Now - StartTime;
-//			_logger.Trace( "UpdateFilter Done - " + Elapsed.ToString( ) + "ms" );
+        private float GetNextExperimentScience(ScienceInstance exp, List<ScienceData> onboardData)
+        {
+            float experimentValue = 0f;
+            var subjectOnboardData = onboardData.Where(d => d.subjectID == exp.ScienceSubject.id).ToArray();
+
+            if (subjectOnboardData.Length == 0)
+            {
+                experimentValue = ResearchAndDevelopment.GetScienceValue(exp.ScienceExperiment.baseValue * exp.ScienceExperiment.dataScale, exp.ScienceSubject)
+                    * HighLogic.CurrentGame.Parameters.Career.ScienceGainMultiplier;
+            }
+            else
+            {
+                experimentValue = ResearchAndDevelopment.GetNextScienceValue(exp.ScienceExperiment.baseValue * exp.ScienceExperiment.dataScale, exp.ScienceSubject)
+                    * HighLogic.CurrentGame.Parameters.Career.ScienceGainMultiplier;
+
+                if (subjectOnboardData.Length > 1)
+                {
+                    experimentValue /= Mathf.Pow(4f, subjectOnboardData.Length - 1);
+                }
+            }
+
+            return experimentValue;
+        }
+
+
+
+        private List<ScienceData> GetCurrentVesselOnboardData()
+        {
+            var foundData = new List<ScienceData>();
+
+            if (FlightGlobals.ActiveVessel != null)
+            {
+                var containers = FlightGlobals.ActiveVessel.FindPartModulesImplementing<IScienceDataContainer>();
+
+                foreach (var container in containers)
+                {
+                    foundData.AddRange(container.GetData());
+                }
+            }
+
+            return foundData;
+        }
+
+
+
+        private bool IsAmountLimitedByDMagic(ScienceInstance x, IList<ModuleScienceExperiment> DMModuleScienceAnimateGenerics)
+		{
+			if (DMModuleScienceAnimateGenerics == null || DMModuleScienceAnimateGenerics.Count == 0)
+				return false;
+			
+			var dmm = DMModuleScienceAnimateGenerics.FirstOrDefault(d => d.experimentID == x.ScienceExperiment.id);
+			if (dmm == null) return false;
+			
+			var f = (float)dmm.Fields.GetValue("totalScienceLevel");
+			if (f == 1f) return false;
+
+			var completedScience = x.ScienceSubject.science * HighLogic.CurrentGame.Parameters.Career.ScienceGainMultiplier;
+			var totalScience = x.ScienceSubject.scienceCap * HighLogic.CurrentGame.Parameters.Career.ScienceGainMultiplier * f;
+			var isComplete = completedScience > totalScience || totalScience - completedScience < 0.1;
+
+			return isComplete;
 		}
 
 

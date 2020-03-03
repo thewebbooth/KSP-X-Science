@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 
 
@@ -31,7 +32,7 @@ namespace ScienceChecklist
 
 
 
-		// Anyone can hook these to get notified
+        // Anyone can hook these to get notified
 			public event EventHandler					FilterUpdateEvent;
 			public event EventHandler					ExperimentUpdateEvent;
 			public event EventHandler					FullUpdateEvent;
@@ -66,7 +67,6 @@ namespace ScienceChecklist
 			GameEvents.onGameStateSave.Add( new EventData<ConfigNode>.OnEvent( this.GameStateSave ) );
 			GameEvents.OnPartPurchased.Add( new EventData<AvailablePart>.OnEvent( this.PartPurchased ) );
 			GameEvents.OnTechnologyResearched.Add( new EventData<GameEvents.HostTargetAction<RDTech, RDTech.OperationResult>>.OnEvent( this.TechnologyResearched ) );
-			GameEvents.OnScienceChanged.Add( new EventData<float, TransactionReasons>.OnEvent( this.ScienceChanged ) );
 			GameEvents.OnScienceRecieved.Add( new EventData<float, ScienceSubject, ProtoVessel, bool>.OnEvent( this.ScienceRecieved ) );
 			GameEvents.onVesselRename.Add( new EventData<GameEvents.HostedFromToAction<Vessel, string>>.OnEvent( this.VesselRename ) );
 			GameEvents.OnKSCFacilityUpgraded.Add( new EventData<Upgradeables.UpgradeableFacility, int>.OnEvent( this.FacilityUpgrade ) );
@@ -86,19 +86,21 @@ namespace ScienceChecklist
 		public void Update( )
 		{
 			UpdateSituation( );
-			UpdateExperiments( );
+            CheckOnboardDataChanges( );
+            UpdateExperiments( );
 			RefreshFilter( );
 		}
 
 
-
-		private int _lastDataCount;
-		private DateTime _nextSituationUpdate = DateTime.Now;
-		public void UpdateSituation( )
+        private int[] _onboardData = new int[] { };
+        private DateTime _nextSituationUpdate = DateTime.Now;
+        private DateTime _nextOnboardDataUpdate = DateTime.Now;
+        
+        public void UpdateSituation( )
 		{
 			if( _nextSituationUpdate < DateTime.Now )
 			{
-				_nextSituationUpdate = DateTime.Now.AddSeconds( 0.5 );
+				_nextSituationUpdate = DateTime.Now.AddSeconds( 0.1 );
 				RecalculateSituation( );
 			}
 		}
@@ -111,7 +113,8 @@ namespace ScienceChecklist
 //_logger.Trace( "RecalculateSituation Start" );
 
 			var vessel = FlightGlobals.ActiveVessel;
-			if( vessel == null )
+
+            if ( vessel == null )
 			{
 				if( _currentSituation != null )
 				{
@@ -122,51 +125,67 @@ namespace ScienceChecklist
 				return;
 			}
 
-			var body = vessel.mainBody;
+			var celestialBody = vessel.mainBody;
 			var situation = ScienceUtil.GetExperimentSituation( vessel );
 
-			var biome = ScienceUtil.GetExperimentBiome( body, vessel.latitude, vessel.longitude );
+			var biome = ScienceUtil.GetExperimentBiome( celestialBody, vessel.latitude, vessel.longitude );
 			var subBiome = string.IsNullOrEmpty( vessel.landedAt )
 				? null
 				: Vessel.GetLandedAtString( vessel.landedAt ).Replace( " ", "" );
-
-			var Parts = vessel.FindPartModulesImplementing<IScienceDataContainer>( );
-			var dataCount = 0;
-			for( var x = 0; x < Parts.Count; x++ )
-				dataCount +=Parts[ x].GetData( ).Length;
-
-			if( _lastDataCount != dataCount )
-			{
-//				_logger.Trace( "Collected new science!" );
-				_lastDataCount = dataCount;
-				ScheduleExperimentUpdate( );
-			}
-
-			if(
+            
+            if (
 				_currentSituation != null &&
 				_currentSituation.Biome == biome &&
 				_currentSituation.ExperimentSituation == situation &&
-				_currentSituation.Body.CelestialBody == body &&
+				_currentSituation.Body.CelestialBody == celestialBody &&
 				_currentSituation.SubBiome == subBiome
 			)
 			{
 				return;
 			}
-			var Body = new Body( body );
-			_currentSituation = new Situation( Body, situation, biome, subBiome );
+
+			var body = new Body( celestialBody );
+			_currentSituation = new Situation( body, situation, biome, subBiome );
 
 			if( SituationChanged != null )
-				SituationChanged( this, new NewSituationData( Body, situation, biome, subBiome ) );
+				SituationChanged( this, new NewSituationData( body, situation, biome, subBiome ) );
 //_logger.Trace( "RecalculateSituation Done" );
 		}
 
 
 
-		private void UpdateExperiments( )
+        private void CheckOnboardDataChanges()
+        {
+            if (_nextOnboardDataUpdate < DateTime.Now)
+            {
+                _nextOnboardDataUpdate = DateTime.MaxValue;
+
+                if (FlightGlobals.ActiveVessel != null)
+                {
+                    int[] newData = FlightGlobals.ActiveVessel.FindPartModulesImplementing<IScienceDataContainer>()
+                        .Select(sdc => sdc.GetData().Length)
+                        .ToArray();
+
+                    if (!Enumerable.SequenceEqual(newData, _onboardData))
+                    {
+                        _onboardData = newData;
+                        ScheduleExperimentUpdate(false, 0.11f);
+                    }
+                }
+
+                _nextOnboardDataUpdate = DateTime.Now.AddSeconds(0.1);
+            }
+        }
+
+
+
+        private void UpdateExperiments( )
 		{
 			if( _nextExperimentUpdate != null && _nextExperimentUpdate.Value < DateTime.Now )
 			{
-				if( _mustDoFullRefresh )
+                _nextExperimentUpdate = null;
+
+                if ( _mustDoFullRefresh )
 				{
 					_parent.Science.Reset( );
 					if( FullUpdateEvent != null )
@@ -178,8 +197,9 @@ namespace ScienceChecklist
 					if( ExperimentUpdateEvent != null )
 						ExperimentUpdateEvent( this, EventArgs.Empty );
 				}
-				_nextExperimentUpdate = null;
-				_mustDoFullRefresh = false;
+
+                
+                _mustDoFullRefresh = false;
 				_filterRefreshPending = true; // Must do a filter change if we updated some science
 			}
 		}
@@ -188,12 +208,12 @@ namespace ScienceChecklist
 
 		private void RefreshFilter( )
 		{
-			if( _filterRefreshPending && DateTime.Now > _nextFilterCheck )
+			if( _filterRefreshPending && _nextFilterCheck < DateTime.Now )
 			{
-				_nextFilterCheck = DateTime.Now.AddSeconds( 0.5 );
+				_filterRefreshPending = false;
 				if( FilterUpdateEvent != null )
 					FilterUpdateEvent( this, EventArgs.Empty );
-				_filterRefreshPending = false;
+				_nextFilterCheck = DateTime.Now.AddSeconds( 0.1 );
 			}
 		}
 
@@ -202,12 +222,13 @@ namespace ScienceChecklist
 		// Schedules a full experiment update in 1 second.
 		// In addition to the events we hook, this is also called bu the parent when
 		// the system has been sleeping and wakes up.  Eg when the window is made visible.
-		public void ScheduleExperimentUpdate( bool FullRefresh = false, int AddTime = 1 )
+		public void ScheduleExperimentUpdate( bool fullRefresh = false, float seconds = 1f )
 		{
-			_nextExperimentUpdate = DateTime.Now.AddSeconds( AddTime );
-			if( FullRefresh )
-				_mustDoFullRefresh = true;
-		}
+			_nextExperimentUpdate = DateTime.Now.AddSeconds( seconds );
+
+            if (fullRefresh)
+                _mustDoFullRefresh = true;
+        }
 
 
 
@@ -251,12 +272,6 @@ namespace ScienceChecklist
 				ScheduleExperimentUpdate( );
 			}
 
-			private void ScienceChanged( float V, TransactionReasons R )
-			{
-//				_logger.Trace( "Callback: ScienceChanged" );
-				ScheduleExperimentUpdate( );
-			}
-
 			private void ScienceRecieved( float V, ScienceSubject S, ProtoVessel P, bool F )
 			{
 //				_logger.Trace( "Callback: ScienceRecieved" );
@@ -297,7 +312,7 @@ namespace ScienceChecklist
 			private void FacilityUpgrade( Upgradeables.UpgradeableFacility Data, int V )
 			{
 //				_logger.Trace( "Callback: KSP Facility Upgraded" );
-				ScheduleExperimentUpdate( true, 5 ); // 5 seconds.  Trying to avoid an exception.  The colliders list gets updated while we are looking at it.
+				ScheduleExperimentUpdate( true, 5f ); // 5 seconds.  Trying to avoid an exception.  The colliders list gets updated while we are looking at it.
 			}
 
 			private void DominantBodyChange( GameEvents.FromToAction<CelestialBody, CelestialBody> Data )

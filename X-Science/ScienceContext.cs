@@ -73,10 +73,11 @@ namespace ScienceChecklist
 				return;
 			UpdateBodies( );
 			UpdateOnboardScience( );
-			UpdateScienceSubjects( );
 			UpdateExperiments( );
 			UpdateKscBiomes( );
 			RefreshExperimentCache( );
+			_scienceSubjects = null;
+			UpdateScienceSubjects( );
 		}
 
 
@@ -151,13 +152,14 @@ namespace ScienceChecklist
 				}
 
 
-
+			// NOTE: The code below causes performance issues and should be disabled by default
 			// Look for science in unloaded vessels.
 			// Don't do debris or already loaded vessels(from routine above)
 			// I was having execptions because something was NULL.
 			// Only happend on a brand-new game, not a load.
 			// This seemed to fix it
-				if( HighLogic.CurrentGame != null && HighLogic.CurrentGame.flightState != null )
+				if( HighLogic.CurrentGame != null && HighLogic.CurrentGame.flightState != null &&
+					_parent.Config.CheckUnloadedVessels)
 				{
 					// Dump all the vessels to a save.
 					var node = new ConfigNode( );
@@ -202,20 +204,31 @@ namespace ScienceChecklist
 
 		private void UpdateScienceSubjects( )
 		{
-//var StartTime = DateTime.Now;
+			//var StartTime = DateTime.Now;
 
-
-
-			var SciSubjects = ( ResearchAndDevelopment.GetSubjects( ) ?? new List<ScienceSubject>( ) );
-			Dictionary<string,ScienceSubject> SciDict = SciSubjects.ToDictionary( p => p.id );
-
-
-
-//_logger.Trace( "Science Subjects contains " + SciSubjects.Count.ToString( ) + " items" );
-//_logger.Trace( "Science Subjects contains " + SciDict.Count.ToString( ) + " items" );
-//var Elapsed = DateTime.Now - StartTime;
-//_logger.Trace( "UpdateScienceSubjects Done - " + Elapsed.ToString( ) + "ms" );
-			_scienceSubjects = SciDict;
+			var SciSubjects = (ResearchAndDevelopment.GetSubjects() ?? new List<ScienceSubject>());
+			if (_scienceSubjects != null)
+			{
+				for (int i = 0; i < SciSubjects.Count; i++)
+				{
+					var subj = SciSubjects[i];
+					ScienceSubject subj2;
+					if (_scienceSubjects.TryGetValue(subj.id, out subj2))
+					{
+						subj2.science = subj.science;
+						subj2.scientificValue = subj.scientificValue;
+					}
+				}
+			}
+			else
+			{
+				_scienceSubjects = SciSubjects.ToDictionary(p => p.id);
+			}
+				
+			//_logger.Trace( "Science Subjects contains " + SciSubjects.Count.ToString( ) + " items" );
+			//_logger.Trace( "Science Subjects contains " + SciDict.Count.ToString( ) + " items" );
+			//var Elapsed = DateTime.Now - StartTime;
+			//_logger.Trace( "UpdateScienceSubjects Done - " + Elapsed.ToString( ) + "ms" );
 		}
 
 
@@ -229,7 +242,17 @@ namespace ScienceChecklist
 			for( int x = 0; x < PartLoader.LoadedPartsList.Count; x++ )
 			{
 				AvailablePart P = PartLoader.LoadedPartsList[ x ];
-				List<ModuleScienceExperiment> Modules = P.partPrefab.FindModulesImplementing<ModuleScienceExperiment>( );
+				List<ModuleScienceExperiment> Modules;
+
+				// In KSP 1.8.0, this can throw a NullReferenceException.
+				try {
+					Modules = P.partPrefab.FindModulesImplementing<ModuleScienceExperiment>( );
+				}
+				catch (NullReferenceException e) {
+					_logger.Info( P.name + " threw NullReferenceException in " + e.TargetSite );
+					continue;
+				}
+
 				for( int y = 0; y < Modules.Count; y++ )
 				{
 					ModuleScienceExperiment Module = Modules[ y ];

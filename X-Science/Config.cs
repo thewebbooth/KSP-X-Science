@@ -19,11 +19,13 @@ namespace ScienceChecklist {
 			private bool _checkDebris;
 			private bool _allFilter;
 			private bool _stopTimeWarp;
+            private float _scienceThreshold;
 			private bool _playNoise;
 			private bool _showResultsWindow;
 			private bool _filterDifficultScience;
 			private float _uiScale;
 			private bool _musicStartsMuted;
+			private bool _checkUnloadedVessels;
 			private bool _righClickMutesMusic;
 			private bool _selectedObjectWindow;
 
@@ -35,6 +37,7 @@ namespace ScienceChecklist {
 			public bool CompleteWithoutRecovery			{ get { return _completeWithoutRecovery; }		set { if( _completeWithoutRecovery != value ) { _completeWithoutRecovery = value; OnCompleteWithoutRecoveryChanged( ); } } }
 			public bool CheckDebris						{ get { return _checkDebris; }					set { if( _checkDebris != value ) { _checkDebris = value; OnCheckDebrisChanged( ); } } }
 			public bool AllFilter						{ get { return _allFilter; }					set { if( _allFilter != value ) { _allFilter = value; OnAllFilterChanged( ); } } }
+            public float ScienceThreshold				{ get { return _scienceThreshold; }				set { if (_scienceThreshold != value) { _scienceThreshold = value; } } }
 			public bool StopTimeWarp					{ get { return _stopTimeWarp; }					set { if( _stopTimeWarp != value ) { _stopTimeWarp = value; OnStopTimeWarpChanged( ); } } }
 			public bool PlayNoise						{ get { return _playNoise; }					set { if( _playNoise != value ) { _playNoise = value; OnPlayNoiseChanged( ); } } }
 			public bool ShowResultsWindow				{ get { return _showResultsWindow; }			set { if( _showResultsWindow != value ) { _showResultsWindow = value; OnShowResultsWindowChanged( ); } } }
@@ -59,6 +62,7 @@ namespace ScienceChecklist {
 				}
 			}
 			public bool SelectedObjectWindow				{ get { return _selectedObjectWindow; }				set { if( _selectedObjectWindow != value ) { _selectedObjectWindow = value; OnSelectedObjectWindowChanged( ); } } }
+			public bool CheckUnloadedVessels				{ get { return _checkUnloadedVessels; }					set { if(_checkUnloadedVessels != value ) { _checkUnloadedVessels = value; OnCheckUnloadedVesselsChanged( ); } } }
 
 
 
@@ -76,6 +80,7 @@ namespace ScienceChecklist {
 			public event EventHandler MusicStartsMutedChanged;
  			public event EventHandler RighClickMutesMusicChanged;
 			public event EventHandler SelectedObjectWindowChanged;
+			public event EventHandler CheckUnloadedVesselsChanged;
 			
 
 
@@ -184,6 +189,14 @@ namespace ScienceChecklist {
 				}
 			}
 
+			private void OnCheckUnloadedVesselsChanged( )
+			{
+				if( CheckUnloadedVesselsChanged != null )
+				{
+					CheckUnloadedVesselsChanged( this, EventArgs.Empty );
+				}
+			}
+
 		public Config( )
 		{
 			_logger = new Logger( this );
@@ -261,12 +274,14 @@ namespace ScienceChecklist {
 			settings.AddValue( "CompleteWithoutRecovery",		_completeWithoutRecovery );
 			settings.AddValue( "CheckDebris",					_checkDebris );
 			settings.AddValue( "AllFilter",						_allFilter );
+            settings.AddValue( "ScienceThreshold",				_scienceThreshold );
 			settings.AddValue( "StopTimeWarp",					_stopTimeWarp );
 			settings.AddValue( "PlayNoise",						_playNoise );
 			settings.AddValue( "ShowResultsWindow",				_showResultsWindow );
 			settings.AddValue( "FilterDifficultScience",		_filterDifficultScience );
 			settings.AddValue( "UiScale",						_uiScale );
 			settings.AddValue( "MusicStartsMuted",				_musicStartsMuted );
+			settings.AddValue( "CheckUnloadedVessels",			_checkUnloadedVessels );
 			settings.AddValue( "RighClickMutesMusic",			_righClickMutesMusic );
 			settings.AddValue( "SelectedObjectWindow",			_selectedObjectWindow );
 
@@ -300,12 +315,14 @@ namespace ScienceChecklist {
 			_completeWithoutRecovery =		false;
 			_checkDebris =					false;
 			_allFilter =					true;
+            _scienceThreshold =             0.1f;
 			_stopTimeWarp =					true;
 			_playNoise =					true;
 			_showResultsWindow =			true;
 			_filterDifficultScience =		true;
 			_uiScale =						1f;
 			_musicStartsMuted =				false;
+			_checkUnloadedVessels =			false;
 			_righClickMutesMusic =			true;
 			_selectedObjectWindow =			true;
 
@@ -343,8 +360,12 @@ namespace ScienceChecklist {
 					V = settings.GetValue( "AllFilter" );
 					if( V != null )
 						_allFilter = bool.Parse( V );
+                    
+                    V = settings.GetValue( "ScienceThreshold" );
+                    if( V != null )
+                        _scienceThreshold = float.Parse( V );
 
-					V = settings.GetValue( "StopTimeWarp" );
+                    V = settings.GetValue( "StopTimeWarp" );
 					if( V != null )
 						_stopTimeWarp = bool.Parse( V );
 
@@ -375,6 +396,10 @@ namespace ScienceChecklist {
 					V = settings.GetValue( "SelectedObjectWindow" );
 					if( V != null )
 						_selectedObjectWindow = bool.Parse( V );
+
+					V = settings.GetValue( "CheckUnloadedVessels" );
+					if( V != null )
+						_checkUnloadedVessels = bool.Parse( V );
 
 
 

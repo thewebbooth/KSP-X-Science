@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ScienceChecklist.Lib.Adds;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -30,14 +31,15 @@ namespace ScienceChecklist
 		private GUIStyle						_experimentButtonStyle;
 		private GUIStyle						_experimentLabelStyle;
 		private GUIStyle						_situationStyle;
-		private GUIStyle						_horizontalScrollbarOnboardStyle;
+		private GUIStyle						_scienceThresholdLabelStyle;
+        private GUIStyle						_horizontalScrollbarOnboardStyle;
 		private GUIStyle						_progressLabelStyle;
 		private	IList<ModuleScienceExperiment>	_moduleScienceExperiments;
 		private IList<ModuleScienceExperiment>	_DMModuleScienceAnimates;
 		private IList<ModuleScienceExperiment>	_DMModuleScienceAnimateGenerics;
 		private Dictionary<string, bool>		_availableScienceExperiments;
 
-		public event EventHandler OnCloseEvent;
+        public event EventHandler OnCloseEvent;
 		public event EventHandler OnOpenEvent;
 
 		public StatusWindow( ScienceChecklistAddon Parent )
@@ -70,14 +72,13 @@ namespace ScienceChecklist
 
 			_parent.ScienceEventHandler.FilterUpdateEvent += ( s, e ) => RefreshFilter( s, e );
 			_parent.ScienceEventHandler.SituationChanged += ( s, e ) => UpdateSituation( s, e );
-			this.Resizable = false;
+
+            this.Resizable = false;
 			_filter.UpdateFilter( );
 			_parent.Config.UiScaleChanged += OnUiScaleChange;
-		}
+        }
 
-
-
-		protected override void ConfigureStyles( )
+        protected override void ConfigureStyles( )
 		{
 			base.ConfigureStyles( );
 
@@ -108,7 +109,13 @@ namespace ScienceChecklist
 					textColor = new Color(0.7f, 0.8f, 0.8f)
 				}
 			};
-			_experimentButtonStyle = new GUIStyle( _skin.button )
+            _scienceThresholdLabelStyle = new GUIStyle(_skin.label)
+            {
+                fontSize = wScale(14),
+                alignment = TextAnchor.MiddleLeft,
+                padding = wScale(new RectOffset(0, 0, -2, 0))
+            };
+            _experimentButtonStyle = new GUIStyle( _skin.button )
 			{
 				fontSize = wScale(14)
 			};
@@ -154,15 +161,43 @@ namespace ScienceChecklist
 					GUILayout.Width(wScale(250))
 				);
 			}
-			int Top = wScale(65);
+
+            GUILayout.Space(wScale(10));
+
+            GUILayout.BeginHorizontal();
+
+            GUILayout.Label("Min Science", _scienceThresholdLabelStyle);
+
+            float prev_scienceThreshold = _parent.Config.ScienceThreshold;
+            float scienceThreshold = Adds.AcceleratedSlider(_parent.Config.ScienceThreshold, 0.1f, 50f, 1.8f, new[] {
+                new Adds.StepRule(0.5f, 10f),
+                new Adds.StepRule(1f, 40f),
+                new Adds.StepRule(2f, 50f),
+            });
+
+            if (prev_scienceThreshold != scienceThreshold)
+            {
+                _parent.Config.ScienceThreshold = scienceThreshold;
+                _parent.Config.Save();
+            }
+
+            GUILayout.Label(_parent.Config.ScienceThreshold.ToString("F1"), _scienceThresholdLabelStyle, GUILayout.Width(wScale(26)));
+
+            GUILayout.EndHorizontal();
+
+            int Top = wScale(90);
 			if( _filter.DisplayScienceInstances != null )
 			{
 				for( var i = 0; i < _filter.DisplayScienceInstances.Count; i++ )
 				{
-					var rect = new Rect(wScale(5), Top, wScale(250), wScale(30));
 					var experiment = _filter.DisplayScienceInstances[ i ];
-					DrawExperiment( experiment, rect );
-					Top += wScale(35);
+                    
+                    if (experiment.NextScienceIncome >= _parent.Config.ScienceThreshold)
+                    {
+                        var rect = new Rect(wScale(5), Top, wScale(250), wScale(30));
+                        DrawExperiment(experiment, rect);
+                        Top += wScale(35);
+                    }
 				}
 			}
 			else
@@ -172,9 +207,10 @@ namespace ScienceChecklist
 
 			if( _filter.DisplayScienceInstances.Count > 0 )
 				GUILayout.Space( wScale( _filter.DisplayScienceInstances.Count * 35 ) ); // Leave space for experiments, as drawn above
-			GUILayout.Space( wScale( 10 ) );
 
-			GUILayout.BeginHorizontal( );
+            GUILayout.Space(wScale(10));
+
+            GUILayout.BeginHorizontal( );
 			GUIContent Content = null;
 			if( _parent.Config.StopTimeWarp )
 				Content = new GUIContent( _GfxTimeWarp, "Time warp will be stopped" );
@@ -293,18 +329,19 @@ namespace ScienceChecklist
 		{
 			bool ExperimentRunnable = CanRunExperiment( exp, true );
 			Rect buttonRect = new Rect(rect) { xMax = wScale(200) };
-			
+            string scienceValueString = " (" + exp.NextScienceIncome.ToString("F1") + ")";
+
 			if( ExperimentRunnable )
 			{
 				_experimentButtonStyle.normal.textColor = exp.IsComplete ? Color.green : Color.yellow;
-				if( GUI.Button( buttonRect, exp.ShortDescription, _experimentButtonStyle ) )
+				if( GUI.Button( buttonRect, exp.ShortDescription + scienceValueString, _experimentButtonStyle ) )
 				{
 					RunExperiment( exp );
 				}
 			}
 			else
 			{
-				GUI.Label( buttonRect, exp.ShortDescription, _experimentLabelStyle );
+				GUI.Label( buttonRect, exp.ShortDescription + scienceValueString, _experimentLabelStyle );
 			}
 			int Dif = (int)(((rect.yMax - rect.yMin) - wScale(13)) / 2);
 			Rect progressRect = new Rect(wScale(205), rect.yMin + Dif, wScale(50), wScale(13));
@@ -313,7 +350,7 @@ namespace ScienceChecklist
 
 
 
-		private void ProgressBar( Rect rect, float curr, float total, float curr2 )
+        private void ProgressBar( Rect rect, float curr, float total, float curr2 )
 		{
 			var completeTexture = _completeTexture;
 			var progressTexture = _progressTexture;
@@ -366,6 +403,11 @@ namespace ScienceChecklist
 		// This is the lightest update used when the vessel changes
 		public void RefreshFilter( object sender, EventArgs e )
 		{
+            if (!IsVisible())
+            {
+                return;
+            }
+
 //			_logger.Trace( "RefreshFilter" );
 
 			if( _moduleScienceExperiments != null )
@@ -389,7 +431,7 @@ namespace ScienceChecklist
 
 
 
-			_filter.UpdateFilter( );
+			_filter.UpdateFilter( _DMModuleScienceAnimateGenerics );
 		}
 
 
@@ -397,6 +439,10 @@ namespace ScienceChecklist
 		// Bung new situation into filter and recalculate everything
 		public void UpdateSituation( object sender, NewSituationData e )
 		{
+            if (!IsVisible())
+            {
+                return;
+            }
 //			_logger.Trace( "UpdateSituation" );
 			if( e == null )
 			{
@@ -404,12 +450,12 @@ namespace ScienceChecklist
 				return;
 			}
 			else
+            {
 				_filter.CurrentSituation = new Situation( e._body, e._situation, e._biome, e._subBiome );
-			RefreshFilter( sender, e );
+            }
 
+			//_logger.Trace( "ScienceThisBiome: " + _filter.TotalCount + " / " + _filter.CompleteCount );
 
-
-			_logger.Trace( "ScienceThisBiome: " + _filter.TotalCount + " / " + _filter.CompleteCount );
 			if( _filter.TotalCount > 0 )
 			{
 				var anyRunnableExperiments = false;
@@ -417,6 +463,11 @@ namespace ScienceChecklist
 				{
 					var experiment = _filter.DisplayScienceInstances[ i ];
 					var Id = experiment.ScienceExperiment.id;
+
+                    if (experiment.NextScienceIncome < _parent.Config.ScienceThreshold)
+                    {
+                        continue;
+                    }
 
 					if( Id == "crewReport" || Id == "surfaceSample" || Id == "evaReport" ) // Always pop UI for Kerbal experiments
 					{
@@ -456,7 +507,20 @@ namespace ScienceChecklist
 			bool IsAvailable = false;
 			if( _availableScienceExperiments.ContainsKey( s.ScienceExperiment.id ) )
 				return _availableScienceExperiments[ s.ScienceExperiment.id ];
-			if( _moduleScienceExperiments != null && _moduleScienceExperiments.Count > 0 )
+
+			IEnumerable<ModuleScienceExperiment> dlm = FindDMAnimateGenericsForExperiment(s.ScienceExperiment.id);
+			if ( dlm != null && dlm.Any() )
+			{
+				DMModuleScienceAnimateGeneric NewDMagicInstance = _parent.DMagic.GetDMModuleScienceAnimateGeneric();
+				IsAvailable = dlm.Any(x =>
+					(int)x.Fields.GetValue("experimentsLimit") > 1 ? NewDMagicInstance.canConduct(x) : NewDMagicInstance.canConduct(x) &&
+					(x.rerunnable || runSingleUse));
+
+				_availableScienceExperiments[s.ScienceExperiment.id] = IsAvailable;
+				return IsAvailable;
+			}
+
+			if ( _moduleScienceExperiments != null && _moduleScienceExperiments.Count > 0 )
 			{
 				IEnumerable<ModuleScienceExperiment> lm = _moduleScienceExperiments.Where(x => (
 					x.experimentID == s.ScienceExperiment.id &&
@@ -494,32 +558,27 @@ namespace ScienceChecklist
 
 		public void RunExperiment(ScienceInstance s, bool runSingleUse = true)
 		{
-			_logger.Trace( "Finding Module for Science Report: " + s.ScienceExperiment.id );
+			//_logger.Trace( "Finding Module for Science Report: " + s.ScienceExperiment.id );
 			ModuleScienceExperiment m = null;
 
 
 
 			// If possible run with DMagic new API
-			if( _DMModuleScienceAnimateGenerics != null && _DMModuleScienceAnimateGenerics.Count > 0)
+			IEnumerable<ModuleScienceExperiment> lm = FindDMAnimateGenericsForExperiment(s.ScienceExperiment.id);
+			if ( lm != null && lm.Any() )
 			{
 				DMModuleScienceAnimateGeneric NewDMagicInstance = _parent.DMagic.GetDMModuleScienceAnimateGeneric( );
-				if( NewDMagicInstance != null )
-				{
-					IEnumerable<ModuleScienceExperiment> lm = _DMModuleScienceAnimateGenerics.Where(x => (
-						x.experimentID == s.ScienceExperiment.id &&
-						!x.Inoperable &&
-						((int)x.Fields.GetValue("experimentLimit") > 1 ? NewDMagicInstance.canConduct(x) : NewDMagicInstance.canConduct(x) && (x.rerunnable || runSingleUse))
-						));
-					if (lm.Count() != 0)
-						m = lm.First();
+				m = lm.FirstOrDefault(x =>
+					(int)x.Fields.GetValue("experimentsLimit") > 1 ? NewDMagicInstance.canConduct(x) : NewDMagicInstance.canConduct(x) && 
+					(x.rerunnable || runSingleUse));
 
-					if (m != null)
-					{
-						_logger.Debug("Running DMModuleScienceAnimateGenerics Experiment " + m.experimentID + " on part " + m.part.partInfo.name);
-						NewDMagicInstance.gatherScienceData( m, !_parent.Config.ShowResultsWindow );
-						return;
-					}
+				if (m != null)
+				{
+					_logger.Debug("Running DMModuleScienceAnimateGenerics Experiment " + m.experimentID + " on part " + m.part.partInfo.name);
+					NewDMagicInstance.gatherScienceData( m, !_parent.Config.ShowResultsWindow );
 				}
+
+				return;
 			}
 
 
@@ -530,19 +589,22 @@ namespace ScienceChecklist
 				DMAPI DMAPIInstance = _parent.DMagic.GetDMAPI( );
 				if( DMAPIInstance != null )
 				{
-					IEnumerable<ModuleScienceExperiment> lm = _DMModuleScienceAnimates.Where(x =>
+					IEnumerable<ModuleScienceExperiment> lm2 = _DMModuleScienceAnimates.Where(x => x.experimentID == s.ScienceExperiment.id);
+					if (lm2.Any())
 					{
-						return x.experimentID == s.ScienceExperiment.id &&
-						!x.Inoperable &&
-						((int)x.Fields.GetValue("experimentLimit") > 1 ? DMAPIInstance.experimentCanConduct(x) : DMAPIInstance.experimentCanConduct(x) && (x.rerunnable || runSingleUse));
-					});
-					if (lm.Count() != 0)
-						m = lm.First();
+						m = lm2.FirstOrDefault(x =>
+						{
+							return !x.Inoperable &&
+							((int)x.Fields.GetValue("experimentLimit") > 1 ? DMAPIInstance.experimentCanConduct(x) : DMAPIInstance.experimentCanConduct(x) && 
+							(x.rerunnable || runSingleUse));
+						});
 
-					if (m != null)
-					{
-						_logger.Trace("Running DMModuleScienceAnimates Experiment " + m.experimentID + " on part " + m.part.partInfo.name);
-						DMAPIInstance.deployDMExperiment( m, !_parent.Config.ShowResultsWindow );
+						if (m != null)
+						{
+							//_logger.Trace("Running DMModuleScienceAnimates Experiment " + m.experimentID + " on part " + m.part.partInfo.name);
+							DMAPIInstance.deployDMExperiment( m, !_parent.Config.ShowResultsWindow );
+						}
+
 						return;
 					}
 				}
@@ -554,7 +616,7 @@ namespace ScienceChecklist
 			m = FindExperiment( s, runSingleUse );
 			if( m != null )
 			{
-				_logger.Trace( "Running Experiment " + m.experimentID + " on part " + m.part.partInfo.name );
+				//_logger.Trace( "Running Experiment " + m.experimentID + " on part " + m.part.partInfo.name );
 				RunStandardModuleScienceExperiment( m );
 				return;
 			}
@@ -584,6 +646,20 @@ namespace ScienceChecklist
 		}
 
 
+
+		public IEnumerable<ModuleScienceExperiment> FindDMAnimateGenericsForExperiment(string experimentId)
+		{
+			if (_DMModuleScienceAnimateGenerics != null && _DMModuleScienceAnimateGenerics.Count > 0)
+			{
+				DMModuleScienceAnimateGeneric NewDMagicInstance = _parent.DMagic.GetDMModuleScienceAnimateGeneric();
+				if (NewDMagicInstance != null)
+				{
+					return _DMModuleScienceAnimateGenerics.Where(x => x.experimentID == experimentId);
+				}
+			}
+
+			return null;
+		}
 
 
 

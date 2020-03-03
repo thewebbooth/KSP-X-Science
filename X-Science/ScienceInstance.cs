@@ -71,10 +71,16 @@ namespace ScienceChecklist {
 		/// Gets the amount of science for this experiment that is currently stored on vessels.
 		/// </summary>
 		public float OnboardScience		{ get; private set; }
-		/// <summary>
-		/// Gets the ScienceSubject containing information on how much science has been retrieved from this experiment.
+
+        /// <summary>
+		/// Amount of science to receice with next experiment.
 		/// </summary>
-		public ScienceSubject ScienceSubject { get; private set; }
+		public float NextScienceIncome = 0f;
+
+        /// <summary>
+        /// Gets the ScienceSubject containing information on how much science has been retrieved from this experiment.
+        /// </summary>
+        public ScienceSubject ScienceSubject { get; private set; }
 
 		/// <summary>
 		/// Gets the human-readable description of this experiment.
@@ -100,11 +106,15 @@ namespace ScienceChecklist {
 		/// <param name="onboardScience">The total onboard ScienceData.</param>
 		public void Update( ScienceContext Sci )
 		{
-			if( Sci.ScienceSubjects.ContainsKey( Id ) )
-				ScienceSubject = Sci.ScienceSubjects[ Id ];
-			else ScienceSubject = new ScienceSubject(ScienceExperiment, Situation.ExperimentSituation, Situation.Body.CelestialBody, Situation.SubBiome ?? Situation.Biome ?? string.Empty);
-
-
+			ScienceSubject tmp;
+			if( Sci.ScienceSubjects.TryGetValue( Id, out tmp ) )
+				ScienceSubject = tmp;
+			else
+			{
+					ScienceSubject = new ScienceSubject(ScienceExperiment, Situation.ExperimentSituation, Situation.Body.CelestialBody, Situation.SubBiome ?? Situation.Biome ?? string.Empty);
+					Sci.ScienceSubjects.Add( Id, ScienceSubject );
+			}
+			
 			IsUnlocked = Sci.UnlockedInstruments.IsUnlocked( ScienceExperiment.id ) && ( Situation.Body.Reached != null );
 
 			CompletedScience = ScienceSubject.science * HighLogic.CurrentGame.Parameters.Career.ScienceGainMultiplier;
