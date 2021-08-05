@@ -108,13 +108,18 @@ namespace ScienceChecklist {
         /// </summary>
         /// <param name="biome">The biome to be converted.</param>
         /// <returns>The human-readable form of the biome.</returns>
-        private string BiomeToString(CelestialBody body, string biome) {
-            string stringBiome = Regex.Replace(biome ?? string.Empty, "((?<=[a-z])[A-Z]|[A-Z](?=[a-z]))", " $1").Replace("  ", " ").Trim();
-            if (!string.IsNullOrEmpty(stringBiome))
+        private string BiomeToString(CelestialBody body, string biome)
+		{
+			if (string.IsNullOrEmpty(biome))
             {
-                stringBiome = ScienceUtil.GetBiomedisplayName(body, stringBiome);
-            } 
-            return stringBiome;
+				return string.Empty;
+            }
+			string stringBiome = biome.Replace("  ", " ").Trim();
+			if (!string.IsNullOrEmpty(stringBiome))
+			{
+				stringBiome = ScienceUtil.GetBiomedisplayName(body, stringBiome);
+			}
+			return stringBiome;
 		}
 
 		private readonly Body				  _body;
