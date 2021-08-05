@@ -21,8 +21,8 @@ namespace ScienceChecklist {
 			_situation = situation;
 			_biome = biome;
 			_subBiome = subBiome;
-			_formattedBiome = BiomeToString(_biome);
-			_formattedSubBiome = BiomeToString(_subBiome);
+			_formattedBiome = BiomeToString(body.CelestialBody, _biome);
+			_formattedSubBiome = BiomeToString(body.CelestialBody, _subBiome);
 			_description = string.Format("{0} {1}{2}",
 				ToString(_situation),
 				GameHelper.LocalizeBodyName( Body.CelestialBody.displayName ),
@@ -103,13 +103,23 @@ namespace ScienceChecklist {
 			}
 		}
 
-		/// <summary>
-		/// Converts a biome to a human-readable representation.
-		/// </summary>
-		/// <param name="biome">The biome to be converted.</param>
-		/// <returns>The human-readable form of the biome.</returns>
-		private string BiomeToString (string biome) {
-			return Regex.Replace(biome ?? string.Empty, "((?<=[a-z])[A-Z]|[A-Z](?=[a-z]))", " $1").Replace("  ", " ").Trim();
+        /// <summary>
+        /// Converts a biome to a human-readable representation.
+        /// </summary>
+        /// <param name="biome">The biome to be converted.</param>
+        /// <returns>The human-readable form of the biome.</returns>
+        private string BiomeToString(CelestialBody body, string biome)
+		{
+			if (string.IsNullOrEmpty(biome))
+            {
+				return string.Empty;
+            }
+			string stringBiome = biome.Replace("  ", " ").Trim();
+			if (!string.IsNullOrEmpty(stringBiome))
+			{
+				stringBiome = ScienceUtil.GetBiomedisplayName(body, stringBiome);
+			}
+			return stringBiome;
 		}
 
 		private readonly Body				  _body;
